@@ -46,6 +46,6 @@ jobs:
 
       - name: Run Unit Tests
         working-directory: src/provisioning
-        run: go test
+        run: go test ./...
 
 
