@@ -2,6 +2,7 @@ name: Code Checking
 on:
   pull_request:
     branches: [dev]
+    paths: [./src/frontend]
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -25,4 +26,4 @@ jobs:
         working-directory: ./src/frontend/hosting
       - name: Check formatting with Prettier
         working-directory: ./src/frontend/hosting  # Run Prettier in the same directory
-        run: npx prettier --check "**/*.{js,ts,css,html}"
+        run: npx prettier --check "**/*.{ts,tsx,js,md,mdx,css,yaml,html,svelte}"
