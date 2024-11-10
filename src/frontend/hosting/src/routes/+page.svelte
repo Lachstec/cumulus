@@ -1,6 +1,7 @@
 <script>
   import { Alert } from "flowbite-svelte";
   import { Img } from "flowbite-svelte";
+
 </script>
 
 <h1>Welcome to SvelteKit</h1>
@@ -13,4 +14,5 @@
   <div class="mx-auto mt-4">
     <Img src="/images/dausend.jpg" alt="sample 1" />
   </div>
+
 </div>

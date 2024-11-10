@@ -34,4 +34,3 @@
     </FooterIcon>
   </FooterLinkGroup>
 </Footer>
-h-screen
