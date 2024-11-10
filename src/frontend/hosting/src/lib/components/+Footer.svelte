@@ -22,7 +22,7 @@
   <FooterCopyright href="/" by="Bogus Bingus" year={2024} />
   <FooterLinkGroup
     ulClass="flex flex-wrap items-center mt-3 text-sm text-gray-500 dark:text-gray-400 sm:mt-0">
-    <FooterLink href="/">About</FooterLink>
+    <FooterLink href="/about">About</FooterLink>
     <FooterLink href="/">Privacy Policy</FooterLink>
     <FooterLink href="/">Contact</FooterLink>
     <FooterIcon href="https://github.com/Lachstec/mc-hosting">
@@ -34,3 +34,4 @@
     </FooterIcon>
   </FooterLinkGroup>
 </Footer>
+h-screen
