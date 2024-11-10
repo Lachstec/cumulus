@@ -4,6 +4,8 @@ import (
 	"errors"
 	"github.com/golang-migrate/migrate"
 	"github.com/golang-migrate/migrate/database/postgres"
+	_ "github.com/golang-migrate/migrate/source/file"
+	_ "github.com/jackc/pgx/v5/stdlib" // Importing pgx for the driver
 	"github.com/jmoiron/sqlx"
 )
 
@@ -22,20 +24,24 @@ func NewMigrator(db *sqlx.DB) *Migrator {
 	return &Migrator{db}
 }
 
-// migrate applies all migrations in the migrations directory.
-func (m *Migrator) migrate() error {
+// Migrate applies all migrations in the migrations directory.
+func (m *Migrator) Migrate() error {
+	// Using pgx with the "postgres" driver from golang-migrate
 	pg, err := postgres.WithInstance(m.DB.DB, &postgres.Config{})
 	if err != nil {
 		return err
 	}
+
+	// Ensure that we're using the correct driver
 	migrations, err := migrate.NewWithDatabaseInstance(
-		"file://migrations",
-		"postgres",
+		"file://migrations", // Path to migration files
+		"postgres",          // Use "postgres" as the driver name
 		pg)
 	if err != nil {
 		return err
 	}
 
+	// Apply migrations
 	err = migrations.Up()
 	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
 		return err
