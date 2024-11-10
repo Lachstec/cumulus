@@ -1,3 +1,5 @@
+BEGIN;
+
 -- Create a new Schema for the service
 CREATE SCHEMA IF NOT EXISTS mch_provisioner;
 
@@ -35,3 +37,5 @@ CREATE TABLE mch_provisioner.world_backups(
     timestamp TIMESTAMP,                                                -- Timestamp of creation
     size INTEGER                                                        -- Size of the backup in bytes
 );
+
+COMMIT;
