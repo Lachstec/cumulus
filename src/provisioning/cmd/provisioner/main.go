@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	cfg := config.LoadConfig("config.json")
+	cfg := config.LoadConfig(".env")
 	s, err := sqlx.Open("pgx", cfg.Db.ConnectionURI())
 	if err != nil {
 		panic(err)
