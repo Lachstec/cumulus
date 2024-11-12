@@ -24,12 +24,10 @@ type Config struct {
 // DB_PORT: port for the database (default: 5432)
 // DB_USER: username for the database (default: postgres)
 // DB_PASS: password for the database (default: postgres)
-func LoadConfig(path string) *Config {
-	if _, err := os.Stat(path); err == nil {
-		err = godotenv.Load(path)
-		if err != nil {
-			log.Fatalf(".env file is present but failed to read: %v", err)
-		}
+func LoadConfig() *Config {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf(".env file is present but failed to read: %v", err)
 	}
 
 	cfg := &Config{
