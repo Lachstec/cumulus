@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/joho/godotenv"
+	"log"
 	"os"
 )
 
@@ -24,7 +25,10 @@ type Config struct {
 // DB_USER: username for the database (default: postgres)
 // DB_PASS: password for the database (default: postgres)
 func LoadConfig() *Config {
-	_ = godotenv.Load()
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("No .env file found. Using Fallback values")
+	}
 
 	cfg := &Config{
 		Db: DbConfig{
