@@ -2,7 +2,6 @@ package config
 
 import (
 	"github.com/joho/godotenv"
-	"log"
 	"os"
 )
 
@@ -25,10 +24,7 @@ type Config struct {
 // DB_USER: username for the database (default: postgres)
 // DB_PASS: password for the database (default: postgres)
 func LoadConfig() *Config {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf(".env file is present but failed to read: %v", err)
-	}
+	_ = godotenv.Load()
 
 	cfg := &Config{
 		Db: DbConfig{
