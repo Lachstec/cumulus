@@ -1,7 +1,8 @@
 package config
 
 import (
-	"encoding/json"
+	"github.com/joho/godotenv"
+	"log"
 	"os"
 )
 
@@ -12,28 +13,41 @@ type Config struct {
 	Db DbConfig
 }
 
-// LoadConfig loads the config from the file at given path.
-// File is expected to be in JSON format. When an error occurs,
-// this function panics as config is mandatory for the service to work.
+// LoadConfig loads the application configuration.
+//
+// It first checks if a .env file is available and loads it if so, overriding possibly set
+// environment variables. If it is not present, it simply reads the set environment
+// variables, supplying a default value if one should not be present.
+// Expected variables:
+//
+// DB_HOST: hostname for the database (default: localhost)
+// DB_PORT: port for the database (default: 5432)
+// DB_USER: username for the database (default: postgres)
+// DB_PASS: password for the database (default: postgres)
 func LoadConfig(path string) *Config {
-	file, err := os.Open(path)
-	if err != nil {
-		panic("Failed to open config file. aborting.")
-	}
-
-	defer func(file *os.File) {
-		err := file.Close()
+	if _, err := os.Stat(path); err == nil {
+		err = godotenv.Load(path)
 		if err != nil {
-			panic("Unexpected error when closing file")
+			log.Fatalf(".env file is present but failed to read: %v", err)
 		}
-	}(file)
-
-	decoder := json.NewDecoder(file)
-	config := Config{}
-	err = decoder.Decode(&config)
-	if err != nil {
-		panic("Invalid config file format")
 	}
 
-	return &config
+	cfg := &Config{
+		Db: DbConfig{
+			Host:     getEnv("DB_HOST", "localhost"),
+			Port:     getEnv("DB_PORT", "5432"),
+			User:     getEnv("DB_USER", "postgres"),
+			Password: getEnv("DB_PASS", "postgres"),
+		},
+	}
+	return cfg
+}
+
+// getEnv looks if an environment variable with the name key exists,
+// returning it if so, else, the fallback is returned.
+func getEnv(key string, fallback string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	return fallback
 }
