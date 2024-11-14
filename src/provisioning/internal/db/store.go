@@ -14,7 +14,7 @@ type Store[T any] interface {
 	GetById(id int64) (T, error)
 
 	// Find returns all records in the store where predicate is true.
-	Find(predicate Predicate[T]) (T, error)
+	Find(predicate Predicate[T]) ([]T, error)
 
 	// Add persists a given type T to the underlying data store.
 	Add(T) (T, error)
