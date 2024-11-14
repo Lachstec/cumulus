@@ -19,18 +19,18 @@
       <img
         src="/images/logo.png"
         class="me-3 h-6 sm:h-9"
-        alt="Bepis Hosting Logo" />
+        alt="Hosting Logo" />
       <span
         class="self-center whitespace-nowrap text-xl font-semibold dark:text-white"
-        >Bepis Hosting</span>
+        >MC-Hosting</span>
     </NavBrand>
     <div class="flex items-center md:order-2">
-      <Avatar id="avatar-menu" src="/images/example-profile.jpg" />
+      <Avatar id="avatar-menu" src="/images/example-profile.png" />
       <NavHamburger class1="w-full md:flex md:w-auto md:order-1" />
     </div>
     <Dropdown placement="bottom" triggeredBy="#avatar-menu">
       <DropdownHeader>
-        <span class="block text-sm">Bogus Bepis</span>
+        <span class="block text-sm">Beep Boop</span>
         <span class="block truncate text-sm font-medium">name@example.com</span>
       </DropdownHeader>
       <DropdownItem>Dashboard</DropdownItem>
