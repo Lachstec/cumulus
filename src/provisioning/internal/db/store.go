@@ -1,7 +1,5 @@
 package db
 
-import "github.com/google/uuid"
-
 // Predicate represents a search constraint
 // in order to filter rows returned by the database.
 // The Predicate should return true if a value T should
@@ -13,7 +11,7 @@ type Predicate[T any] func(T) bool
 type Store[T any] interface {
 	// GetById searches the data store for a record with the given id.
 	// If a record was not found, the return value will be nil.
-	GetById(id uuid.UUID) (T, error)
+	GetById(id int64) (T, error)
 
 	// Find returns all records in the store where predicate is true.
 	Find(predicate Predicate[T]) (T, error)
