@@ -1,5 +1,7 @@
 package types
 
+import "net"
+
 type ServerStatus string
 
 const (
@@ -29,6 +31,7 @@ const (
 type Server struct {
 	Id               int
 	Name             string
+	Address          net.IPNet
 	Status           ServerStatus
 	Port             int
 	Memory           int
