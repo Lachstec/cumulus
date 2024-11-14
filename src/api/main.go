@@ -7,7 +7,7 @@ import (
 ) 
 
 func genericEndpoint(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, "Not implemented yet")
+	c.IndentedJSON(http.StatusOK, "Not implemented yet") 
 }
 
 func getServersByUserID(c *gin.Context) {
