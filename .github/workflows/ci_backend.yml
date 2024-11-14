@@ -38,7 +38,7 @@ jobs:
 
       - name: Install Dependencies
         working-directory: src/provisioning
-        run: go get .
+        run: go mod download
 
       - name: Build Service
         working-directory: src/provisioning
