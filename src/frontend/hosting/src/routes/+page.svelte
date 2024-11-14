@@ -1,5 +1,6 @@
 <script>
   import { Alert } from "flowbite-svelte";
+  import { Img } from "flowbite-svelte";
 </script>
 
 <h1>Welcome to SvelteKit</h1>
@@ -8,9 +9,8 @@
   documentation
 </p>
 
-<div class="p-6">
-  <Alert>
-    <span class="font-medium">Info alert!</span>
-    Confused Unga Bunga
-  </Alert>
+<div class="flex items-stretch mt-4 p-8 bg-white dark:bg-gray-900 h-screen">
+  <div class="mx-auto mt-4">
+    <Img src="/images/landing_image_01.png" alt="picture 1" />
+  </div>
 </div>
