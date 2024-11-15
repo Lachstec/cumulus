@@ -4,7 +4,6 @@
   import "../app.css";
 </script>
 
-
 <Navbar></Navbar>
 <slot></slot>
 <Footer></Footer>

@@ -1,12 +1,6 @@
 <script>
-  import {
-    Navbar,
-    NavBrand,
-    NavLi,
-    NavUl,
-  } from "flowbite-svelte";
-    import Useritem from "./+Useritem.svelte";
-
+  import { Navbar, NavBrand, NavLi, NavUl } from "flowbite-svelte";
+  import Useritem from "./+Useritem.svelte";
 </script>
 
 <div class="relative px-8">
