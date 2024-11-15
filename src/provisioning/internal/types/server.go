@@ -29,7 +29,7 @@ const (
 )
 
 type Server struct {
-	Id               int
+	Id               int64
 	Name             string
 	Address          net.IPNet
 	Status           ServerStatus
