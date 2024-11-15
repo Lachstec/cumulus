@@ -17,7 +17,6 @@
         class="self-center whitespace-nowrap text-xl font-semibold dark:text-white"
         >MC-Hosting</span>
     </NavBrand>
-    <Useritem></Useritem>
     <NavUl>
       <NavLi href="/" active={true}>Home</NavLi>
       <NavLi href="/servers">Server</NavLi>
@@ -25,5 +24,6 @@
       <NavLi href="/pricing">Pricing</NavLi>
       <NavLi href="/contact">Contact</NavLi>
     </NavUl>
+    <Useritem></Useritem>
   </Navbar>
 </div>

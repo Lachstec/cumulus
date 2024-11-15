@@ -27,5 +27,8 @@ go.work.sum
 # Intellij-related stuff
 .idea/
 
-#Auth
+# Auth
 auth_config.js
+
+# Remove act (used for local testing of github workflows)
+act

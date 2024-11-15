@@ -4,7 +4,7 @@
     import { get } from 'svelte/store';
     // @ts-ignore
     import auth from "../auth_service";
-    import { isAuthenticated, user } from "../store";
+    import { isAuthenticated, user } from "$lib/store/stores";
   
     // @ts-ignore
     let auth0Client;
@@ -19,6 +19,7 @@
       isAuthenticated.set(await auth0Client.isAuthenticated());
       user.set(await auth0Client.getUser());
       console.log(get(isAuthenticated))
+      console.log(get(user))
     });
   
     function login() {
