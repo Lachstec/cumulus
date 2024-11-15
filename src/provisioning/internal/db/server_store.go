@@ -70,8 +70,7 @@ func (s *ServerStore) Add(server types.Server) (types.Server, error) {
 
 func (s *ServerStore) Update(server types.Server) (types.Server, error) {
 	_, err := s.db.Exec(
-		"UPDATE mch_provisioner.servers SET (id, addr, status, port, memory_mb, game, game_version, game_mode, difficulty, whitelist_enabled, players_max) WHERE id = ? VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
-		server.Id,
+		"UPDATE mch_provisioner.servers SET id = ?, addr = ?, status = ?, port = ?, memory_mb = ?, game = ?, game_version = ?, game_mode = ?, difficulty = ?, whitelist_enabled = ?, players_max = ? WHERE id = ?;",
 		server.Id,
 		server.Address,
 		server.Status,
@@ -83,6 +82,7 @@ func (s *ServerStore) Update(server types.Server) (types.Server, error) {
 		server.Difficulty,
 		server.WhitelistEnabled,
 		server.PlayersMax,
+		server.Id,
 	)
 	if err != nil {
 		return types.Server{}, err
