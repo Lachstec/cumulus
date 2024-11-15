@@ -3,7 +3,7 @@
     import { onMount } from "svelte";
     import { get } from 'svelte/store';
     // @ts-ignore
-    import auth from "../auth_service";
+    import auth from "$lib/service/auth_service";
     import { isAuthenticated, user } from "$lib/store/stores";
   
     // @ts-ignore
@@ -19,7 +19,8 @@
       isAuthenticated.set(await auth0Client.isAuthenticated());
       user.set(await auth0Client.getUser());
       console.log(get(isAuthenticated))
-      console.log(get(user))
+      const userData = await auth0Client.getUser();
+      console.log(userData)
     });
   
     function login() {
