@@ -1,5 +1,5 @@
 import { Auth0Client, createAuth0Client, type Auth0ClientOptions, type PopupLoginOptions } from "@auth0/auth0-spa-js";
-import { user, isAuthenticated, popupOpen } from '$lib/store/stores';
+import { user, isAuthenticated, popupOpen } from '$lib/store/auth_store';
 import config from "$lib/config/auth_config";
 
 async function createClient() {

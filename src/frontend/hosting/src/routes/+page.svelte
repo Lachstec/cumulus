@@ -4,7 +4,7 @@
     import { get } from 'svelte/store';
     // @ts-ignore
     import auth from "$lib/service/auth_service";
-    import { isAuthenticated, user } from "$lib/store/stores";
+    import { isAuthenticated, user } from "$lib/store/auth_store";
   
     // @ts-ignore
     let auth0Client;
