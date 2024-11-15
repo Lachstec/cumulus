@@ -26,3 +26,6 @@ go.work.sum
 
 # Intellij-related stuff
 .idea/
+
+#Auth
+auth_config.js
