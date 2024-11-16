@@ -23,6 +23,7 @@
 
     isAuthenticated.set(await auth0Client.isAuthenticated());
     user.set(await auth0Client.getUser());
+    console.log("cookie");
   });
 
   async function login() {
@@ -53,7 +54,7 @@
       <span class="block truncate text-sm font-medium">{$user?.email}</span>
     </DropdownHeader>
     <DropdownItem>Dashboard</DropdownItem>
-    <DropdownItem>Settings</DropdownItem>
+    <DropdownItem href="/user/1">Settings</DropdownItem>
     <DropdownItem href="/user/1/servers">My Servers</DropdownItem>
     <DropdownDivider />
     <DropdownItem
