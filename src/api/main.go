@@ -54,7 +54,7 @@ func genericHandler(c *gin.Context) {
 				switch
 				{
 					case method == "GET":
-						serverid := urlParamConverter(c, c.Param("serverid")) - 1
+						serverid := urlParamToInteger(c, c.Param("serverid")) - 1
 						if serverid <= len(Data.Servers) {
 							c.IndentedJSON(http.StatusOK, Data.Servers[serverid])
 						} else {
