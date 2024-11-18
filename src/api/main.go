@@ -19,7 +19,7 @@ func getServersByUserID(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, fmt.Sprintf("Not implemented / given userID: %s",  c.Param("userID")))
 }
 
-func urlParamConverter(c *gin.Context, param string) int {
+func urlParamToInteger(c *gin.Context, param string) int {
 	i, err := strconv.Atoi(param)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest,err)
