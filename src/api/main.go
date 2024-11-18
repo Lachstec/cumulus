@@ -2,10 +2,12 @@ package main
 
 import (
 	Data "data"
+	"strconv"
 
 	"fmt"
-	"strings"
 	"net/http"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 ) 
 
@@ -17,6 +19,15 @@ func getServersByUserID(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, fmt.Sprintf("Not implemented / given userID: %s",  c.Param("userID")))
 }
 
+func urlParamConverter(c *gin.Context, param string) int {
+	i, err := strconv.Atoi(param)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest,err)
+		panic(err)
+	}
+	return i
+}
+
 func genericHandler(c *gin.Context) {
 	
 	path := strings.Split(strings.TrimPrefix(c.Request.URL.Path, "/"), "/")
@@ -24,7 +35,7 @@ func genericHandler(c *gin.Context) {
 	switch 
 	{
 		case path[0] == "servers":
-			if(len(path) == 1) {
+			if len(path) == 1 {
 				switch  
 				{
 					case method == "GET":
@@ -37,10 +48,23 @@ func genericHandler(c *gin.Context) {
 							return
 						}
 						Data.Servers = append(Data.Servers, server)
+						c.JSON(http.StatusCreated,"")
 				}
-
-			} else if (path[1] == "test"){
-				c.IndentedJSON(http.StatusOK, "Bepis")
+			} else {
+				switch
+				{
+					case method == "GET":
+						serverid := urlParamConverter(c, c.Param("serverid")) - 1
+						if serverid <= len(Data.Servers) {
+							c.IndentedJSON(http.StatusOK, Data.Servers[serverid])
+						} else {
+							c.AbortWithStatus(http.StatusNotFound)
+						}
+					case method == "POST":
+					case method == "PUT":
+					case method == "PATCH":
+					case method == "DELETE":
+				}
 			}
 		case path[0] == "users":
 
@@ -67,13 +91,13 @@ func main() {
 	router.GET("/servers", genericHandler)
 	router.POST("/servers", genericHandler)
 
-	router.GET("/server/:serverID", genericEndpoint)
-	router.POST("/server/:serverID", genericEndpoint)
-	router.PUT("/server/:serverID", genericEndpoint)
-	router.PATCH("/server/:serverID", genericEndpoint)
-	router.DELETE("/server/:serverID", genericEndpoint)
+	router.GET("/servers/:serverid", genericHandler)
+	router.POST("/servers/:serverid", genericEndpoint)
+	router.PUT("/servers/:serverid", genericEndpoint)
+	router.PATCH("/servers/:serverid", genericEndpoint)
+	router.DELETE("/servers/:serverid", genericEndpoint)
 
-	router.GET("/server/:serverID/health", genericEndpoint)
+	router.GET("/servers/:serverid/health", genericEndpoint)
 
     router.Run("localhost:10000")
 }
