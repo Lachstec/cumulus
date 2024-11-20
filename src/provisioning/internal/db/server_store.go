@@ -14,7 +14,7 @@ func NewServerStore(db *sqlx.DB) *ServerStore {
 }
 
 func (s *ServerStore) GetById(id int64) (types.Server, error) {
-	row := s.db.QueryRowx("SELECT * FROM mch_provisioner.servers WHERE id = ?;", id)
+	row := s.db.QueryRowx("SELECT * FROM mch_provisioner.servers WHERE id = $1;", id)
 	var server types.Server
 	err := row.StructScan(&server)
 
@@ -47,11 +47,12 @@ func (s *ServerStore) Find(predicate Predicate[types.Server]) ([]types.Server, e
 	return servers, nil
 }
 
-func (s *ServerStore) Add(server types.Server) (types.Server, error) {
-	_, err := s.db.Exec(
-		"INSERT INTO mch_provisioner.servers (id, addr, status, port, memory_mb, game, game_version, game_mode, difficulty, whitelist_enabled, players_max) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
-		server.Id,
-		server.Address,
+func (s *ServerStore) Add(server types.Server) (int64, error) {
+	var id int64
+	err := s.db.QueryRowx(
+		"INSERT INTO mch_provisioner.servers (name, addr, status, port, memory_mb, game, game_version, game_mode, difficulty, whitelist_enabled, players_max) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id;",
+		server.Name,
+		server.Address.String(),
 		server.Status,
 		server.Port,
 		server.Memory,
@@ -61,17 +62,16 @@ func (s *ServerStore) Add(server types.Server) (types.Server, error) {
 		server.Difficulty,
 		server.WhitelistEnabled,
 		server.PlayersMax,
-	)
+	).Scan(&id)
 	if err != nil {
-		return types.Server{}, err
+		return 0, err
 	}
-	return server, nil
+	return id, nil
 }
 
 func (s *ServerStore) Update(server types.Server) (types.Server, error) {
 	_, err := s.db.Exec(
-		"UPDATE mch_provisioner.servers SET id = ?, addr = ?, status = ?, port = ?, memory_mb = ?, game = ?, game_version = ?, game_mode = ?, difficulty = ?, whitelist_enabled = ?, players_max = ? WHERE id = ?;",
-		server.Id,
+		"UPDATE mch_provisioner.servers SET name = $1, addr = $2, status = $3, port = $4, memory_mb = $5, game = $6, game_version = $7, game_mode = $8, difficulty = $9, whitelist_enabled = $10, players_max = $11 WHERE id = $12;",
 		server.Address,
 		server.Status,
 		server.Port,
@@ -91,7 +91,7 @@ func (s *ServerStore) Update(server types.Server) (types.Server, error) {
 }
 
 func (s *ServerStore) Delete(server types.Server) error {
-	_, err := s.db.Exec("DELETE FROM mch_provisioner.servers WHERE id = ?", server.Id)
+	_, err := s.db.Exec("DELETE FROM mch_provisioner.servers WHERE id = $1", server.Id)
 	if err != nil {
 		return err
 	}
