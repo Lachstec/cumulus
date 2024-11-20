@@ -14,7 +14,7 @@ func NewServerBackupStore(db sqlx.DB) *ServerBackupStore {
 }
 
 func (b *ServerBackupStore) GetById(id int64) (types.Backup, error) {
-	row := b.db.QueryRowx("SELECT * FROM mch_provisioner.world_backups WHERE id=?", id)
+	row := b.db.QueryRowx("SELECT * FROM mch_provisioner.world_backups WHERE id=$1", id)
 	var backup types.Backup
 	err := row.StructScan(&backup)
 
@@ -47,25 +47,25 @@ func (b *ServerBackupStore) Find(predicate Predicate[types.Backup]) ([]types.Bac
 	return backups, nil
 }
 
-func (b *ServerBackupStore) Add(backup types.Backup) (types.Backup, error) {
-	_, err := b.db.Exec("INSERT INTO mch_provisioner.world_backups (id, server_id, world, game, timestamp, size) VALUES (?, ?, ?, ?, ?, ?)",
-		backup.Id,
+func (b *ServerBackupStore) Add(backup types.Backup) (int64, error) {
+	var id int64
+	err := b.db.QueryRowx("INSERT INTO mch_provisioner.world_backups (server_id, world, game, timestamp, size) VALUES ($1, $2, $3, $4, $5)",
 		backup.ServerId,
 		backup.World,
 		backup.Game,
 		backup.Timestamp,
 		backup.Size,
 		backup.Id,
-	)
+	).Scan(&id)
 	if err != nil {
-		return types.Backup{}, err
+		return 0, err
 	}
 
-	return backup, nil
+	return id, nil
 }
 
 func (b *ServerBackupStore) Update(backup types.Backup) (types.Backup, error) {
-	_, err := b.db.Exec("UPDATE mch_provisioner.world_backups SET id = ?, server_id = ?, world = ?, game = ?, timestamp = ?, size = ? WHERE id = ?",
+	_, err := b.db.Exec("UPDATE mch_provisioner.world_backups SET server_id = $1, world = $2, game = $3, timestamp = $4, size = $5 WHERE id = $6",
 		backup.Id,
 		backup.ServerId,
 		backup.World,
@@ -83,7 +83,7 @@ func (b *ServerBackupStore) Update(backup types.Backup) (types.Backup, error) {
 }
 
 func (b *ServerBackupStore) Delete(backup types.Backup) error {
-	_, err := b.db.Exec("DELETE FROM mch_provisioner.world_backups WHERE id=?", backup.Id)
+	_, err := b.db.Exec("DELETE FROM mch_provisioner.world_backups WHERE id = $1", backup.Id)
 	if err != nil {
 		return err
 	}
