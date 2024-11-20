@@ -17,7 +17,7 @@ type Store[T any] interface {
 	Find(predicate Predicate[T]) ([]T, error)
 
 	// Add persists a given type T to the underlying data store.
-	Add(T) (T, error)
+	Add(T) (int64, error)
 
 	// Update changes the stored record if it exists, else it gets inserted.
 	Update(T) (T, error)
