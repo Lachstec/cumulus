@@ -6,6 +6,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"net"
 	"testing"
+	"time"
 )
 
 type TestConnection struct {
@@ -28,7 +29,8 @@ func NewTestConnection() *TestConnection {
 
 func TestServerStore(t *testing.T) {
 	db := NewTestConnection()
-	store := NewServerStore(db.Db)
+	serverStore := NewServerStore(db.Db)
+	backupStore := NewServerBackupStore(db.Db)
 
 	server := types.Server{
 		Id:               0,
@@ -45,21 +47,59 @@ func TestServerStore(t *testing.T) {
 		PlayersMax:       2,
 	}
 
-	id, err := store.Add(server)
+	id, err := serverStore.Add(server)
 	if err != nil {
 		t.Fatalf("unable to save server: %s", err)
 	}
 
-	inserted, err := store.GetById(id)
+	inserted, err := serverStore.GetById(id)
 	if err != nil {
 		t.Fatalf("unable to get inserted server from database: %s", err)
 	}
 
 	cmp.Equal(server, inserted)
 
+	backup := types.Backup{
+		Id:        0,
+		ServerId:  inserted.Id,
+		World:     "Nether",
+		Game:      "Minecraft",
+		Timestamp: time.Now(),
+		Size:      4096,
+	}
+
+	backupId, err := backupStore.Add(backup)
+	if err != nil {
+		t.Fatalf("unable to save backup: %s", err)
+	}
+
+	insertedBackup, err := backupStore.GetById(backupId)
+
+	if err != nil {
+		t.Fatalf("unable to get inserted backup from database: %s", err)
+	}
+
+	cmp.Equal(insertedBackup, backup)
+
+	insertedBackup.Game = "Minecraft 2.0 - Electric Boogaloo"
+	updatedBackup, err := backupStore.Update(insertedBackup)
+
+	if err != nil {
+		t.Fatalf("unable to update backup: %s", err)
+	}
+
+	if updatedBackup.Game != "Minecraft 2.0 - Electric Boogaloo" {
+		t.Fatalf("expected game to be Minecraft 2.0 - Electric Boogaloo but got %s", updatedBackup.Game)
+	}
+
+	err = backupStore.Delete(updatedBackup)
+	if err != nil {
+		t.Fatalf("unable to delete backup: %s", err)
+	}
+
 	inserted.Name = "This is a new name!"
 
-	updated, err := store.Update(inserted)
+	updated, err := serverStore.Update(inserted)
 
 	if err != nil {
 		t.Fatalf("unable to update server: %s", err)
@@ -72,14 +112,14 @@ func TestServerStore(t *testing.T) {
 		t.Fatalf("expected name to be 'This is a new name!', got %s", updated.Name)
 	}
 
-	find, err := store.Find(func(s types.Server) bool { return s.Id == updated.Id })
+	find, err := serverStore.Find(func(s types.Server) bool { return s.Id == updated.Id })
 	if err != nil {
 		t.Fatalf("unable to find server: %s", err)
 	}
 
 	cmp.Equal(find[0], updated)
 
-	err = store.Delete(find[0])
+	err = serverStore.Delete(find[0])
 	if err != nil {
 		t.Fatalf("unable to delete server: %s", err)
 	}
