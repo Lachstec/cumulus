@@ -5,27 +5,27 @@ import "net"
 type ServerStatus string
 
 const (
-	Running    ServerStatus = "running"
-	Stopped    ServerStatus = "stopped"
-	Restarting ServerStatus = "restarting"
+	Running    ServerStatus = "running"    //nolint:all
+	Stopped    ServerStatus = "stopped"    //nolint:all
+	Restarting ServerStatus = "restarting" //nolint:all
 )
 
 type GameMode string
 
 const (
-	Creative  GameMode = "creative"
-	Survival  GameMode = "survival"
-	Adventure GameMode = "peaceful"
-	Hardcore  GameMode = "hardcore"
+	Creative  GameMode = "creative" //nolint:all
+	Survival  GameMode = "survival" //nolint:all
+	Adventure GameMode = "peaceful" //nolint:all
+	Hardcore  GameMode = "hardcore" //nolint:all
 )
 
 type Difficulty string
 
 const (
-	Peaceful Difficulty = "peaceful"
-	Easy     Difficulty = "easy"
-	Normal   Difficulty = "normal"
-	Hard     Difficulty = "hard"
+	Peaceful Difficulty = "peaceful" //nolint:all
+	Easy     Difficulty = "easy"     //nolint:all
+	Normal   Difficulty = "normal"   //nolint:all
+	Hard     Difficulty = "hard"     //nolint:all
 )
 
 type Server struct {
