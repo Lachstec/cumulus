@@ -70,8 +70,10 @@ func (s *ServerStore) Add(server types.Server) (int64, error) {
 }
 
 func (s *ServerStore) Update(server types.Server) (types.Server, error) {
-	_, err := s.db.Exec(
-		"UPDATE mch_provisioner.servers SET name = $1, addr = $2, status = $3, port = $4, memory_mb = $5, game = $6, game_version = $7, game_mode = $8, difficulty = $9, whitelist_enabled = $10, players_max = $11 WHERE id = $12;",
+	var updated types.Server
+	err := s.db.QueryRowx(
+		"UPDATE mch_provisioner.servers SET name = $1, addr = $2, status = $3, port = $4, memory_mb = $5, game = $6, game_version = $7, game_mode = $8, difficulty = $9, whitelist_enabled = $10, players_max = $11 WHERE id = $12 RETURNING *;",
+		server.Name,
 		server.Address,
 		server.Status,
 		server.Port,
@@ -83,11 +85,11 @@ func (s *ServerStore) Update(server types.Server) (types.Server, error) {
 		server.WhitelistEnabled,
 		server.PlayersMax,
 		server.Id,
-	)
+	).StructScan(&updated)
 	if err != nil {
 		return types.Server{}, err
 	}
-	return server, nil
+	return updated, nil
 }
 
 func (s *ServerStore) Delete(server types.Server) error {
