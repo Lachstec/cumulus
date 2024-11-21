@@ -6,10 +6,10 @@ import (
 )
 
 type ServerBackupStore struct {
-	db sqlx.DB
+	db *sqlx.DB
 }
 
-func NewServerBackupStore(db sqlx.DB) *ServerBackupStore {
+func NewServerBackupStore(db *sqlx.DB) *ServerBackupStore {
 	return &ServerBackupStore{db: db}
 }
 
@@ -49,13 +49,12 @@ func (b *ServerBackupStore) Find(predicate Predicate[types.Backup]) ([]types.Bac
 
 func (b *ServerBackupStore) Add(backup types.Backup) (int64, error) {
 	var id int64
-	err := b.db.QueryRowx("INSERT INTO mch_provisioner.world_backups (server_id, world, game, timestamp, size) VALUES ($1, $2, $3, $4, $5)",
+	err := b.db.QueryRowx("INSERT INTO mch_provisioner.world_backups (server_id, world, game, timestamp, size) VALUES ($1, $2, $3, $4, $5) RETURNING id;",
 		backup.ServerId,
 		backup.World,
 		backup.Game,
 		backup.Timestamp,
 		backup.Size,
-		backup.Id,
 	).Scan(&id)
 	if err != nil {
 		return 0, err
@@ -66,7 +65,6 @@ func (b *ServerBackupStore) Add(backup types.Backup) (int64, error) {
 
 func (b *ServerBackupStore) Update(backup types.Backup) (types.Backup, error) {
 	_, err := b.db.Exec("UPDATE mch_provisioner.world_backups SET server_id = $1, world = $2, game = $3, timestamp = $4, size = $5 WHERE id = $6",
-		backup.Id,
 		backup.ServerId,
 		backup.World,
 		backup.Game,
