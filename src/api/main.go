@@ -2,8 +2,9 @@ package main
 
 import (
 	Data "data"
+	Services "services"
+	
 	"strconv"
-
 	"fmt"
 	"net/http"
 	"strings"
@@ -39,31 +40,50 @@ func genericHandler(c *gin.Context) {
 				switch  
 				{
 					case method == "GET":
-						c.IndentedJSON(http.StatusOK, Data.Servers)
+						c.JSON(http.StatusOK, Services.ReadAllServers())
 					case method == "POST":
 						var server Data.Server
-						server.ID = len(Data.Servers) + 1
+						server.ID = Services.ReadNumOfServers() + 1
 						if err:=c.BindJSON(&server);err!=nil{
 							c.AbortWithError(http.StatusBadRequest,err)
 							return
 						}
-						Data.Servers = append(Data.Servers, server)
-						c.JSON(http.StatusCreated,"")
+						Services.CreateServer(server)
+						c.Status(http.StatusCreated)
 				}
 			} else {
+				serverid := urlParamToInteger(c, c.Param("serverid")) - 1
 				switch
 				{
 					case method == "GET":
-						serverid := urlParamToInteger(c, c.Param("serverid")) - 1
-						if serverid <= len(Data.Servers) {
-							c.IndentedJSON(http.StatusOK, Data.Servers[serverid])
+						if serverid <= Services.ReadNumOfServers() {
+							c.JSON(http.StatusOK, Services.ReadServerByServerID(serverid))
 						} else {
 							c.AbortWithStatus(http.StatusNotFound)
 						}
 					case method == "POST":
+						c.JSON(http.StatusOK, "Starting servers is not implemented yet")
 					case method == "PUT":
+						c.JSON(http.StatusOK, "Shutting down servers is not implemented yet")
 					case method == "PATCH":
+						var server Data.Server
+						if serverid <= Services.ReadNumOfServers() {
+							if err:=c.BindJSON(&server);err!=nil{
+								c.AbortWithError(http.StatusBadRequest,err)
+								return
+							}
+							//hier Service.UpdateServer aufrufen und den vorhandenen Server mit dem neuen Server updaten
+							c.JSON(http.StatusOK, server)
+						} else {
+							c.AbortWithStatus(http.StatusBadRequest)
+						}
 					case method == "DELETE":
+						if serverid <= Services.ReadNumOfServers() {
+							Services.DeleteServerByServerID(serverid)
+						} else {
+							c.AbortWithStatus(http.StatusBadRequest)
+						}
+						c.Status(http.StatusNoContent)
 				}
 			}
 		case path[0] == "users":
@@ -92,12 +112,14 @@ func main() {
 	router.POST("/servers", genericHandler)
 
 	router.GET("/servers/:serverid", genericHandler)
-	router.POST("/servers/:serverid", genericEndpoint)
-	router.PUT("/servers/:serverid", genericEndpoint)
-	router.PATCH("/servers/:serverid", genericEndpoint)
-	router.DELETE("/servers/:serverid", genericEndpoint)
+	router.POST("/servers/:serverid", genericHandler)
+	router.PUT("/servers/:serverid", genericHandler)
+	router.PATCH("/servers/:serverid", genericHandler)
+	router.DELETE("/servers/:serverid", genericHandler)
 
 	router.GET("/servers/:serverid/health", genericEndpoint)
+
+	router.GET("/teapot", func(c *gin.Context) { c.Status(http.StatusTeapot) })
 
     router.Run("localhost:10000")
 }
