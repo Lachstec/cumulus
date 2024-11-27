@@ -23,3 +23,12 @@ func CreateServer(server Data.Server) {
 func DeleteServerByServerID(serverid int) {
 	Data.Servers = append(Data.Servers[:serverid], Data.Servers[serverid + 1:]...)
 }
+
+func UpdateServer(serverid int, server Data.Server) {
+	switch {
+		case server.Name != "":
+			Data.Servers[serverid].Name = server.Name
+		case server.Difficulty != "":
+			Data.Servers[serverid].Difficulty = server.Difficulty
+	}
+} 
