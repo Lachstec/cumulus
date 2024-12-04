@@ -5,7 +5,6 @@ import (
 	Services "services"
 	
 	"strconv"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -14,10 +13,6 @@ import (
 
 func genericEndpoint(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, "Not implemented yet") 
-}
-
-func getServersByUserID(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, fmt.Sprintf("Not implemented / given userID: %s",  c.Param("userID")))
 }
 
 func urlParamToInteger(c *gin.Context, param string) int {
@@ -91,6 +86,57 @@ func genericHandler(c *gin.Context) {
 				}
 			}
 		case path[0] == "users":
+			if len(path) == 1 {
+				switch  
+				{
+					case method == "GET":
+						c.JSON(http.StatusOK, Services.ReadAllUsers())
+					case method == "POST":
+						var user Data.User
+						user.ID = Services.ReadNumOfUsers() + 1
+						if err:=c.BindJSON(&user);err!=nil{
+							c.AbortWithError(http.StatusBadRequest,err)
+							return
+						}
+						Services.CreateUser(user)
+						c.Status(http.StatusCreated)
+				}
+			} else {
+				userid := urlParamToInteger(c, c.Param("userid")) - 1
+				if len(path) == 3 {
+					//c.JSON(http.StatusOK, "Healthcheck is not implemented yet")
+				} else {
+					switch
+					{
+						// TODO else auslagern und vorher checken
+						case method == "GET":
+							if userid <= Services.ReadNumOfUsers() {
+								c.JSON(http.StatusOK, Services.ReadUserByUserID(userid))
+							} else {
+								c.AbortWithStatus(http.StatusNotFound)
+							}
+						case method == "PATCH":
+							var user Data.User
+							if userid <= Services.ReadNumOfUsers() {
+								if err:=c.BindJSON(&user);err!=nil{
+									c.AbortWithError(http.StatusBadRequest,err)
+									return
+								}
+								Services.UpdateUser(userid, user)
+								c.JSON(http.StatusOK, Services.ReadUserByUserID(userid))
+							} else {
+								c.AbortWithStatus(http.StatusBadRequest)
+							}
+						case method == "DELETE":
+							if userid <= Services.ReadNumOfUsers() {
+								Services.DeleteUserByUserID(userid)
+							} else {
+								c.AbortWithStatus(http.StatusBadRequest)
+							}
+							c.Status(http.StatusNoContent)
+					}
+				}
+			}
 
 		default:
 			break
@@ -100,17 +146,21 @@ func genericHandler(c *gin.Context) {
 
 func main() {
 	router := gin.Default()
-	
-	router.GET("/users/:userID/servers", getServersByUserID)
 
-	router.GET("/users/:userID", genericEndpoint)
-	router.PATCH("/users/:userID", genericEndpoint)
-	router.DELETE("/users/:userID", genericEndpoint)
+	// users
+	router.GET("/users", genericHandler)
+	router.POST("/users", genericHandler)
 
-	router.GET("/users", genericEndpoint)
-	router.POST("/users", genericEndpoint)
+	// users/:userid
+	router.GET("/users/:userid", genericHandler)
+	router.PATCH("/users/:userid", genericHandler)
+	router.DELETE("/users/:userid", genericHandler)
 
-	router.POST("/login", genericEndpoint)
+	// users/:userid/servers
+	router.GET("/users/:userid/servers", genericEndpoint)
+
+	// self -> // return user by checking bearer token
+	router.GET("/self", genericEndpoint)
 
 	// servers
 	router.GET("/servers", genericHandler)
@@ -124,7 +174,7 @@ func main() {
 	router.DELETE("/servers/:serverid", genericHandler)
 
 	// servers/:serverid/health
-	router.GET("/servers/:serverid/health", genericEndpoint)
+	router.GET("/servers/:serverid/health", genericHandler)
 
 	// teapot
 	router.GET("/teapot", func(c *gin.Context) { c.Status(http.StatusTeapot) })
