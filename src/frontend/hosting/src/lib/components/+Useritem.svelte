@@ -23,7 +23,6 @@
 
     isAuthenticated.set(await auth0Client.checkSession());
     user.set(await auth0Client.getUser());
-
   });
 
   async function login() {
@@ -41,15 +40,16 @@
   async function getToken() {
     try {
       const token = await auth0Client.getTokenSilently();
-      console.log('Token:', token);
+      console.log("Token:", token);
     } catch (error) {
-      console.error('Error getting token:', error);
+      console.error("Error getting token:", error);
     }
   }
 
   const authStatus = $isAuthenticated;
   const userData = $user;
 </script>
+
 <button on:click={getToken}>Get Token</button>
 {#if $isAuthenticated}
   <div class="flex items-center space-x-4" id="user-menu">
