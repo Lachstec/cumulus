@@ -53,37 +53,41 @@ func genericHandler(c *gin.Context) {
 				}
 			} else {
 				serverid := urlParamToInteger(c, c.Param("serverid")) - 1
-				switch
-				{
-					case method == "GET":
-						if serverid <= Services.ReadNumOfServers() {
-							c.JSON(http.StatusOK, Services.ReadServerByServerID(serverid))
-						} else {
-							c.AbortWithStatus(http.StatusNotFound)
-						}
-					case method == "POST":
-						c.JSON(http.StatusOK, "Starting servers is not implemented yet")
-					case method == "PUT":
-						c.JSON(http.StatusOK, "Shutting down servers is not implemented yet")
-					case method == "PATCH":
-						var server Data.Server
-						if serverid <= Services.ReadNumOfServers() {
-							if err:=c.BindJSON(&server);err!=nil{
-								c.AbortWithError(http.StatusBadRequest,err)
-								return
+				if len(path) == 3 {
+					c.JSON(http.StatusOK, "Healthcheck is not implemented yet")
+				} else {
+					switch
+					{
+						case method == "GET":
+							if serverid <= Services.ReadNumOfServers() {
+								c.JSON(http.StatusOK, Services.ReadServerByServerID(serverid))
+							} else {
+								c.AbortWithStatus(http.StatusNotFound)
 							}
-							//hier Service.UpdateServer aufrufen und den vorhandenen Server mit dem neuen Server updaten
-							c.JSON(http.StatusOK, server)
-						} else {
-							c.AbortWithStatus(http.StatusBadRequest)
-						}
-					case method == "DELETE":
-						if serverid <= Services.ReadNumOfServers() {
-							Services.DeleteServerByServerID(serverid)
-						} else {
-							c.AbortWithStatus(http.StatusBadRequest)
-						}
-						c.Status(http.StatusNoContent)
+						case method == "POST":
+							c.JSON(http.StatusOK, "Starting servers is not implemented yet")
+						case method == "PUT":
+							c.JSON(http.StatusOK, "Shutting down servers is not implemented yet")
+						case method == "PATCH":
+							var server Data.Server
+							if serverid <= Services.ReadNumOfServers() {
+								if err:=c.BindJSON(&server);err!=nil{
+									c.AbortWithError(http.StatusBadRequest,err)
+									return
+								}
+								Services.UpdateServer(serverid, server)
+								c.JSON(http.StatusOK, Services.ReadServerByServerID(serverid))
+							} else {
+								c.AbortWithStatus(http.StatusBadRequest)
+							}
+						case method == "DELETE":
+							if serverid <= Services.ReadNumOfServers() {
+								Services.DeleteServerByServerID(serverid)
+							} else {
+								c.AbortWithStatus(http.StatusBadRequest)
+							}
+							c.Status(http.StatusNoContent)
+					}
 				}
 			}
 		case path[0] == "users":
@@ -108,18 +112,23 @@ func main() {
 
 	router.POST("/login", genericEndpoint)
 
+	// servers
 	router.GET("/servers", genericHandler)
 	router.POST("/servers", genericHandler)
 
+	// servers/:serverid
 	router.GET("/servers/:serverid", genericHandler)
 	router.POST("/servers/:serverid", genericHandler)
 	router.PUT("/servers/:serverid", genericHandler)
 	router.PATCH("/servers/:serverid", genericHandler)
 	router.DELETE("/servers/:serverid", genericHandler)
 
+	// servers/:serverid/health
 	router.GET("/servers/:serverid/health", genericEndpoint)
 
+	// teapot
 	router.GET("/teapot", func(c *gin.Context) { c.Status(http.StatusTeapot) })
 
+	// run webserver
     router.Run("localhost:10000")
 }

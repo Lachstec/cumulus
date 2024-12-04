@@ -30,5 +30,15 @@ func UpdateServer(serverid int, server Data.Server) {
 			Data.Servers[serverid].Name = server.Name
 		case server.Difficulty != "":
 			Data.Servers[serverid].Difficulty = server.Difficulty
+		case server.IP != "":
+			Data.Servers[serverid].IP = server.IP
+		case server.MaxPlayers != 0:
+			Data.Servers[serverid].MaxPlayers  = server.MaxPlayers
+		case server.Mode != "":
+			Data.Servers[serverid].Mode = server.Mode
+		case server.PvP != "":
+			Data.Servers[serverid].PvP = server.PvP
+		case server.Version != "":
+			Data.Servers[serverid].Version = server.Version
 	}
 } 

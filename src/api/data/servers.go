@@ -8,7 +8,7 @@ type Server struct {
 	Mode string `json:"mode"`
 	Difficulty string `json:"difficulty"`
 	MaxPlayers int `json:"maxplayers"`
-	PvP bool `json:"pvp"`
+	PvP string `json:"pvp"`
 }
 
 var Servers []Server
@@ -23,7 +23,7 @@ func init() {
 			Mode: "Survival",
 			Difficulty: "Hard",
 			MaxPlayers: 20,
-			PvP: true,
+			PvP: "true",
 		  },
 		  {
 			ID: 2,
@@ -33,7 +33,7 @@ func init() {
 			Mode: "Adventure",
 			Difficulty: "Normal",
 			MaxPlayers: 15,
-			PvP: false,
+			PvP: "false",
 		  },
 		  {
 			ID: 3,
@@ -43,7 +43,7 @@ func init() {
 			Mode: "Creative",
 			Difficulty: "Peaceful",
 			MaxPlayers: 25,
-			PvP: false,
+			PvP: "false",
 		  },
 		  {
 			ID: 4,
@@ -53,7 +53,7 @@ func init() {
 			Mode: "Survival",
 			Difficulty: "Normal",
 			MaxPlayers: 30,
-			PvP: true,
+			PvP: "true",
 		  },
 		  {
 			ID: 5,
@@ -63,7 +63,7 @@ func init() {
 			Mode: "Adventure",
 			Difficulty: "Easy",
 			MaxPlayers: 10,
-			PvP: false,
+			PvP: "false",
 		  },
 		  {
 			ID: 6,
@@ -73,7 +73,7 @@ func init() {
 			Mode: "Survival",
 			Difficulty: "Hard",
 			MaxPlayers: 5,
-			PvP: true,
+			PvP: "true",
 		  },
 		  {
 			ID: 7,
@@ -83,7 +83,7 @@ func init() {
 			Mode: "Creative",
 			Difficulty: "Normal",
 			MaxPlayers: 15,
-			PvP: false,
+			PvP: "false",
 		  },
 		  {
 			ID: 8,
@@ -93,7 +93,7 @@ func init() {
 			Mode: "Adventure",
 			Difficulty: "Normal",
 			MaxPlayers: 25,
-			PvP: true,
+			PvP: "true",
 		  },
 		  {
 			ID: 9,
@@ -103,7 +103,7 @@ func init() {
 			Mode: "Survival",
 			Difficulty: "Peaceful",
 			MaxPlayers: 12,
-			PvP: false,
+			PvP: "false",
 		  },
 		  {
 			ID: 10,
@@ -113,7 +113,7 @@ func init() {
 			Mode: "Adventure",
 			Difficulty: "Hard",
 			MaxPlayers: 20,
-			PvP: true,
+			PvP: "true",
 		  },
 	}
 }
