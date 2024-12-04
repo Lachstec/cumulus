@@ -15,14 +15,15 @@ CREATE TYPE game_mode AS ENUM ('creative', 'adventure', 'survival', 'hardcore');
 -- Server table representing gameservers
 CREATE TABLE mch_provisioner.servers(
     id SERIAL PRIMARY KEY,         -- id of the server
+    name VARCHAR(256) NOT NULL,    -- Name of the Server
     addr INET,                     -- IP-Address of the server
     status server_status NOT NULL, -- Current Server Status
     port INTEGER NOT NULL,         -- Port the Server is listening on
     memory_mb INTEGER NOT NULL,    -- Amount of RAM the Server has
     game VARCHAR(128),             -- Which game this server is for
     game_version VARCHAR(128),     -- Which game version is running
-    game_mode game_mode,        -- Which game mod is currently active
-    difficulty difficulty,       -- Game difficulty
+    game_mode game_mode,           -- Which game mod is currently active
+    difficulty difficulty,         -- Game difficulty
     whitelist_enabled BOOLEAN,     -- Whether the whitelist is enabled
     players_max INTEGER            -- How many Players are allowed
 );

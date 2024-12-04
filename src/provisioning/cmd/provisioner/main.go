@@ -16,7 +16,7 @@ func main() {
 	}
 	mig := db.NewMigrator(s)
 
-	err = mig.Migrate()
+	err = mig.Migrate("../../migrations")
 	if err != nil {
 		panic(err)
 	}
