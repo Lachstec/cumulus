@@ -21,9 +21,9 @@
 
     auth0Client = await auth.createClient();
 
-    isAuthenticated.set(await auth0Client.isAuthenticated());
+    isAuthenticated.set(await auth0Client.checkSession());
     user.set(await auth0Client.getUser());
-    console.log("cookie");
+
   });
 
   async function login() {
@@ -38,10 +38,19 @@
     user.set(null); // Reset user data
   }
 
+  async function getToken() {
+    try {
+      const token = await auth0Client.getTokenSilently();
+      console.log('Token:', token);
+    } catch (error) {
+      console.error('Error getting token:', error);
+    }
+  }
+
   const authStatus = $isAuthenticated;
   const userData = $user;
 </script>
-
+<button on:click={getToken}>Get Token</button>
 {#if $isAuthenticated}
   <div class="flex items-center space-x-4" id="user-menu">
     <Avatar src={$user?.picture} />

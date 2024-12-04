@@ -14,7 +14,6 @@
     <NavUl>
       <NavLi href="/" active={true}>Home</NavLi>
       <NavLi href="/user/1/servers">Server</NavLi>
-      <NavLi href="/docs/components/navbar">Navbar</NavLi>
       <NavLi href="/pricing">Pricing</NavLi>
       <NavLi href="/contact">Contact</NavLi>
     </NavUl>
