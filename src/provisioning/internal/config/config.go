@@ -13,6 +13,8 @@ type Config struct {
 	// Db configuration to access the primary database
 	Db    DbConfig
 	Auth0 Auth0Config
+	// Openstack configuration to connect to an openstack cluster.
+	Openstack OpenStackConfig
 }
 
 // LoadConfig loads the application configuration.
@@ -47,6 +49,12 @@ func LoadConfig() *Config {
 		},
 		Auth0: Auth0Config{
 			Url: *auth0,
+		},
+		Openstack: OpenStackConfig{
+			identityEndpoint: getEnv("OPENSTACK_IDENTITY_ENDPOINT", "http://localhost"),
+			username:         getEnv("OPENSTACK_USER", "osuser"),
+			password:         getEnv("OPENSTACK_PASS", "ospassword"),
+			tenantId:         getEnv("OPENSTACK_TENANT_ID", "osp"),
 		},
 	}
 	return cfg
