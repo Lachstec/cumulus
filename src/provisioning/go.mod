@@ -5,6 +5,7 @@ go 1.23.3
 require (
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/google/go-cmp v0.6.0
+	github.com/gophercloud/gophercloud/v2 v2.2.0
 	github.com/jackc/pgx/v5 v5.7.1
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/joho/godotenv v1.5.1
