@@ -29,6 +29,10 @@ type Config struct {
 // DB_USER: username for the database (default: postgres)
 // DB_PASS: password for the database (default: postgres)
 // AUTH0_URL: URL to the Auth0 Userinfo endpoint (default: http://localhost)
+// OPENSTACK_IDENTITY_ENDPOINT: Keystone URL of the openstack cluster (default: http://localhost)
+// OPENSTACK_USER: Username for openstack (default: osuser)
+// OPENSTACK_PASS: Password for openstack (default: ospassword)
+// OPENSTACK_TENANT_ID: TenantID for openstack (default: osp)
 func LoadConfig() *Config {
 	err := godotenv.Load()
 	if err != nil {
