@@ -2,11 +2,11 @@
 FROM golang:1.23-alpine AS build
 
 WORKDIR /app
-COPY go.mod ./
+COPY . .
 RUN go mod download
+RUN go mod verify
 
-COPY *.go ./
-RUN go build -o /provisioner
+RUN CGO_ENABLED=0 GOOS=linux go build -o /provisioner ./cmd/provisioner
 
 # Stage 2: Deploy to a minimal scratch container
 FROM scratch
