@@ -29,8 +29,12 @@ func (c *ServerService) ReadAllServers() ([]types.Server,error) {
 	return servers,nil
 }
 
-func ReadServerByServerID(serverid int) types.Server {
-	return types.Servers[serverid]
+func (c *ServerService)ReadServerByServerID(serverid int64) ([]types.Server,error) {
+	server, err := c.store.Find(func (s types.Server) bool { return s.ID == serverid})
+	if err != nil {
+		return nil,err
+	}
+	return server,nil
 }
 
 func CreateServer(server types.Server) {
