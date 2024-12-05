@@ -9,7 +9,7 @@ type ServerStore struct {
 	db *sqlx.DB
 }
 
-func NewServerStore(db *sqlx.DB) *ServerStore {
+func NewServerStore(db *sqlx.DB) Store[types.Server] {
 	return &ServerStore{db: db}
 }
 
