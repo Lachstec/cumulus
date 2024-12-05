@@ -15,7 +15,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-func db_init() {
+func db_init() *sqlx.DB {
 	cfg := config.LoadConfig()
 	s, err := sqlx.Open("pgx", cfg.Db.ConnectionURI())
 	if err != nil {
@@ -29,6 +29,7 @@ func db_init() {
 	}
 
 	fmt.Println("typesbase schema has been created")
+	return s
 }
 
 func genericEndpoint(c *gin.Context) {
@@ -162,7 +163,10 @@ func genericHandler(c *gin.Context) {
 func main() {
 
 	// initialize the database
-	db_init()
+	db := db_init()
+
+	// initialize the services
+	server_service := services.NewServerService(db)
 
 	// initialize the router
 	router := gin.Default()
@@ -183,7 +187,14 @@ func main() {
 	router.GET("/self", genericEndpoint)
 
 	// servers
-	router.GET("/servers", genericHandler)
+	router.GET("/servers", func (c *gin.Context) {
+		servers, err := server_service.ReadAllServers()
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+		} else {
+			c.JSON(http.StatusOK, servers)
+		}
+	})
 	router.POST("/servers", genericHandler)
 
 	// servers/:serverid

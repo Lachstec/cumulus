@@ -1,15 +1,32 @@
 package services
 
 import (
+	"github.com/Lachstec/mc-hosting/internal/db"
 	"github.com/Lachstec/mc-hosting/internal/types"
+	"github.com/jmoiron/sqlx"
 )
+
+type ServerService struct {
+	store *db.ServerStore
+}
+
+func NewServerService(conn *sqlx.DB) *ServerService {
+	return &ServerService{
+		store: db.NewServerStore(conn),
+	}
+}
 
 func ReadNumOfServers() int {
 	return len(types.Servers)
 }
 
-func ReadAllServers() []types.Server {
-	return types.Servers
+func (c *ServerService) ReadAllServers() ([]types.Server,error) {
+
+	servers,err := c.store.Find(func(s types.Server) bool { return true })
+	if err != nil {
+		return nil,err
+	}
+	return servers,nil
 }
 
 func ReadServerByServerID(serverid int) types.Server {
