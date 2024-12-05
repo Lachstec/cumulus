@@ -187,7 +187,7 @@ func main() {
 	router.GET("/self", genericEndpoint)
 
 	// servers
-	router.GET("/servers", func (c *gin.Context) {
+	router.GET("/servers", func(c *gin.Context) {
 		servers, err := server_service.ReadAllServers()
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
