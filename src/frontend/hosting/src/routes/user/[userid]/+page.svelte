@@ -5,43 +5,50 @@
 
     let { data }: { data: PageData } = $props();
 
-    let popupModal = false;
+    let showModal = $state(false);
+    let isButtonEnabled = $state(false);
+    let timer = $state(5);
 
-    let buttonDeleteDisabled = true;
-    let counter = 5;
+    function startTimer() {
+        isButtonEnabled = false;
+        timer = 5;
 
-    function trigger() {
-        buttonDeleteDisabled = true;
-        counter = 5;
-        timeout();
+        const countdown = setInterval(() => {
+            timer--;
+            if (timer <= 0) {
+                clearInterval(countdown);
+                isButtonEnabled = true;
+            }
+        }, 1000);
     }
-    function timeout() {
-        if (--counter > 0) return setTimeout(timeout, 1000);
-        buttonDeleteDisabled = false;
-        console.log(buttonDeleteDisabled);
+
+    function openModal() {
+        showModal = true;
+        startTimer();
     }
-    //$: if (popupModal) {
-    //    trigger();
-    //}
+
+    function closeModal() {
+        showModal = false;
+    }
 </script>
 
 <div class="p-8 mt-16 bg-white dark:bg-gray-900 h-screen">
     <h1>{data.name}</h1>
     <div>{@html data.role}</div>
-    <Button on:click={() => (popupModal = true)} color="red">Delete Account</Button>
+    <Button on:click={openModal} color="red">Delete Account</Button>
 </div>
 
-<Modal bind:open={popupModal} size="xs" autoclose>
+<Modal bind:open={showModal} on:close={closeModal} size="xs" autoclose>
     <div class="text-center">
         <ExclamationCircleOutline
                 class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200" />
         <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
             Are you sure you want to delete your account?
         </h3>
-        {#if counter > 0}
-            <p class="mb-5">Please wait for: {counter}s</p>
+        {#if timer > 0}
+            <p class="mb-5">Please wait for: {timer}s</p>
         {/if}
-        <Button color="red" class="me-2" disabled={buttonDeleteDisabled}
+        <Button color="red" class="me-2" disabled={!isButtonEnabled}
         >Yes, I'm sure</Button>
         <Button color="alternative">No, cancel</Button>
     </div>
