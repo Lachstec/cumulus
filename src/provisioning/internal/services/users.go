@@ -1,7 +1,7 @@
 package services
 
 import (
-	Data "data"
+	"github.com/Lachstec/mc-hosting/internal/types"
 )
 
 func ReadNumOfUsers() int {
@@ -21,14 +21,14 @@ func CreateUser(user Data.User) {
 }
 
 func DeleteUserByUserID(userid int) {
-	Data.Users = append(Data.Users[:userid], Data.Users[userid + 1:]...)
+	Data.Users = append(Data.Users[:userid], Data.Users[userid+1:]...)
 }
 
 func UpdateUser(userid int, user Data.User) {
 	switch {
-		case user.Name != "":
-			Data.Users[userid].Name = user.Name
-		case user.Role != "":
-			Data.Users[userid].Role = user.Role
+	case user.Name != "":
+		Data.Users[userid].Name = user.Name
+	case user.Role != "":
+		Data.Users[userid].Role = user.Role
 	}
 }

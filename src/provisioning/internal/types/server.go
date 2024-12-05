@@ -28,6 +28,13 @@ const (
 	Hard     Difficulty = "hard"     //nolint:all
 )
 
+type PvP string
+
+const (
+	Enabled  PvP = "true"  //nolint:all
+	Disabled PvP = "false" //nolint:all
+)
+
 type Server struct {
 	Id               int64
 	OpenstackId      string `db:"openstack_id"`
@@ -40,7 +47,8 @@ type Server struct {
 	GameVersion      string   `db:"game_version"`
 	GameMode         GameMode `db:"game_mode"`
 	Difficulty       Difficulty
-	WhitelistEnabled bool   `db:"whitelist_enabled"`
-	PlayersMax       int    `db:"players_max"`
+	WhitelistEnabled bool `db:"whitelist_enabled"`
+	PlayersMax       int  `db:"players_max"`
+	PvP              PvP
 	SSHKey           []byte `db:"ssh_key"`
 }
