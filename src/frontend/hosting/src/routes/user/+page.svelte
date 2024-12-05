@@ -1,6 +1,6 @@
 <script lang="ts">
     import {onMount} from "svelte";
-    import {Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell} from "flowbite-svelte";
+    import {Alert, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell} from "flowbite-svelte";
 
     type UserData = {
         ID: number,
@@ -10,16 +10,32 @@
     }
 
     let data: UserData[]
-    onMount(async () => {
+
+    async function getAllUsers() {
         const res = await fetch("http://localhost:10000/users");
         data = await res.json();
-        console.log(data);
+    }
+
+    onMount(async () => {
+        await getAllUsers();
     });
 
-    function deleteUser(ID) {
-        return fetch(`http://localhost:10000/users/${ID}`, {
+    let isVisible = false;
+
+    function deleteUser(ID : number) {
+        fetch(`http://localhost:10000/users/${ID}`, {
             method: "DELETE",
+        }).then(res => {
+            if(res.status === 204){
+                isVisible = true;
+                getAllUsers();
+            } else {
+                console.error('Failed to delete user: ', res.status);
+            }
         })
+        .catch(error => {
+            console.error(error);
+        });
     }
 </script>
 
@@ -49,11 +65,11 @@
                                 class="font-medium text-primary-600 hover:underline dark:text-primary-500"
                             >View</a> | Edit |
                             <a
-                                href="#"
+                                role="button"
                                 on:click={() => {
                                         confirm("Do you really want to delete this user?")
                                         deleteUser(ID)
-                                        console.log("Fetus Deletus")
+                                        console.log("Deleted user")
                                     }}
                                 class="font-medium text-primary-600 hover:underline dark:text-primary-500"
                             >Delete</a>
