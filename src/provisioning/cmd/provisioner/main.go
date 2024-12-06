@@ -219,8 +219,8 @@ func main() {
 		c.JSON(http.StatusOK, server)
 	})
 
-	router.POST("/servers/:serverid", genericHandler)
-	router.PUT("/servers/:serverid", genericHandler)
+	router.POST("/servers/:serverid", genericEndpoint)
+	router.PUT("/servers/:serverid", genericEndpoint)
 
 	router.PATCH("/servers/:serverid", func(c *gin.Context) {
 		serverid, err := urlParamToInt64(c.Param("serverid"))
@@ -238,8 +238,18 @@ func main() {
 		}
 		c.JSON(http.StatusOK, server)
 	})
-	
-	router.DELETE("/servers/:serverid", genericHandler)
+
+	router.DELETE("/servers/:serverid", func(c *gin.Context) {
+		serverid, err := urlParamToInt64(c.Param("serverid"))
+		if err != nil {
+			c.AbortWithError(http.StatusBadRequest, err)
+		}
+		err = server_service.DeleteServerByServerID(serverid)
+		if err != nil {
+			c.AbortWithError(http.StatusNotFound, err)
+		}
+		c.Status(http.StatusNoContent)
+	})
 
 	// servers/:serverid/health
 	router.GET("/servers/:serverid/health", genericHandler)
