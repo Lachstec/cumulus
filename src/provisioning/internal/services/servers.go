@@ -53,21 +53,11 @@ func (c *ServerService) DeleteServerByServerID(serverid int64) (error) {
 	return nil
 }
 
-func UpdateServer(serverid int, server types.Server) {
-	switch {
-	case server.Name != "":
-		types.Servers[serverid].Name = server.Name
-	case server.Difficulty != "":
-		types.Servers[serverid].Difficulty = server.Difficulty
-	case server.IP != "":
-		types.Servers[serverid].IP = server.IP
-	case server.MaxPlayers != 0:
-		types.Servers[serverid].MaxPlayers = server.MaxPlayers
-	case server.Mode != "":
-		types.Servers[serverid].Mode = server.Mode
-	case server.PvP != "":
-		types.Servers[serverid].PvP = server.PvP
-	case server.Version != "":
-		types.Servers[serverid].Version = server.Version
+func (c *ServerService) UpdateServer(serverid int64, server types.Server) (types.Server, error) {
+	server.ID = serverid
+	server, err := c.store.Update(server)
+	if err != nil {
+		return types.Nothing[types.Server](), err
 	}
+	return server, nil
 }

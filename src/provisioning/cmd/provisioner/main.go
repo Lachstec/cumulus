@@ -221,7 +221,24 @@ func main() {
 
 	router.POST("/servers/:serverid", genericHandler)
 	router.PUT("/servers/:serverid", genericHandler)
-	router.PATCH("/servers/:serverid", genericHandler)
+
+	router.PATCH("/servers/:serverid", func(c *gin.Context) {
+		serverid, err := urlParamToInt64(c.Param("serverid"))
+		if err != nil {
+			c.AbortWithError(http.StatusBadRequest, err)
+		}
+		var server types.Server
+		err = c.BindJSON(&server)
+		if err != nil {
+			c.AbortWithError(http.StatusBadRequest, err)
+		}
+		server, err = server_service.UpdateServer(serverid, server)
+		if err != nil {
+			c.AbortWithError(http.StatusBadRequest, err)
+		}
+		c.JSON(http.StatusOK, server)
+	})
+	
 	router.DELETE("/servers/:serverid", genericHandler)
 
 	// servers/:serverid/health
