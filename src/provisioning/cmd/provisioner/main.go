@@ -207,7 +207,6 @@ func main() {
 		c.JSON(http.StatusOK, serverid)
 	})
 
-	// servers/:serverid
 	router.GET("/servers/:serverid", func(c *gin.Context) {
 		serverid, err := urlParamToInt64(c.Param("serverid"))
 		if err != nil {
