@@ -1,7 +1,7 @@
 package types
 
-// Flavours represents the various Virtual Machine flavours
-// that are available in our open stack cluster. The Flavours are currently:
+// Flavour represents the various Virtual Machine flavours
+// that are available in our open stack cluster. The Flavour are currently:
 // +----+-----------+-------+------+-----------+-------+-----------+
 // | ID | Name      |   RAM | Disk | Ephemeral | VCPUs | Is Public |
 // +----+-----------+-------+------+-----------+-------+-----------+
@@ -11,16 +11,16 @@ package types
 // | 4  | m1.large  |  8192 |   80 |         0 |     4 | True      |
 // | 5  | m1.xlarge | 16384 |  160 |         0 |     8 | True      |
 // +----+-----------+-------+------+-----------+-------+-----------+
-type Flavours string
+type Flavour string
 
 const (
-	Tiny   Flavours = "1"
-	Small  Flavours = "2"
-	Medium Flavours = "3"
-	Large  Flavours = "4"
-	XLarge Flavours = "5"
+	Tiny   Flavour = "1" //nolint:all
+	Small  Flavour = "2" //nolint:all
+	Medium Flavour = "3" //nolint:all
+	Large  Flavour = "4" //nolint:all
+	XLarge Flavour = "5" //nolint:all
 )
 
-func (f Flavours) Value() string {
+func (f Flavour) Value() string {
 	return string(f)
 }
