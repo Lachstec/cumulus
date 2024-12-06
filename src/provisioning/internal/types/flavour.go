@@ -24,3 +24,22 @@ const (
 func (f Flavour) Value() string {
 	return string(f)
 }
+
+func (f Flavour) AvailableRam() int {
+	var ram int
+
+	switch f {
+	case Tiny:
+		ram = 512
+	case Small:
+		ram = 2048
+	case Medium:
+		ram = 4096
+	case Large:
+		ram = 8192
+	case XLarge:
+		ram = 16384
+	}
+
+	return ram
+}
