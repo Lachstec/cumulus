@@ -33,3 +33,11 @@ func NewClient(config config.Config) (*Client, error) {
 
 	return client, nil
 }
+
+func (c *Client) ComputeClient() (*gophercloud.ServiceClient, error) {
+	client, err := openstack.NewComputeV2(c.client, gophercloud.EndpointOpts{})
+	if err != nil {
+		return nil, err
+	}
+	return client, nil
+}
