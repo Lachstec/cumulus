@@ -193,7 +193,19 @@ func main() {
 		}
 		c.JSON(http.StatusOK, servers)
 	})
-	router.POST("/servers", genericHandler)
+
+	router.POST("/servers", func(c *gin.Context) {
+		var server types.Server
+		err := c.BindJSON(&server)
+		if err != nil {
+			c.AbortWithError(http.StatusBadRequest, err)
+		}
+		serverid, err := server_service.CreateServer(server)
+		if err != nil {
+			c.AbortWithError(http.StatusConflict, err)
+		}
+		c.JSON(http.StatusOK, serverid)
+	})
 
 	// servers/:serverid
 	router.GET("/servers/:serverid", func(c *gin.Context) {
