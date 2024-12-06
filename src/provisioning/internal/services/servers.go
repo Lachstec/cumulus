@@ -16,10 +16,6 @@ func NewServerService(conn *sqlx.DB) *ServerService {
 	}
 }
 
-func ReadNumOfServers() int {
-	return len(types.Servers)
-}
-
 func (c *ServerService) ReadAllServers() ([]types.Server, error) {
 
 	servers, err := c.store.Find(func(s types.Server) bool { return true })

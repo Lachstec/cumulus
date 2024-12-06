@@ -36,13 +36,12 @@ func genericEndpoint(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, "Not implemented yet")
 }
 
-func urlParamToInteger(c *gin.Context, param string) int {
-	i, err := strconv.Atoi(param)
+func urlParamToInt64(param string) (int64, error) {
+	i, err := strconv.ParseInt(param, 10, 64)
 	if err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		panic(err)
+		return 0, err
 	}
-	return i
+	return i, nil
 }
 
 func genericHandler(c *gin.Context) {
@@ -191,14 +190,24 @@ func main() {
 		servers, err := server_service.ReadAllServers()
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
-		} else {
-			c.JSON(http.StatusOK, servers)
 		}
+		c.JSON(http.StatusOK, servers)
 	})
 	router.POST("/servers", genericHandler)
 
 	// servers/:serverid
-	router.GET("/servers/:serverid", genericHandler)
+	router.GET("/servers/:serverid", func(c *gin.Context) {
+		serverid, err := urlParamToInt64(c.Param("serverid"))
+		if err != nil {
+			c.AbortWithError(http.StatusBadRequest, err)
+		}
+		server, err := server_service.ReadServerByServerID(serverid)
+		if err != nil {
+			c.AbortWithError(http.StatusNotFound, err)
+		}
+		c.JSON(http.StatusOK, server)
+	})
+
 	router.POST("/servers/:serverid", genericHandler)
 	router.PUT("/servers/:serverid", genericHandler)
 	router.PATCH("/servers/:serverid", genericHandler)
