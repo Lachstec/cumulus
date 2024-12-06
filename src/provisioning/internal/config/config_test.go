@@ -13,6 +13,10 @@ func TestLoadConfig(t *testing.T) {
 	os.Setenv("DB_USER", "sample_user")
 	os.Setenv("DB_PASS", "sample_pass")
 	os.Setenv("AUTH0_URL", "https://auth0.com/test")
+	os.Setenv("OPENSTACK_IDENTITY_ENDPOINT", "https://my-keystoneserver.zip/v3")
+	os.Setenv("OPENSTACK_USER", "stackymcstackface")
+	os.Setenv("OPENSTACK_PASS", "secure_password1!")
+	os.Setenv("OPENSTACK_TENANT_ID", "default")
 
 	defer func() {
 		os.Unsetenv("DB_HOST")
@@ -20,6 +24,10 @@ func TestLoadConfig(t *testing.T) {
 		os.Unsetenv("DB_USER")
 		os.Unsetenv("DB_PASS")
 		os.Unsetenv("AUTH0_URL")
+		os.Unsetenv("OPENSTACK_IDENTITY_ENDPOINT")
+		os.Unsetenv("OPENSTACK_USER")
+		os.Unsetenv("OPENSTACK_PASS")
+		os.Unsetenv("OPENSTACK_TENANT_ID")
 	}()
 
 	cfg := LoadConfig()
@@ -29,6 +37,10 @@ func TestLoadConfig(t *testing.T) {
 	assert.Equal(t, "sample_user", cfg.Db.User)
 	assert.Equal(t, "sample_pass", cfg.Db.Password)
 	assert.Equal(t, url.URL{Scheme: "https", Host: "auth0.com", Path: "/test"}, cfg.Auth0.Url)
+	assert.Equal(t, "https://my-keystoneserver.zip/v3", cfg.Openstack.identityEndpoint)
+	assert.Equal(t, "stackymcstackface", cfg.Openstack.username)
+	assert.Equal(t, "secure_password1!", cfg.Openstack.password)
+	assert.Equal(t, "default", cfg.Openstack.tenantId)
 }
 
 func TestFallbackValues(t *testing.T) {
@@ -39,4 +51,8 @@ func TestFallbackValues(t *testing.T) {
 	assert.Equal(t, "postgres", cfg.Db.User)
 	assert.Equal(t, "postgres", cfg.Db.Password)
 	assert.Equal(t, url.URL{Scheme: "http", Host: "localhost"}, cfg.Auth0.Url)
+	assert.Equal(t, "http://localhost", cfg.Openstack.identityEndpoint)
+	assert.Equal(t, "osuser", cfg.Openstack.username)
+	assert.Equal(t, "ospassword", cfg.Openstack.password)
+	assert.Equal(t, "osp", cfg.Openstack.tenantId)
 }
