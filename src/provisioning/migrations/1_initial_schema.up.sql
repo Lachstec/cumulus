@@ -12,6 +12,8 @@ CREATE TYPE difficulty AS ENUM ('peaceful', 'easy', 'normal', 'hard');
 -- Type representing the minecraft game mode
 CREATE TYPE game_mode AS ENUM ('creative', 'adventure', 'survival', 'hardcore');
 
+CREATE TYPE class as ENUM ('admin', 'user');
+
 -- Server table representing gameservers
 CREATE TABLE mch_provisioner.servers(
     id SERIAL PRIMARY KEY,         -- id of the server
@@ -28,6 +30,13 @@ CREATE TABLE mch_provisioner.servers(
     whitelist_enabled BOOLEAN,     -- Whether the whitelist is enabled
     players_max INTEGER,           -- How many Players are allowed
     ssh_key BYTEA                  -- SSH Key that can be used to connect to the gameserver
+);
+
+CREATE TABLE mch_provisioner.users(
+    id SERIAL PRIMARY KEY,
+    sub VARCHAR(256) NOT NULL,
+    name VARCHAR(256) NOT NULL,
+    class class NOT NULL,
 );
 
 -- Table storing server backup information

@@ -219,6 +219,7 @@ func main() {
 		c.JSON(http.StatusOK, server)
 	})
 
+	//TODO
 	router.POST("/servers/:serverid", genericEndpoint)
 	router.PUT("/servers/:serverid", genericEndpoint)
 
