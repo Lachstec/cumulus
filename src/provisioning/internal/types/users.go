@@ -8,7 +8,7 @@ const (
 )
 
 type User struct {
-	ID   int
+	ID   int64
 	Sub  string
 	Name string `json:"name"`
 	Class string `json:"class"`
