@@ -26,6 +26,9 @@ func NewMinecraftProvisioner(conn *sqlx.DB, openstack openstack.Client) *Minecra
 	}
 }
 
+// NewGameServer provisions a new Gameserver with the specified flavour in openstack. The provisioned server
+// has an ephemeral disk and uses the default settings and config of the specified image
+// in openstack. Information about the server gets stored in the database.
 func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, name string, flavour types.Flavour, image types.Image) (*types.Server, error) {
 	client, err := m.openstack.ComputeClient()
 	if err != nil {
