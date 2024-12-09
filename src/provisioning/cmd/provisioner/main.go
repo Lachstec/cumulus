@@ -10,8 +10,8 @@ import (
 	"github.com/Lachstec/mc-hosting/internal/services"
 	"github.com/Lachstec/mc-hosting/internal/types"
 	"github.com/gin-gonic/gin"
-	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 func db_init() *sqlx.DB {
