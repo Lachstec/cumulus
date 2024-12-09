@@ -9,11 +9,14 @@ import (
 	"net/url"
 )
 
+// AuthService provides functions for checking if a user is authenticated
+// or extracting user info from it.
 type AuthService struct {
 	serviceUrl url.URL
 	client     http.Client
 }
 
+// NewAuthService creates a new AuthenticationService that asks the auth0 url
 func NewAuthService(auth0 url.URL) *AuthService {
 	return &AuthService{
 		serviceUrl: auth0,
@@ -21,6 +24,8 @@ func NewAuthService(auth0 url.URL) *AuthService {
 	}
 }
 
+// ValidateToken sends the given token to Auth0 in order to obtain
+// user information. If an error occurs, the user is to be treated as not authorized.
 func (s *AuthService) ValidateToken(token string) (*types.UserInfo, error) {
 	req, err := http.NewRequest("GET", s.serviceUrl.String(), nil)
 	if err != nil {
