@@ -9,7 +9,7 @@ type ServerBackupStore struct {
 	db *sqlx.DB
 }
 
-func NewServerBackupStore(db *sqlx.DB) *ServerBackupStore {
+func NewServerBackupStore(db *sqlx.DB) Store[types.Backup] {
 	return &ServerBackupStore{db: db}
 }
 
