@@ -113,7 +113,7 @@ func main() {
 		}
 		err = user_service.DeleteUserByUserID(userid)
 		if err != nil {
-			c.AbortWithError(http.StatusNotFound, err)
+			c.AbortWithError(http.StatusGone, err)
 		}
 		c.Status(http.StatusNoContent)
 	})
@@ -186,7 +186,7 @@ func main() {
 		}
 		err = server_service.DeleteServerByServerID(serverid)
 		if err != nil {
-			c.AbortWithError(http.StatusNotFound, err)
+			c.AbortWithError(http.StatusGone, err)
 		}
 		c.Status(http.StatusNoContent)
 	})
