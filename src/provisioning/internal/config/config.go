@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/joho/godotenv"
 	"log"
+	"net/url"
 	"os"
 )
 
@@ -10,7 +11,8 @@ import (
 // All settings or credentials the backend needs is to be supplied here.
 type Config struct {
 	// Db configuration to access the primary database
-	Db DbConfig
+	Db    DbConfig
+	Auth0 Auth0Config
 }
 
 // LoadConfig loads the application configuration.
@@ -24,10 +26,16 @@ type Config struct {
 // DB_PORT: port for the database (default: 5432)
 // DB_USER: username for the database (default: postgres)
 // DB_PASS: password for the database (default: postgres)
+// AUTH0_URL: URL to the Auth0 Userinfo endpoint (default: http://localhost)
 func LoadConfig() *Config {
 	err := godotenv.Load()
 	if err != nil {
 		log.Println("No .env file found. Using Fallback values")
+	}
+
+	auth0, err := url.Parse(getEnv("AUTH0_URL", "http://localhost"))
+	if err != nil {
+		log.Fatalln("Invalid url for Auth0")
 	}
 
 	cfg := &Config{
@@ -36,6 +44,9 @@ func LoadConfig() *Config {
 			Port:     getEnv("DB_PORT", "5432"),
 			User:     getEnv("DB_USER", "postgres"),
 			Password: getEnv("DB_PASS", "postgres"),
+		},
+		Auth0: Auth0Config{
+			Url: *auth0,
 		},
 	}
 	return cfg
