@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Button, Modal } from "flowbite-svelte";
+    import { Button, Modal, Label, Input, Select, AccordionItem, Accordion } from "flowbite-svelte";
     import { ExclamationCircleOutline } from "flowbite-svelte-icons";
     import type { PageData } from './$types';
 
@@ -30,12 +30,37 @@
     function closeModal() {
         showModal = false;
     }
+
+    let selected;
+    let roles = [
+        { value: "Admin", name: "Admin" },
+        { value: "User", name: "User" },
+    ]
 </script>
 
-<div class="p-8 mt-16 bg-white dark:bg-gray-900 h-screen">
-    <h1>{data.name}</h1>
-    <div>{@html data.role}</div>
-    <Button on:click={openModal} color="red">Delete Account</Button>
+<div class="p-8 mt-16 mb-6 bg-white dark:bg-gray-900 h-screen">
+    <form method="POST">
+        <div class="mb-6">
+            <Label for="name-input" class="block mb-2">Name</Label>
+            <Input id="name-input" value="{data.name}" />
+        </div>
+        <div class="mb-6">
+        <Label>
+            Select a role
+            <Select class="mt-2" items={roles} bind:value={data.role} />
+        </Label>
+        </div>
+
+        <Button class="mb-6" color="green">Save</Button>
+    </form>
+
+
+    <Accordion>
+        <AccordionItem>
+            <span slot="header">Danger Zone</span>
+            <Button on:click={openModal} color="red">Delete Account</Button>
+        </AccordionItem>
+    </Accordion>
 </div>
 
 <Modal bind:open={showModal} on:close={closeModal} size="xs" autoclose>

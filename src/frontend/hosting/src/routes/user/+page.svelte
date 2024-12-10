@@ -1,6 +1,15 @@
 <script lang="ts">
     import {onMount} from "svelte";
-    import {Alert, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell} from "flowbite-svelte";
+    import {
+        Alert,
+        Button,
+        Table,
+        TableBody,
+        TableBodyCell,
+        TableBodyRow,
+        TableHead,
+        TableHeadCell
+    } from "flowbite-svelte";
 
     type UserData = {
         ID: number,
@@ -60,19 +69,23 @@
                         <TableBodyCell>{name}</TableBodyCell>
                         <TableBodyCell>{role}</TableBodyCell>
                         <TableBodyCell>
-                            <a
+                            <Button size="xs" outline color="green"
                                 href="../../user/{ID}"
-                                class="font-medium text-primary-600 hover:underline dark:text-primary-500"
-                            >View</a> | Edit |
-                            <a
+                            >View</Button>
+                            <Button size="xs" outline color="yellow"
+
+                            >Edit</Button>
+                            <Button size="xs" outline color="red"
                                 role="button"
                                 on:click={() => {
-                                        confirm("Do you really want to delete this user?")
-                                        deleteUser(ID)
-                                        console.log("Deleted user")
+                                        if(confirm("Do you really want to delete this user?")){
+                                            deleteUser(ID)
+                                            console.log("Deleted user")
+                                        } else {
+                                            console.log('Not Deleted');
+                                        }
                                     }}
-                                class="font-medium text-primary-600 hover:underline dark:text-primary-500"
-                            >Delete</a>
+                            >Delete</Button>
                         </TableBodyCell>
                     </TableBodyRow>
                 {/each}
