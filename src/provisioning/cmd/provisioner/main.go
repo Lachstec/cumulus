@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 
 	"github.com/Lachstec/mc-hosting/internal/config"
@@ -10,8 +11,8 @@ import (
 	"github.com/Lachstec/mc-hosting/internal/services"
 	"github.com/Lachstec/mc-hosting/internal/types"
 	"github.com/gin-gonic/gin"
-	"github.com/jmoiron/sqlx"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/jmoiron/sqlx"
 )
 
 func db_init() *sqlx.DB {
@@ -48,9 +49,12 @@ func main() {
 	// initialize the database
 	db := db_init()
 
+	var url url.URL
+
 	// initialize the services
 	server_service := services.NewServerService(db)
 	user_service := services.NewUserService(db)
+	auth_service := services.NewAuthService(url)
 
 	// initialize the router
 	router := gin.Default()
@@ -121,8 +125,14 @@ func main() {
 	// users/:userid/servers
 	router.GET("/users/:userid/servers", genericEndpoint)
 
-	// self -> // return user by checking bearer token //TODO
-	router.GET("/self", genericEndpoint)
+	router.GET("/self", func(c *gin.Context) {
+		token := c.GetHeader("Token")
+		user, err := auth_service.ValidateToken(token)
+		if err != nil {
+			c.AbortWithError(http.StatusUnauthorized, err)
+		}
+		c.JSON(http.StatusOK, user)
+	})
 
 	// CRUD servers
 	router.GET("/servers", func(c *gin.Context) {
