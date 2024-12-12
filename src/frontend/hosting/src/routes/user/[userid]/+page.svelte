@@ -30,29 +30,33 @@
     function closeModal() {
         showModal = false;
     }
-
-    let selected;
+    let selectedName = $state();
+    let selectedRole = $state();
     let roles = [
         { value: "Admin", name: "Admin" },
         { value: "User", name: "User" },
     ]
+
+    function updateData(){
+        console.log(selectedName + " " + selectedRole);
+    }
 </script>
 
 <div class="p-8 mt-16 mb-6 bg-white dark:bg-gray-900 h-screen">
-    <form method="POST">
         <div class="mb-6">
             <Label for="name-input" class="block mb-2">Name</Label>
-            <Input id="name-input" value="{data.name}" />
+            <Input id="name-input" value={selectedName}/>{data.name}
         </div>
+
+
         <div class="mb-6">
         <Label>
             Select a role
-            <Select class="mt-2" items={roles} bind:value={data.role} />
+            <Select class="mt-2" items={roles} bind:value={selectedRole} />
         </Label>
         </div>
 
-        <Button class="mb-6" color="green">Save</Button>
-    </form>
+        <Button class="mb-6" color="green" on:click={updateData}>Save</Button>
 
 
     <Accordion>
