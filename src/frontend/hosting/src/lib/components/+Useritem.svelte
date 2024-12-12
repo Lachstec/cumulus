@@ -26,7 +26,7 @@
   });
 
   async function login() {
-    await auth.loginPopup(auth0Client, {authorizationParams: {audience: "http://localhost:3001/api"}});
+    await auth.loginPopup(auth0Client);
     isAuthenticated.set(await auth0Client.isAuthenticated()); // Update authentication status
     user.set(await auth0Client.getUser()); // Update user data
   }

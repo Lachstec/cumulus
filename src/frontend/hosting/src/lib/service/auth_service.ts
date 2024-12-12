@@ -11,7 +11,8 @@ async function createClient() {
   let auth0 = await createAuth0Client({
     domain: config.domain,
     clientId: config.clientId,
-    cacheLocation: "localstorage"
+    cacheLocation: "localstorage",
+    authorizationParams: {audience: config.audience},
   });
 
   return auth0;
