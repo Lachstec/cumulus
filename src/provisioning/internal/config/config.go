@@ -38,11 +38,6 @@ func LoadConfig() *Config {
 		log.Fatalln("Invalid url for Auth0")
 	}
 
-	jwksURL, err := url.Parse(getEnv("AUTH0_JWKS_URL", "http://localhost"))
-	if err != nil {
-		log.Fatalln("Invalid url for Auth0 JWKS endpoint")
-	}
-
 	cfg := &Config{
 		Db: DbConfig{
 			Host:     getEnv("DB_HOST", "localhost"),
@@ -51,8 +46,8 @@ func LoadConfig() *Config {
 			Password: getEnv("DB_PASS", "postgres"),
 		},
 		Auth0: Auth0Config{
-			AuthURL: *authURL,
-			JWKSURL: *jwksURL,
+			AuthURL:  *authURL,
+			Audience: getEnv("AUTH0_AUDIENCE", "http://localhost"),
 		},
 	}
 	return cfg

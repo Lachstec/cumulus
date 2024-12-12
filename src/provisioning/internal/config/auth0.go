@@ -4,6 +4,6 @@ import "net/url"
 
 // Auth0Config represents Configuration related to connecting to an Auth0 Tenant
 type Auth0Config struct {
-	AuthURL url.URL
-	JWKSURL url.URL
+	AuthURL  url.URL
+	Audience string
 }
