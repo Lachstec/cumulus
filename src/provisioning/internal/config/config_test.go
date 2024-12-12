@@ -46,5 +46,5 @@ func TestFallbackValues(t *testing.T) {
 	assert.Equal(t, "postgres", cfg.Db.Password)
 	assert.Equal(t, url.URL{Scheme: "http", Host: "localhost"}, cfg.Auth0.AuthURL)
 	assert.Equal(t, "http://localhost", cfg.Auth0.Audience)
-	assert.Equal(t, "sample_secret", cfg.Auth0.Secret)
+	assert.Equal(t, "secret", cfg.Auth0.Secret)
 }
