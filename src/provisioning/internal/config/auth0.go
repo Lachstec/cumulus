@@ -6,4 +6,5 @@ import "net/url"
 type Auth0Config struct {
 	AuthURL  url.URL
 	Audience string
+	Secret   string
 }

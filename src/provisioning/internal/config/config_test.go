@@ -14,6 +14,7 @@ func TestLoadConfig(t *testing.T) {
 	os.Setenv("DB_PASS", "sample_pass")
 	os.Setenv("AUTH0_URL", "https://auth0.com/test")
 	os.Setenv("AUTH0_AUDIENCE", "https://mc-hosting.zip")
+	os.Setenv("AUTH0_SECRET", "sample_secret")
 
 	defer func() {
 		os.Unsetenv("DB_HOST")
@@ -22,6 +23,7 @@ func TestLoadConfig(t *testing.T) {
 		os.Unsetenv("DB_PASS")
 		os.Unsetenv("AUTH0_URL")
 		os.Unsetenv("AUTH0_AUDIENCE")
+		os.Unsetenv("AUTH0_SECRET")
 	}()
 
 	cfg := LoadConfig()
@@ -32,6 +34,7 @@ func TestLoadConfig(t *testing.T) {
 	assert.Equal(t, "sample_pass", cfg.Db.Password)
 	assert.Equal(t, url.URL{Scheme: "https", Host: "auth0.com", Path: "/test"}, cfg.Auth0.AuthURL)
 	assert.Equal(t, "https://mc-hosting.zip", cfg.Auth0.Audience)
+	assert.Equal(t, "sample_secret", cfg.Auth0.Secret)
 }
 
 func TestFallbackValues(t *testing.T) {
@@ -43,4 +46,5 @@ func TestFallbackValues(t *testing.T) {
 	assert.Equal(t, "postgres", cfg.Db.Password)
 	assert.Equal(t, url.URL{Scheme: "http", Host: "localhost"}, cfg.Auth0.AuthURL)
 	assert.Equal(t, "http://localhost", cfg.Auth0.Audience)
+	assert.Equal(t, "sample_secret", cfg.Auth0.Secret)
 }

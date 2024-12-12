@@ -48,6 +48,7 @@ func LoadConfig() *Config {
 		Auth0: Auth0Config{
 			AuthURL:  *authURL,
 			Audience: getEnv("AUTH0_AUDIENCE", "http://localhost"),
+			Secret:   getEnv("AUTH0_SECRET", "secret"),
 		},
 	}
 	return cfg
