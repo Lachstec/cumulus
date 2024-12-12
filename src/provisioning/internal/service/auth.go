@@ -1,9 +1,12 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/Lachstec/mc-hosting/internal/types"
+	jwtmiddleware "github.com/auth0/go-jwt-middleware/v2"
+	"github.com/auth0/go-jwt-middleware/v2/validator"
 	"io"
 	"net/http"
 	"net/url"
@@ -13,13 +16,15 @@ import (
 // or extracting user info from it.
 type AuthService struct {
 	serviceUrl url.URL
+	audience   string
 	client     http.Client
 }
 
 // NewAuthService creates a new AuthenticationService that asks the auth0 url
-func NewAuthService(auth0 url.URL) *AuthService {
+func NewAuthService(auth0 url.URL, audience string) *AuthService {
 	return &AuthService{
 		serviceUrl: auth0,
+		audience:   audience,
 		client:     http.Client{},
 	}
 }
@@ -56,4 +61,23 @@ func (s *AuthService) ValidateToken(token string) (*types.UserInfo, error) {
 	}
 
 	return &userinfo, nil
+}
+
+func (s *AuthService) GetAuthMiddleware(secret []byte) (*jwtmiddleware.JWTMiddleware, error) {
+	keyFunc := func(ctx context.Context) (interface{}, error) {
+		return secret, nil
+	}
+
+	jwtValidator, err := validator.New(
+		keyFunc,
+		validator.HS256,
+		s.serviceUrl.String(),
+		[]string{s.audience},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	middleware := jwtmiddleware.New(jwtValidator.ValidateToken)
+	return middleware, nil
 }
