@@ -6,6 +6,7 @@ import (
 	"crypto/ed25519"
 	"crypto/rand"
 	"encoding/base64"
+	"golang.org/x/crypto/ssh"
 )
 
 // CryptoService provides utility functions to handle SSH keys
@@ -71,4 +72,38 @@ func (c *CryptoService) DecryptPrivateKey(key string) ([]byte, error) {
 	}
 
 	return plaintext, nil
+}
+
+// publicKeyToOpenSSH is a helper function that turns an ed25519 Public Key into
+// a string to give to OpenStack.
+func publicKeyToOpenSSH(pub ed25519.PublicKey) (string, error) {
+	publicKey, err := ssh.NewPublicKey(pub)
+	if err != nil {
+		return "", err
+	}
+
+	publicKeyString := "ssh-ed25519" + " " + base64.StdEncoding.EncodeToString(publicKey.Marshal())
+	return publicKeyString, nil
+}
+
+// NewKeyPair generates a new Key Pair for a gameserver. It returns
+// the private key as an encrypted, base64-encoded string and the public key as
+// a string compatible with OpenSSH / Openstack. Returns an error if something goes wrong.
+func (c *CryptoService) NewKeyPair() (string, string, error) {
+	pub, priv, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		return "", "", err
+	}
+
+	publicKey, err := publicKeyToOpenSSH(pub)
+	if err != nil {
+		return "", "", err
+	}
+
+	privateKey, err := c.EncryptPrivateKey(priv)
+	if err != nil {
+		return "", "", err
+	}
+
+	return publicKey, privateKey, nil
 }
