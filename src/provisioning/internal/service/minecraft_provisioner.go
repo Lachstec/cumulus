@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/base64"
 	"github.com/Lachstec/mc-hosting/internal/db"
 	"github.com/Lachstec/mc-hosting/internal/openstack"
 	"github.com/Lachstec/mc-hosting/internal/types"
@@ -9,6 +10,14 @@ import (
 	"github.com/jmoiron/sqlx"
 	"net"
 )
+
+// initScript is a simple and more or less dangerous way of getting docker ready to roll
+// on newly provisioned servers. This should NOT be used in a production scenario
+// as we are piping a more or less random script into bash. Installation should
+// be performed with the package manager of the used distribution when deploying to production.
+const initScript = `#!/bin/bash
+curl -fsSL get.docker.com -o get-docker.sh && sh get-docker.sh
+`
 
 // MinecraftProvisioner is a service that can interact with
 // OpenStack to provision and configure minecraft servers.
@@ -45,11 +54,14 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, name string, f
 		},
 	}
 
+	userData := base64.StdEncoding.EncodeToString([]byte(initScript))
+
 	opts := servers.CreateOpts{
 		Name:        name,
 		FlavorRef:   flavour.Value(),
 		ImageRef:    image.Value(),
 		BlockDevice: blockDev,
+		UserData:    []byte(userData),
 	}
 
 	server, err := servers.Create(ctx, client, opts, nil).Extract()
