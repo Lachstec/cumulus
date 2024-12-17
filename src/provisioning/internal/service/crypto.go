@@ -13,7 +13,7 @@ import (
 // that are used in order to execute commands on the game servers.
 // This service should not be directly exposed to end user requests.
 type CryptoService struct {
-	// encryptionKey is used to encrypt SSH keys in order to store them in the database securely.
+	// encryptionKey is used to encrypt SSH keys in order to serverstore them in the database securely.
 	encryptionKey []byte
 }
 
