@@ -6,6 +6,7 @@ import (
 	"github.com/Lachstec/mc-hosting/internal/db"
 	"github.com/Lachstec/mc-hosting/internal/openstack"
 	"github.com/Lachstec/mc-hosting/internal/types"
+	"github.com/gophercloud/gophercloud/v2/openstack/blockstorage/v3/volumes"
 	"github.com/gophercloud/gophercloud/v2/openstack/compute/v2/servers"
 	"github.com/jmoiron/sqlx"
 	"net"
@@ -22,17 +23,50 @@ curl -fsSL get.docker.com -o get-docker.sh && sh get-docker.sh
 // MinecraftProvisioner is a service that can interact with
 // OpenStack to provision and configure minecraft servers.
 type MinecraftProvisioner struct {
-	store     db.Store[types.Server]
-	openstack openstack.Client
+	backupstore db.Store[types.Backup]
+	serverstore db.Store[types.Server]
+	openstack   openstack.Client
 }
 
 // NewMinecraftProvisioner creates a new provisioner service that stores
 // its data in the database behind the given sqlx connection.
 func NewMinecraftProvisioner(conn *sqlx.DB, openstack openstack.Client) *MinecraftProvisioner {
 	return &MinecraftProvisioner{
-		store:     db.NewServerStore(conn),
-		openstack: openstack,
+		backupstore: db.NewServerBackupStore(conn),
+		serverstore: db.NewServerStore(conn),
+		openstack:   openstack,
 	}
+}
+
+// newPersistentVolume creates a new, persisting volume to store minecraft world data in.
+// Returns the ID of the newly created volume or an error.
+func (m *MinecraftProvisioner) newPersistentVolume(ctx context.Context, name string, serverid int64) (int64, error) {
+	opts := volumes.CreateOpts{
+		Name: name,
+		Size: 10,
+	}
+
+	client, err := m.openstack.StorageClient()
+	if err != nil {
+		return 0, err
+	}
+
+	vol, err := volumes.Create(ctx, client, opts, nil).Extract()
+	if err != nil {
+		return 0, err
+	}
+
+	volume, err := m.backupstore.Add(types.Backup{
+		ServerId:  serverid,
+		Timestamp: vol.CreatedAt,
+		Size:      vol.Size * 1000,
+	})
+
+	if err != nil {
+		return 0, err
+	}
+
+	return volume, nil
 }
 
 // NewGameServer provisions a new Gameserver with the specified flavour in openstack. The provisioned server
@@ -83,12 +117,12 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, name string, f
 		PlayersMax:       2,
 	}
 
-	id, err := m.store.Add(gameserver)
+	id, err := m.serverstore.Add(gameserver)
 	if err != nil {
 		return nil, err
 	}
 
-	gameserver, err = m.store.GetById(id)
+	gameserver, err = m.serverstore.GetById(id)
 	if err != nil {
 		return nil, err
 	}
