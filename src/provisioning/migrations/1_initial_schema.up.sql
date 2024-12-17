@@ -21,6 +21,8 @@ CREATE TABLE mch_provisioner.servers(
     userid SERIAL NOT NULL REFERENCES mch_provisioner.users
         ON DELETE CASCADE,
     openstack_id UUID NOT NULL,    -- UUID in openstack
+    userid SERIAL NOT NULL REFERENCES mch_provisioner.users
+        ON DELETE CASCADE,
     name VARCHAR(256) NOT NULL,    -- Name of the Server
     addr INET,                     -- IP-Address of the server
     status server_status NOT NULL, -- Current Server Status
