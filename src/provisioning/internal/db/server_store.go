@@ -50,7 +50,7 @@ func (s *ServerStore) Find(predicate Predicate[types.Server]) ([]types.Server, e
 func (s *ServerStore) Add(server types.Server) (int64, error) {
 	var id int64
 	err := s.db.QueryRowx(
-		"INSERT INTO mch_provisioner.servers (name, addr, status, port, memory_mb, game, game_version, game_mode, difficulty, whitelist_enabled, players_max) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id;",
+		"INSERT INTO mch_provisioner.servers (name, addr, status, port, memory_mb, game, game_version, game_mode, difficulty, whitelist_enabled, players_max, ssh_key) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id;",
 		server.Name,
 		server.Address.String(),
 		server.Status,
@@ -62,6 +62,7 @@ func (s *ServerStore) Add(server types.Server) (int64, error) {
 		server.Difficulty,
 		server.WhitelistEnabled,
 		server.PlayersMax,
+		server.SSHKey,
 	).Scan(&id)
 	if err != nil {
 		return 0, err
