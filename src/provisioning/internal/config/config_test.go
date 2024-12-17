@@ -17,6 +17,7 @@ func TestLoadConfig(t *testing.T) {
 	os.Setenv("OPENSTACK_USER", "stackymcstackface")
 	os.Setenv("OPENSTACK_PASS", "secure_password1!")
 	os.Setenv("OPENSTACK_TENANT_ID", "default")
+	os.Setenv("CRYPTO_KEY", "my_secret_key")
 
 	defer func() {
 		os.Unsetenv("DB_HOST")
@@ -28,6 +29,7 @@ func TestLoadConfig(t *testing.T) {
 		os.Unsetenv("OPENSTACK_USER")
 		os.Unsetenv("OPENSTACK_PASS")
 		os.Unsetenv("OPENSTACK_TENANT_ID")
+		os.Unsetenv("CRYPTO_KEY")
 	}()
 
 	cfg := LoadConfig()
@@ -41,6 +43,7 @@ func TestLoadConfig(t *testing.T) {
 	assert.Equal(t, "stackymcstackface", cfg.Openstack.username)
 	assert.Equal(t, "secure_password1!", cfg.Openstack.password)
 	assert.Equal(t, "default", cfg.Openstack.tenantId)
+	assert.Equal(t, []byte("my_secret_key"), cfg.CryptoConfig.EncryptionKey)
 }
 
 func TestFallbackValues(t *testing.T) {
@@ -55,4 +58,5 @@ func TestFallbackValues(t *testing.T) {
 	assert.Equal(t, "osuser", cfg.Openstack.username)
 	assert.Equal(t, "ospassword", cfg.Openstack.password)
 	assert.Equal(t, "osp", cfg.Openstack.tenantId)
+	assert.Equal(t, []byte("super_secure_default_key1!"), cfg.CryptoConfig.EncryptionKey)
 }
