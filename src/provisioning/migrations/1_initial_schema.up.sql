@@ -25,7 +25,8 @@ CREATE TABLE mch_provisioner.servers(
     game_mode game_mode,           -- Which game mod is currently active
     difficulty difficulty,         -- Game difficulty
     whitelist_enabled BOOLEAN,     -- Whether the whitelist is enabled
-    players_max INTEGER            -- How many Players are allowed
+    players_max INTEGER,           -- How many Players are allowed
+    ssh_key BYTEA                  -- SSH Key that can be used to connect to the gameserver
 );
 
 -- Table storing server backup information
@@ -33,10 +34,8 @@ CREATE TABLE mch_provisioner.world_backups(
     id SERIAL PRIMARY KEY,                                              -- Id of the backup
     server_id SERIAL NOT NULL REFERENCES mch_provisioner.servers
         ON DELETE CASCADE,                                              -- Server the backup belongs to
-    world VARCHAR(128),                                                 -- Name of the backed up world
-    game VARCHAR(128),                                                  -- Name of the game
     timestamp TIMESTAMP,                                                -- Timestamp of creation
-    size INTEGER                                                        -- Size of the backup in bytes
+    size INTEGER                                                        -- Size of the backup in megabytes
 );
 
 COMMIT;
