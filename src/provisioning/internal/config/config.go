@@ -11,10 +11,13 @@ import (
 // All settings or credentials the backend needs is to be supplied here.
 type Config struct {
 	// Db configuration to access the primary database
-	Db    DbConfig
+	Db DbConfig
+	// Auth0 configuration for authentication and authorization with Auth0
 	Auth0 Auth0Config
 	// Openstack configuration to connect to an openstack cluster.
 	Openstack OpenStackConfig
+	// CryptoConfig configuration for cryptographic components
+	CryptoConfig CryptoConfig
 }
 
 // LoadConfig loads the application configuration.
@@ -33,6 +36,7 @@ type Config struct {
 // OPENSTACK_USER: Username for openstack (default: osuser)
 // OPENSTACK_PASS: Password for openstack (default: ospassword)
 // OPENSTACK_TENANT_ID: TenantID for openstack (default: osp)
+// CRYPTO_KEY: Key to use for encrypting SSH Keys for the game servers (default: super_secure_default_key1!)
 func LoadConfig() *Config {
 	err := godotenv.Load()
 	if err != nil {
@@ -59,6 +63,9 @@ func LoadConfig() *Config {
 			username:         getEnv("OPENSTACK_USER", "osuser"),
 			password:         getEnv("OPENSTACK_PASS", "ospassword"),
 			tenantId:         getEnv("OPENSTACK_TENANT_ID", "osp"),
+		},
+		CryptoConfig: CryptoConfig{
+			EncryptionKey: []byte(getEnv("CRYPTO_KEY", "super_secure_default_key1!")),
 		},
 	}
 	return cfg
