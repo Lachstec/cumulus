@@ -41,3 +41,11 @@ func (c *Client) ComputeClient() (*gophercloud.ServiceClient, error) {
 	}
 	return client, nil
 }
+
+func (c *Client) StorageClient() (*gophercloud.ServiceClient, error) {
+	client, err := openstack.NewBlockStorageV3(c.client, gophercloud.EndpointOpts{})
+	if err != nil {
+		return nil, err
+	}
+	return client, nil
+}
