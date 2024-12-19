@@ -30,6 +30,7 @@ const (
 
 type Server struct {
 	Id               int64
+	OpenstackId      string `db:"openstack_id"`
 	Name             string
 	Address          net.IP `db:"addr"`
 	Status           ServerStatus
