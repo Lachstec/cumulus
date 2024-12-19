@@ -15,6 +15,7 @@ CREATE TYPE game_mode AS ENUM ('creative', 'adventure', 'survival', 'hardcore');
 -- Server table representing gameservers
 CREATE TABLE mch_provisioner.servers(
     id SERIAL PRIMARY KEY,         -- id of the server
+    openstack_id UUID NOT NULL,    -- UUID in openstack
     name VARCHAR(256) NOT NULL,    -- Name of the Server
     addr INET,                     -- IP-Address of the server
     status server_status NOT NULL, -- Current Server Status
@@ -32,6 +33,7 @@ CREATE TABLE mch_provisioner.servers(
 -- Table storing server backup information
 CREATE TABLE mch_provisioner.world_backups(
     id SERIAL PRIMARY KEY,                                              -- Id of the backup
+    openstack_id UUID NOT NULL,                                         -- UUID in openstack
     server_id SERIAL NOT NULL REFERENCES mch_provisioner.servers
         ON DELETE CASCADE,                                              -- Server the backup belongs to
     timestamp TIMESTAMP,                                                -- Timestamp of creation
