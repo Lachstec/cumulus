@@ -11,6 +11,7 @@ import (
 	"github.com/gophercloud/gophercloud/v2/openstack/compute/v2/keypairs"
 	"github.com/gophercloud/gophercloud/v2/openstack/compute/v2/servers"
 	"github.com/jmoiron/sqlx"
+	"log"
 	"net"
 )
 
@@ -80,11 +81,13 @@ func (m *MinecraftProvisioner) newPersistentVolume(ctx context.Context, name str
 
 	client, err := m.openstack.StorageClient()
 	if err != nil {
+		log.Println("Error getting storage client: ", err)
 		return nil, err
 	}
 
 	vol, err := volumes.Create(ctx, client, opts, nil).Extract()
 	if err != nil {
+		log.Println("Error creating volume: ", err)
 		return nil, err
 	}
 
@@ -96,11 +99,13 @@ func (m *MinecraftProvisioner) newPersistentVolume(ctx context.Context, name str
 	})
 
 	if err != nil {
+		log.Println("Error saving volume to database: ", err)
 		return nil, err
 	}
 
 	backup, err := m.backupstore.GetById(volumeId)
 	if err != nil {
+		log.Println("Error getting backup from database: ", err)
 		return nil, err
 	}
 
@@ -115,11 +120,13 @@ func (m *MinecraftProvisioner) newKeyPair(ctx context.Context, name string, publ
 
 	client, err := m.openstack.ComputeClient()
 	if err != nil {
+		log.Println("Error getting compute client: ", err)
 		return err
 	}
 
 	_, err = keypairs.Create(ctx, client, opts).Extract()
 	if err != nil {
+		log.Println("Error creating keypair: ", err)
 		return err
 	}
 	return nil
@@ -148,11 +155,13 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, name string, f
 
 	publicKey, privateKey, err := m.crypto.NewKeyPair()
 	if err != nil {
+		log.Println("Error generating keys for server: ", err)
 		return nil, err
 	}
 
 	err = m.newKeyPair(ctx, name+"public_key", publicKey)
 	if err != nil {
+		log.Println("Error saving pubkey to openstack: ", err)
 		return nil, err
 	}
 
@@ -171,6 +180,7 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, name string, f
 
 	server, err := servers.Create(ctx, client, optsExt, nil).Extract()
 	if err != nil {
+		log.Println("Error spawning server: ", err)
 		return nil, err
 	}
 
@@ -192,16 +202,19 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, name string, f
 
 	id, err := m.serverstore.Add(gameserver)
 	if err != nil {
+		log.Println("Error adding server to database: ", err)
 		return nil, err
 	}
 
 	gameserver, err = m.serverstore.GetById(id)
 	if err != nil {
+		log.Println("Error getting server from database: ", err)
 		return nil, err
 	}
 
 	volume, err := m.newPersistentVolume(ctx, gameserver.Name+"_volume", gameserver.Id)
 	if err != nil {
+		log.Println("Error creating persistent volume: ", err)
 		return nil, err
 	}
 
@@ -214,6 +227,7 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, name string, f
 	_, err = attachments.Create(ctx, client, attachmentOpts).Extract()
 
 	if err != nil {
+		log.Println("Error creating attachment: ", err)
 		return nil, err
 	}
 
