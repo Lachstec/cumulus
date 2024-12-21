@@ -2,9 +2,11 @@ package openstack
 
 import (
 	"context"
+	"crypto/tls"
 	"github.com/Lachstec/mc-hosting/internal/config"
 	"github.com/gophercloud/gophercloud/v2"
 	"github.com/gophercloud/gophercloud/v2/openstack"
+	"net/http"
 )
 
 // Client is a factory struct that can construct Clients
@@ -20,8 +22,25 @@ type Client struct {
 func NewClient(config config.Config) (*Client, error) {
 	authOpts := config.Openstack.AuthOptions()
 	ctx := context.Background()
-	provider, err := openstack.AuthenticatedClient(ctx, authOpts)
 
+	insecureHttp := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+	}
+
+	insecureHttpClient := &http.Client{
+		Transport: insecureHttp,
+	}
+
+	provider, err := openstack.NewClient(authOpts.IdentityEndpoint)
+
+	if err != nil {
+		return nil, err
+	}
+	provider.HTTPClient = *insecureHttpClient
+
+	err = openstack.Authenticate(ctx, provider, authOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -44,6 +63,14 @@ func (c *Client) ComputeClient() (*gophercloud.ServiceClient, error) {
 
 func (c *Client) StorageClient() (*gophercloud.ServiceClient, error) {
 	client, err := openstack.NewBlockStorageV3(c.client, gophercloud.EndpointOpts{})
+	if err != nil {
+		return nil, err
+	}
+	return client, nil
+}
+
+func (c *Client) NetworkingClient() (*gophercloud.ServiceClient, error) {
+	client, err := openstack.NewNetworkV2(c.client, gophercloud.EndpointOpts{})
 	if err != nil {
 		return nil, err
 	}
