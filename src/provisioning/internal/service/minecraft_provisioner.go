@@ -99,6 +99,8 @@ func (m *MinecraftProvisioner) newPersistentVolume(ctx context.Context, name str
 	return vol.ID, nil
 }
 
+// newKeyPair creates a new Public Key in Openstack that can be used
+// to authenticate per SSH later down the line.
 func (m *MinecraftProvisioner) newKeyPair(ctx context.Context, name string, publicKey string) error {
 	opts := keypairs.CreateOpts{
 		Name:      name,
@@ -119,6 +121,9 @@ func (m *MinecraftProvisioner) newKeyPair(ctx context.Context, name string, publ
 	return nil
 }
 
+// makeFloatingIp creates a new Floating Ip for use to connect to the running game server.
+// It currently has the network hardcoded to comply with the environment of the university cluster.
+// Must be changed later down the line. The Ip gets automatically associated to the server given with serverId
 func (m *MinecraftProvisioner) makeFloatingIp(ctx context.Context, serverId string) (*floatingips.FloatingIP, error) {
 	client, err := m.openstack.NetworkingClient()
 	if err != nil {
@@ -178,6 +183,8 @@ func (m *MinecraftProvisioner) makeFloatingIp(ctx context.Context, serverId stri
 	return ip, nil
 }
 
+// WaitForVolumeReady wait until a requested volume is ready to be mounted
+// Returns when the volume is ready or errors if the given timeout has elapsed.
 func (m *MinecraftProvisioner) WaitForVolumeReady(ctx context.Context, volumeID string, timeout time.Duration) error {
 	start := time.Now()
 	client, err := m.openstack.StorageClient()
