@@ -12,7 +12,7 @@ async function createClient() {
     domain: config.domain,
     clientId: config.clientId,
     cacheLocation: "localstorage",
-    authorizationParams: {audience: config.audience},
+    authorizationParams: { audience: config.audience },
   });
 
   return auth0;
