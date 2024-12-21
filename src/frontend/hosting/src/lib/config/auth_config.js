@@ -2,8 +2,8 @@ import {
   PUBLIC_AUTH_DOMAIN,
   PUBLIC_AUTH_CLIENT_ID,
   PUBLIC_AUTH_AUDIENCE,
-  PUBLIC_AUTH_CACHE_LOCATION
-} from '$env/static/public';
+  PUBLIC_AUTH_CACHE_LOCATION,
+} from "$env/static/public";
 
 const config = {
   domain: PUBLIC_AUTH_DOMAIN,
