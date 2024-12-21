@@ -28,7 +28,7 @@ go.work.sum
 .idea/
 
 # Auth
-auth_config.js
+# auth_config.js
 
 # Remove act (used for local testing of github workflows)
 act
