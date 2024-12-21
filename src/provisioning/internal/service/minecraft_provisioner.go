@@ -53,7 +53,7 @@ echo '{
 	"mtu": 1442
 }' > /etc/docker/daemon.json
 systemctl restart docker
-docker run -d -it -p 25565:25565 -e EULA=TRUE itzg/minecraft-server
+docker run -d -it -p 25565:25565 -v /mnt/data:/data -e EULA=TRUE itzg/minecraft-server
 `
 
 // MinecraftProvisioner is a service that can interact with
