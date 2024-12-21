@@ -29,13 +29,14 @@ type Config struct {
 //
 // DB_HOST: hostname for the database (default: localhost)
 // DB_PORT: port for the database (default: 5432)
-// DB_USER: username for the database (default: postgres)
-// DB_PASS: password for the database (default: postgres)
+// DB_USER: Username for the database (default: postgres)
+// DB_PASS: Password for the database (default: postgres)
 // AUTH0_URL: URL to the Auth0 Userinfo endpoint (default: http://localhost)
 // OPENSTACK_IDENTITY_ENDPOINT: Keystone URL of the openstack cluster (default: http://localhost)
 // OPENSTACK_USER: Username for openstack (default: osuser)
 // OPENSTACK_PASS: Password for openstack (default: ospassword)
-// OPENSTACK_TENANT_ID: TenantID for openstack (default: osp)
+// OPENSTACK_DOMAIN Domain for openstack (default: osp)
+// OPENSTACK_TENANT_NAME Tenant to use for openstack (default: default)
 // CRYPTO_KEY: Key to use for encrypting SSH Keys for the game servers (default: super_secure_default_key1!)
 func LoadConfig() *Config {
 	err := godotenv.Load()
@@ -59,10 +60,11 @@ func LoadConfig() *Config {
 			Url: *auth0,
 		},
 		Openstack: OpenStackConfig{
-			identityEndpoint: getEnv("OPENSTACK_IDENTITY_ENDPOINT", "http://localhost"),
-			username:         getEnv("OPENSTACK_USER", "osuser"),
-			password:         getEnv("OPENSTACK_PASS", "ospassword"),
-			tenantId:         getEnv("OPENSTACK_TENANT_ID", "osp"),
+			IdentityEndpoint: getEnv("OPENSTACK_IDENTITY_ENDPOINT", "http://localhost"),
+			Username:         getEnv("OPENSTACK_USER", "osuser"),
+			Password:         getEnv("OPENSTACK_PASS", "ospassword"),
+			Domain:           getEnv("OPENSTACK_DOMAIN", "osp"),
+			TenantName:       getEnv("OPENSTACK_TENANT_NAME", "default"),
 		},
 		CryptoConfig: CryptoConfig{
 			EncryptionKey: []byte(getEnv("CRYPTO_KEY", "super_secure_default_key1!")),

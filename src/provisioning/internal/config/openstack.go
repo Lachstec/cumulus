@@ -7,23 +7,26 @@ import (
 // OpenStackConfig contains all information that is needed to authenticate
 // to an openstack cluster.
 type OpenStackConfig struct {
-	// identityEndpoint URL to the Keystone Service of the openstack cluster
-	identityEndpoint string
-	// username to use for authentication
-	username string
-	// password to use for authentication
-	password string
-	// tenantId to use for authentication
-	tenantId string
+	// IdentityEndpoint URL to the Keystone Service of the openstack cluster
+	IdentityEndpoint string
+	// Username to use for authentication
+	Username string
+	// Password to use for authentication
+	Password string
+	// Domain to use for authentication
+	Domain string
+	// TenantName to use for authentication
+	TenantName string
 }
 
 // AuthOptions return an instance of gophercloud.AuthOptions that can be used
 // to authenticate against openstacks keystone service.
 func (c OpenStackConfig) AuthOptions() gophercloud.AuthOptions {
 	return gophercloud.AuthOptions{
-		IdentityEndpoint: c.identityEndpoint,
-		Username:         c.username,
-		Password:         c.password,
-		TenantID:         c.tenantId,
+		IdentityEndpoint: c.IdentityEndpoint,
+		Username:         c.Username,
+		Password:         c.Password,
+		DomainName:       c.Domain,
+		TenantName:       c.TenantName,
 	}
 }
