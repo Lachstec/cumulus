@@ -16,6 +16,8 @@ export const load: PageLoad = async ({ params }) => {
 
     return {
         name: data.name,
-        role: data.role
+        role: data.role,
     };
 };
+
+

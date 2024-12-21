@@ -1,7 +1,6 @@
 <script lang="ts">
     import {onMount} from "svelte";
     import {
-        Alert,
         Button,
         Table,
         TableBody,
@@ -10,7 +9,9 @@
         TableHead,
         TableHeadCell
     } from "flowbite-svelte";
-
+    import auth from "$lib/service/auth_service";
+    import type { Auth0Client } from "@auth0/auth0-spa-js";
+    
     type UserData = {
         ID: number,
         Sub: "",
@@ -19,9 +20,17 @@
     }
 
     let data: UserData[]
+    let auth0Client: Auth0Client;
 
     async function getAllUsers() {
-        const res = await fetch("http://localhost:10000/users");
+        auth0Client = await auth.createClient();
+        const token = await auth0Client.getTokenSilently();
+        const res = await fetch("http://localhost:10000/users", {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
         data = await res.json();
     }
 
