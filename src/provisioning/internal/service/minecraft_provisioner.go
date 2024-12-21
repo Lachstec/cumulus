@@ -10,6 +10,8 @@ import (
 	"github.com/gophercloud/gophercloud/v2/openstack/blockstorage/v3/volumes"
 	"github.com/gophercloud/gophercloud/v2/openstack/compute/v2/keypairs"
 	"github.com/gophercloud/gophercloud/v2/openstack/compute/v2/servers"
+	"github.com/gophercloud/gophercloud/v2/openstack/networking/v2/extensions/layer3/floatingips"
+	ports2 "github.com/gophercloud/gophercloud/v2/openstack/networking/v2/ports"
 	"github.com/jmoiron/sqlx"
 	"log"
 	"net"
@@ -47,7 +49,10 @@ fi
 mkdir -p $mount_point
 mount $device $mount_point
 echo "$device $mount_point ext4 defaults 0 0" >> /etc/fstab
-
+echo '{
+	"mtu": 1442
+}' > /etc/docker/daemon.json
+systemctl restart docker
 docker run -d -it -p 25565:25565 -e EULA=TRUE itzg/minecraft-server
 `
 
@@ -114,36 +119,63 @@ func (m *MinecraftProvisioner) newKeyPair(ctx context.Context, name string, publ
 	return nil
 }
 
-func (m *MinecraftProvisioner) pollServerIp(ctx context.Context, serverId string) (string, error) {
-	timeout := time.After(2 * time.Minute)
-	ticker := time.Tick(5 * time.Second)
-	client, err := m.openstack.ComputeClient()
+func (m *MinecraftProvisioner) makeFloatingIp(ctx context.Context, serverId string) (*floatingips.FloatingIP, error) {
+	client, err := m.openstack.NetworkingClient()
 	if err != nil {
-		log.Println("Error getting compute client: ", err)
-		return "", err
+		fmt.Println("Error getting network client: ", err)
+		return &floatingips.FloatingIP{}, err
 	}
 
+	compClient, err := m.openstack.ComputeClient()
+	if err != nil {
+		fmt.Println("Error getting compute client: ", err)
+		return &floatingips.FloatingIP{}, err
+	}
+
+	// Wait for server to be in ACTIVE state
 	for {
-		select {
-		case <-timeout:
-			return "", fmt.Errorf("timed out waiting for server IP")
-		case <-ticker:
-			server, err := servers.Get(ctx, client, serverId).Extract()
-			if err != nil {
-				return "", fmt.Errorf("failed to get server details: %v", err)
-			}
-
-			// Check for IP address
-			for _, addresses := range server.Addresses {
-				for _, addr := range addresses.([]interface{}) {
-					address := addr.(map[string]interface{})
-					if address["addr"] != nil {
-						return address["addr"].(string), nil
-					}
-				}
-			}
+		server, err := servers.Get(ctx, compClient, serverId).Extract()
+		if err != nil {
+			log.Println("Error getting server status: ", err)
+			return &floatingips.FloatingIP{}, err
 		}
+
+		if server.Status == "ACTIVE" {
+			break
+		}
+
+		log.Println("Waiting for server to become ACTIVE...")
+		time.Sleep(5 * time.Second) // Wait for 5 seconds before checking again
 	}
+
+	ports, err := ports2.List(client, ports2.ListOpts{
+		DeviceID: serverId,
+	}).AllPages(ctx)
+
+	if err != nil {
+		return &floatingips.FloatingIP{}, err
+	}
+
+	portList, err := ports2.ExtractPorts(ports)
+
+	if len(portList) == 0 {
+		fmt.Println("No ports found for device")
+		return &floatingips.FloatingIP{}, err
+	}
+
+	fmt.Println("port id: ", portList[0].ID)
+
+	ip, err := floatingips.Create(ctx, client, floatingips.CreateOpts{
+		FloatingNetworkID: "6f530989-999a-49e6-9197-8a33ae7bfce7",
+		PortID:            portList[0].ID,
+	}).Extract()
+
+	if err != nil {
+		fmt.Println("Error creating floating ip: ", err)
+		return &floatingips.FloatingIP{}, err
+	}
+
+	return ip, nil
 }
 
 func (m *MinecraftProvisioner) WaitForVolumeReady(ctx context.Context, volumeID string, timeout time.Duration) error {
@@ -251,15 +283,16 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, name string, f
 		return nil, err
 	}
 
-	addr, err := m.pollServerIp(ctx, server.ID)
+	addr, err := m.makeFloatingIp(ctx, server.ID)
 	if err != nil {
-		log.Println("Error polling server IP address: ", err)
+		log.Println("Error creating floating ip: ", err)
+		return nil, err
 	}
 
 	gameserver := types.Server{
 		OpenstackId:      server.ID,
 		Name:             name,
-		Address:          net.ParseIP(addr),
+		Address:          net.ParseIP(addr.FloatingIP),
 		Status:           types.Running,
 		Port:             25565,
 		Memory:           flavour.AvailableRam(),
