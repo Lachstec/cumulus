@@ -33,7 +33,7 @@ func LoadConfig() *Config {
 		log.Println("No .env file found. Using Fallback values")
 	}
 
-	auth0, err := url.Parse(getEnv("AUTH0_URL", "http://localhost"))
+	authURL, err := url.Parse(getEnv("AUTH0_URL", "http://localhost"))
 	if err != nil {
 		log.Fatalln("Invalid url for Auth0")
 	}
@@ -46,7 +46,9 @@ func LoadConfig() *Config {
 			Password: getEnv("DB_PASS", "postgres"),
 		},
 		Auth0: Auth0Config{
-			Url: *auth0,
+			AuthURL:  *authURL,
+			Audience: getEnv("AUTH0_AUDIENCE", "http://localhost"),
+			Secret:   getEnv("AUTH0_SECRET", "secret"),
 		},
 	}
 	return cfg
