@@ -50,7 +50,8 @@ func (s *ServerStore) Find(predicate Predicate[types.Server]) ([]types.Server, e
 func (s *ServerStore) Add(server types.Server) (int64, error) {
 	var id int64
 	err := s.db.QueryRowx(
-		"INSERT INTO mch_provisioner.servers (name, addr, status, port, memory_mb, game, game_version, game_mode, difficulty, whitelist_enabled, players_max) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id;",
+		"INSERT INTO mch_provisioner.servers (openstack_id, name, addr, status, port, memory_mb, game, game_version, game_mode, difficulty, whitelist_enabled, players_max, ssh_key) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id;",
+		server.OpenstackId,
 		server.Name,
 		server.Address.String(),
 		server.Status,
@@ -62,6 +63,7 @@ func (s *ServerStore) Add(server types.Server) (int64, error) {
 		server.Difficulty,
 		server.WhitelistEnabled,
 		server.PlayersMax,
+		server.SSHKey,
 	).Scan(&id)
 	if err != nil {
 		return 0, err
@@ -72,7 +74,8 @@ func (s *ServerStore) Add(server types.Server) (int64, error) {
 func (s *ServerStore) Update(server types.Server) (types.Server, error) {
 	var updated types.Server
 	err := s.db.QueryRowx(
-		"UPDATE mch_provisioner.servers SET name = $1, addr = $2, status = $3, port = $4, memory_mb = $5, game = $6, game_version = $7, game_mode = $8, difficulty = $9, whitelist_enabled = $10, players_max = $11 WHERE id = $12 RETURNING *;",
+		"UPDATE mch_provisioner.servers SET openstack_id = $1, name = $2, addr = $3, status = $4, port = $5, memory_mb = $6, game = $7, game_version = $8, game_mode = $9, difficulty = $10, whitelist_enabled = $11, players_max = $12 WHERE id = $13 RETURNING *;",
+		server.OpenstackId,
 		server.Name,
 		server.Address,
 		server.Status,

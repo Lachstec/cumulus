@@ -30,6 +30,7 @@ const (
 
 type Server struct {
 	Id               int64
+	OpenstackId      string `db:"openstack_id"`
 	Name             string
 	Address          net.IP `db:"addr"`
 	Status           ServerStatus
@@ -39,6 +40,7 @@ type Server struct {
 	GameVersion      string   `db:"game_version"`
 	GameMode         GameMode `db:"game_mode"`
 	Difficulty       Difficulty
-	WhitelistEnabled bool `db:"whitelist_enabled"`
-	PlayersMax       int  `db:"players_max"`
+	WhitelistEnabled bool   `db:"whitelist_enabled"`
+	PlayersMax       int    `db:"players_max"`
+	SSHKey           []byte `db:"ssh_key"`
 }

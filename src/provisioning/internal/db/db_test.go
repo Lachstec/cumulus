@@ -34,6 +34,7 @@ func TestServerStore(t *testing.T) {
 
 	server := types.Server{
 		Id:               0,
+		OpenstackId:      "31e0683c-5455-4510-b3ba-3c02241a3eff",
 		Name:             "Test Server",
 		Address:          net.ParseIP("192.168.1.1"),
 		Status:           types.Stopped,
@@ -45,6 +46,7 @@ func TestServerStore(t *testing.T) {
 		Difficulty:       types.Normal,
 		WhitelistEnabled: false,
 		PlayersMax:       2,
+		SSHKey:           []byte("sample ssh key"),
 	}
 
 	id, err := serverStore.Add(server)
@@ -60,12 +62,11 @@ func TestServerStore(t *testing.T) {
 	cmp.Equal(server, inserted)
 
 	backup := types.Backup{
-		Id:        0,
-		ServerId:  inserted.Id,
-		World:     "Nether",
-		Game:      "Minecraft",
-		Timestamp: time.Now(),
-		Size:      4096,
+		Id:          0,
+		OpenstackId: "31e0683c-5455-4510-b3ba-3c02241a3eff",
+		ServerId:    inserted.Id,
+		Timestamp:   time.Now(),
+		Size:        4096,
 	}
 
 	backupId, err := backupStore.Add(backup)
@@ -80,16 +81,10 @@ func TestServerStore(t *testing.T) {
 	}
 
 	cmp.Equal(insertedBackup, backup)
-
-	insertedBackup.Game = "Minecraft 2.0 - Electric Boogaloo"
 	updatedBackup, err := backupStore.Update(insertedBackup)
 
 	if err != nil {
 		t.Fatalf("unable to update backup: %s", err)
-	}
-
-	if updatedBackup.Game != "Minecraft 2.0 - Electric Boogaloo" {
-		t.Fatalf("expected game to be Minecraft 2.0 - Electric Boogaloo but got %s", updatedBackup.Game)
 	}
 
 	err = backupStore.Delete(updatedBackup)
