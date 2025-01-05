@@ -3,6 +3,7 @@ module github.com/Lachstec/mc-hosting
 go 1.23.3
 
 require (
+	github.com/auth0/go-jwt-middleware/v2 v2.2.2
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/google/go-cmp v0.6.0
 	github.com/gophercloud/gophercloud/v2 v2.2.0
@@ -36,5 +37,6 @@ require (
 	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/sys v0.25.0 // indirect
 	golang.org/x/text v0.18.0 // indirect
+	gopkg.in/go-jose/go-jose.v2 v2.6.3 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

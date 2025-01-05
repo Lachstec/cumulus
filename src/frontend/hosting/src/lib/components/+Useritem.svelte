@@ -17,8 +17,6 @@
   let auth0Client: Auth0Client;
 
   onMount(async () => {
-    console.log("onMountCalled");
-
     auth0Client = await auth.createClient();
 
     isAuthenticated.set(await auth0Client.checkSession());

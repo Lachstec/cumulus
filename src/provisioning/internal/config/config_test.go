@@ -19,6 +19,8 @@ func TestLoadConfig(t *testing.T) {
 	os.Setenv("OPENSTACK_DOMAIN", "default")
 	os.Setenv("OPENSTACK_TENANT_NAME", "my_tenant")
 	os.Setenv("CRYPTO_KEY", "my_secret_key")
+	os.Setenv("AUTH0_AUDIENCE", "https://mc-hosting.zip")
+	os.Setenv("AUTH0_SECRET", "sample_secret")
 
 	defer func() {
 		os.Unsetenv("DB_HOST")
@@ -32,6 +34,8 @@ func TestLoadConfig(t *testing.T) {
 		os.Unsetenv("OPENSTACK_DOMAIN")
 		os.Unsetenv("OPENSTACK_TENANT_NAME")
 		os.Unsetenv("CRYPTO_KEY")
+		os.Unsetenv("AUTH0_AUDIENCE")
+		os.Unsetenv("AUTH0_SECRET")
 	}()
 
 	cfg := LoadConfig()
@@ -47,6 +51,9 @@ func TestLoadConfig(t *testing.T) {
 	assert.Equal(t, "default", cfg.Openstack.Domain)
 	assert.Equal(t, "my_tenant", cfg.Openstack.TenantName)
 	assert.Equal(t, []byte("my_secret_key"), cfg.CryptoConfig.EncryptionKey)
+	assert.Equal(t, url.URL{Scheme: "https", Host: "auth0.com", Path: "/test"}, cfg.Auth0.AuthURL)
+	assert.Equal(t, "https://mc-hosting.zip", cfg.Auth0.Audience)
+	assert.Equal(t, "sample_secret", cfg.Auth0.Secret)
 }
 
 func TestFallbackValues(t *testing.T) {
@@ -63,4 +70,7 @@ func TestFallbackValues(t *testing.T) {
 	assert.Equal(t, "osp", cfg.Openstack.Domain)
 	assert.Equal(t, "default", cfg.Openstack.TenantName)
 	assert.Equal(t, []byte("super_secure_default_key1!"), cfg.CryptoConfig.EncryptionKey)
+	assert.Equal(t, url.URL{Scheme: "http", Host: "localhost"}, cfg.Auth0.AuthURL)
+	assert.Equal(t, "http://localhost", cfg.Auth0.Audience)
+	assert.Equal(t, "secret", cfg.Auth0.Secret)
 }
