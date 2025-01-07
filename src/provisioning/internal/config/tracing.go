@@ -7,6 +7,4 @@ type TracingConfig struct {
 	Endpoint string
 	// ServiceName is the name that will be used to identify this service.
 	ServiceName string
-	// InsecureConnection specifies whether to validate Certificates or not. Should only be set when developing.
-	InsecureConnection bool
 }
