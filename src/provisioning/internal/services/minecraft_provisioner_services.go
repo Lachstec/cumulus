@@ -63,6 +63,7 @@ type MinecraftProvisioner struct {
 	crypto      *CryptoService
 	backupstore db.Store[types.Backup]
 	serverstore db.Store[types.Server]
+	keystore    db.Store[types.Key]
 	openstack   *openstack.Client
 }
 
@@ -73,6 +74,7 @@ func NewMinecraftProvisioner(conn *sqlx.DB, openstack *openstack.Client, secretK
 		crypto:      NewCryptoService(secretKey),
 		backupstore: db.NewServerBackupStore(conn),
 		serverstore: db.NewServerStore(conn),
+		keystore:    db.NewKeyStore(conn),
 		openstack:   openstack,
 	}
 }
@@ -102,7 +104,7 @@ func (m *MinecraftProvisioner) newPersistentVolume(ctx context.Context, name str
 
 // newKeyPair creates a new Public Key in Openstack that can be used
 // to authenticate per SSH later down the line.
-func (m *MinecraftProvisioner) newKeyPair(ctx context.Context, name string, publicKey string) error {
+func (m *MinecraftProvisioner) newKeyPair(ctx context.Context, name string, publicKey string, privateKey string) (int64, error) {
 	opts := keypairs.CreateOpts{
 		Name:      name,
 		PublicKey: publicKey,
@@ -111,15 +113,27 @@ func (m *MinecraftProvisioner) newKeyPair(ctx context.Context, name string, publ
 	client, err := m.openstack.ComputeClient()
 	if err != nil {
 		log.Println("Error getting compute client: ", err)
-		return err
+		return 0, err
 	}
 
-	_, err = keypairs.Create(ctx, client, opts).Extract()
+	keys, err := keypairs.Create(ctx, client, opts).Extract()
 	if err != nil {
 		log.Println("Error creating keypair: ", err)
-		return err
+		return 0, err
 	}
-	return nil
+
+	key := types.Key{
+		Name:       keys.Name,
+		PublicKey:  []byte(keys.PublicKey),
+		PrivateKey: []byte(keys.PrivateKey),
+	}
+
+	id, err := m.keystore.Add(&key)
+	if err != nil {
+		log.Println("Error adding keypair: ", err)
+	}
+
+	return id, nil
 }
 
 // makeFloatingIp creates a new Floating Ip for use to connect to the running game server.
@@ -261,6 +275,7 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, server *types.
 		return nil, err
 	}
 
+	kid, err := m.newKeyPair(ctx, name+"public_key", publicKey, privateKey)
 	err = m.newKeyPair(ctx, server.Name+"public_key", publicKey)
 	if err != nil {
 		log.Println("Error saving pubkey to openstack: ", err)
@@ -297,11 +312,11 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, server *types.
 		return nil, err
 	}
 
-	server.OpenstackID = gcServer.ID
+	server.OpenstackId = gcServer.ID
 	server.Address = net.ParseIP(addr.FloatingIP)
 	server.Status = types.Running
 	server.Port = 25565
-	server.SSHKey = []byte(privateKey)
+	server.SSHKey = kid
 
 	backup := &types.Backup{
 		OpenstackID: volume,
@@ -317,4 +332,53 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, server *types.
 	}
 
 	return server, nil
+}
+
+func (m *MinecraftProvisioner) DeleteGameServer(ctx context.Context, server types.Server) error {
+	backups, err := m.backupstore.Find(func(b *types.Backup) bool { return b.ServerID == server.ID })
+	if err != nil {
+		log.Printf("Error finding backups for Server with id %d: %v", server.ID, err)
+		return err
+	}
+
+	storageClient, err := m.openstack.ComputeClient()
+	if err != nil {
+		log.Println("Error getting storage client: ", err)
+		return err
+	}
+
+	computeClient, err := m.openstack.ComputeClient()
+	if err != nil {
+		log.Println("Error getting compute client: ", err)
+		return err
+	}
+
+	key, err := m.keystore.Find(func(k *types.Key) bool { return server.SSHKey == k.Id })
+	if err != nil || len(key) == 0 {
+		log.Println("Error finding server key: ", err)
+	}
+
+	err = servers.Delete(ctx, computeClient, server.OpenstackId).ExtractErr()
+	if err != nil {
+		log.Println("Error deleting server: ", err)
+		return err
+	}
+
+	err = keypairs.Delete(ctx, computeClient, key[0].Name, nil).ExtractErr()
+	if err != nil {
+		log.Println("Error deleting keypair: ", err)
+	}
+
+	for _, backup := range backups {
+		log.Println("Deleting backup: ", backup.OpenstackID)
+		err = volumes.Delete(ctx, storageClient, backup.OpenstackID, nil).ExtractErr()
+		if err != nil {
+			log.Println("Error deleting backup: ", err)
+			return err
+		}
+	}
+
+	// TODO: Implement deletion of the Floating IP. Needs another Table probably.
+
+	return nil
 }
