@@ -1,7 +1,8 @@
 package types
 
-// Key represents a SSH Keypair for use with OpenStack.
+// Key represents an SSH Keypair for use with OpenStack.
 type Key struct {
+	Id int64
 	// Name of the Keypair in OpenStack
 	Name string
 	// PublicKey part of the Keypair.
