@@ -276,7 +276,6 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, server *types.
 	}
 
 	kid, err := m.newKeyPair(ctx, name+"public_key", publicKey, privateKey)
-	err = m.newKeyPair(ctx, server.Name+"public_key", publicKey)
 	if err != nil {
 		log.Println("Error saving pubkey to openstack: ", err)
 		return nil, err
@@ -341,7 +340,7 @@ func (m *MinecraftProvisioner) DeleteGameServer(ctx context.Context, server type
 		return err
 	}
 
-	storageClient, err := m.openstack.ComputeClient()
+	storageClient, err := m.openstack.StorageClient()
 	if err != nil {
 		log.Println("Error getting storage client: ", err)
 		return err
@@ -371,6 +370,14 @@ func (m *MinecraftProvisioner) DeleteGameServer(ctx context.Context, server type
 
 	for _, backup := range backups {
 		log.Println("Deleting backup: ", backup.OpenstackID)
+		err = volumes.Delete(ctx, storageClient, backup.OpenstackID, nil).ExtractErr()
+		log.Println("Deleting backup: ", backup.OpenstackID)
+		err = m.WaitForVolumeReady(ctx, backup.OpenstackID, time.Minute*2)
+		if err != nil {
+			log.Println("Error deleting backup: ", err)
+			return err
+		}
+
 		err = volumes.Delete(ctx, storageClient, backup.OpenstackID, nil).ExtractErr()
 		if err != nil {
 			log.Println("Error deleting backup: ", err)
