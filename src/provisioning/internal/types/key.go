@@ -6,7 +6,7 @@ type Key struct {
 	// Name of the Keypair in OpenStack
 	Name string
 	// PublicKey part of the Keypair.
-	PublicKey []byte
+	PublicKey []byte `db:"public_key"`
 	// PrivateKey part of the Keypair.
-	PrivateKey []byte
+	PrivateKey []byte `db:"private_key"`
 }
