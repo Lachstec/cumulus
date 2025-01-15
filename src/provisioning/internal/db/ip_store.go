@@ -9,7 +9,7 @@ type IPStore struct {
 	db *sqlx.DB
 }
 
-func NewIPStore(db *sqlx.DB) *IPStore {
+func NewIPStore(db *sqlx.DB) Store[types.FloatingIP] {
 	return &IPStore{db: db}
 }
 
@@ -21,6 +21,7 @@ func (i *IPStore) GetById(id int64) (types.FloatingIP, error) {
 	if err != nil {
 		return types.FloatingIP{}, err
 	}
+
 	return ip, nil
 }
 

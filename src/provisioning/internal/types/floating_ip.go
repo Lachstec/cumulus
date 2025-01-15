@@ -5,5 +5,9 @@ import "net"
 type FloatingIP struct {
 	Id          int64
 	OpenstackId string `db:"openstack_id"`
-	Ip          net.IP `db:"addr"`
+	Ip          string `db:"addr"`
+}
+
+func (f *FloatingIP) GetIP() net.IP {
+	return net.ParseIP(f.Ip)
 }
