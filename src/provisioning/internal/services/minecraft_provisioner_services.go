@@ -345,6 +345,10 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, server *types.
 	return server, nil
 }
 
+// DeleteGameServer completely de-provisions the given server. It does this by
+// first deleting the compute instance, then the keypair associated with it. After that,
+// the attached volume with game data gets deleted and as a last thing, the floating
+// ip that was used to make it accessible gets released.
 func (m *MinecraftProvisioner) DeleteGameServer(ctx context.Context, server types.Server) error {
 	backups, err := m.backupstore.Find(func(b *types.Backup) bool { return b.ServerID == server.ID })
 	if err != nil {
