@@ -5,7 +5,6 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/assert"
-	"net"
 	"testing"
 	"time"
 )
@@ -40,6 +39,7 @@ func TestServerStore(t *testing.T) {
 		Class: string(types.Admin),
 	}
 	keyStore := NewKeyStore(db.Db)
+	ipStore := NewIPStore(db.Db)
 
 	key := types.Key{
 		Name:       "key1",
@@ -57,11 +57,21 @@ func TestServerStore(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	addr := types.FloatingIP{
+		OpenstackId: "696d03a0-c5c3-4eba-878f-b0aca2d84cd0",
+		Ip:          "192.168.0.1",
+	}
+
+	iid, err := ipStore.Add(addr)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	server := &types.Server{
 		UserID:           uid,
 		OpenstackId:      "31e0683c-5455-4510-b3ba-3c02241a3eff",
 		Name:             "Test Server",
-		Address:          net.ParseIP("192.168.1.1"),
+		Address:          iid,
 		Status:           types.Stopped,
 		Port:             1337,
 		Flavour:          types.Flavours[2].ID,
@@ -185,5 +195,45 @@ func TestKeyStore(t *testing.T) {
 
 	if len(keys) != 0 {
 		t.Fatalf("expected 0 keys, got %d", len(keys))
+	}
+}
+
+func TestIpStore(t *testing.T) {
+	db := NewTestConnection()
+	ipStore := NewIPStore(db.Db)
+
+	id, err := ipStore.Add(types.FloatingIP{OpenstackId: "696d03a0-c5c3-4eba-878f-b0aca2d84cd0", Ip: "192.168.0.1"})
+	if err != nil {
+		t.Fatalf("unable to save ip: %s", err)
+	}
+
+	ip, err := ipStore.GetById(id)
+	if err != nil {
+		t.Fatalf("unable to get ip: %s", err)
+	}
+
+	assert.Equal(t, ip.OpenstackId, "696d03a0-c5c3-4eba-878f-b0aca2d84cd0")
+	assert.Equal(t, ip.Ip, "192.168.0.1")
+
+	ip.OpenstackId = "307c6705-02b2-4144-94ad-2be61134f283"
+	updated, err := ipStore.Update(ip)
+	if err != nil {
+		t.Fatalf("unable to update ip: %s", err)
+	}
+
+	assert.Equal(t, updated.OpenstackId, "307c6705-02b2-4144-94ad-2be61134f283")
+
+	err = ipStore.Delete(ip)
+	if err != nil {
+		t.Fatalf("unable to delete ip: %s", err)
+	}
+
+	ips, err := ipStore.Find(func(i types.FloatingIP) bool { return i.Id == updated.Id })
+	if err != nil {
+		t.Fatalf("unable to find ips: %s", err)
+	}
+
+	if len(ips) != 0 {
+		t.Fatalf("expected 0 ips, got %d", len(ips))
 	}
 }
