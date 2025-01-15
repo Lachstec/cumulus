@@ -64,6 +64,7 @@ type MinecraftProvisioner struct {
 	backupstore db.Store[types.Backup]
 	serverstore db.Store[types.Server]
 	keystore    db.Store[types.Key]
+	ipstore     db.Store[types.FloatingIP]
 	openstack   *openstack.Client
 }
 
@@ -75,6 +76,7 @@ func NewMinecraftProvisioner(conn *sqlx.DB, openstack *openstack.Client, secretK
 		backupstore: db.NewServerBackupStore(conn),
 		serverstore: db.NewServerStore(conn),
 		keystore:    db.NewKeyStore(conn),
+		ipstore:     db.NewIPStore(conn),
 		openstack:   openstack,
 	}
 }
@@ -311,6 +313,16 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, server *types.
 		return nil, err
 	}
 
+	ip, err := m.ipstore.Add(types.FloatingIP{
+		OpenstackId: addr.ID,
+		Ip:          addr.FloatingIP,
+	})
+
+	if err != nil {
+		log.Println("Error adding floating ip: ", err)
+		return nil, err
+	}
+
 	server.OpenstackId = gcServer.ID
 	server.Address = net.ParseIP(addr.FloatingIP)
 	server.Status = types.Running
@@ -352,6 +364,12 @@ func (m *MinecraftProvisioner) DeleteGameServer(ctx context.Context, server type
 		return err
 	}
 
+	networkClient, err := m.openstack.NetworkingClient()
+	if err != nil {
+		log.Println("Error getting network client: ", err)
+		return err
+	}
+
 	key, err := m.keystore.Find(func(k *types.Key) bool { return server.SSHKey == k.Id })
 	if err != nil || len(key) == 0 {
 		log.Println("Error finding server key: ", err)
@@ -385,7 +403,17 @@ func (m *MinecraftProvisioner) DeleteGameServer(ctx context.Context, server type
 		}
 	}
 
-	// TODO: Implement deletion of the Floating IP. Needs another Table probably.
+	ip, err := m.ipstore.Find(func(ip types.FloatingIP) bool { return server.Address == ip.Id })
+	if err != nil || len(ip) == 0 {
+		log.Println("Error finding ip: ", err)
+		return err
+	}
+
+	err = floatingips.Delete(ctx, networkClient, ip[0].OpenstackId).ExtractErr()
+	if err != nil {
+		log.Println("Error deleting floating ip: ", err)
+		return err
+	}
 
 	return nil
 }
