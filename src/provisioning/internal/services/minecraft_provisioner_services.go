@@ -127,7 +127,7 @@ func (m *MinecraftProvisioner) newKeyPair(ctx context.Context, name string, publ
 	key := types.Key{
 		Name:       keys.Name,
 		PublicKey:  []byte(keys.PublicKey),
-		PrivateKey: []byte(keys.PrivateKey),
+		PrivateKey: []byte(privateKey),
 	}
 
 	id, err := m.keystore.Add(&key)
