@@ -53,7 +53,7 @@ func (s *ServerStore) Add(server *types.Server) (int64, error) {
 		server.UserID,
 		server.OpenstackID,
 		server.Name,
-		server.Address.String(),
+		server.Address,
 		server.Status,
 		server.Port,
 		server.Flavour,
