@@ -268,7 +268,7 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, server types.S
 
 	opts := servers.CreateOpts{
 		Name:        server.Name,
-		FlavorRef:   string(server.Flavour),
+		FlavorRef:   server.Flavour.ID,
 		ImageRef:    string(server.Image),
 		BlockDevice: blockDev,
 		UserData:    []byte(userData),
@@ -301,22 +301,6 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, server types.S
 	server.Status = types.Running
 	server.Port = 25565
 	server.SSHKey = []byte(privateKey)
-
-	gameserver := types.Server{
-		OpenstackID:      gc_server.ID,
-		Name:             name,
-		Address:          net.ParseIP(addr.FloatingIP),
-		Status:           types.Running,
-		Port:             25565,
-		Memory:           flavour.AvailableRam(),
-		Game:             "Minecraft",
-		GameVersion:      "1.0.0",
-		GameMode:         types.Survival,
-		Difficulty:       types.Normal,
-		WhitelistEnabled: false,
-		PlayersMax:       2,
-		SSHKey:           []byte(privateKey),
-	}
 
 	id, err := m.serverstore.Add(gameserver)
 	if err != nil {

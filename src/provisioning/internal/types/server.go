@@ -110,7 +110,7 @@ const (
 type Server struct {
 	ID               int64
 	OpenstackID      string `db:"openstack_id"`
-	Name             string
+	Name             string `db:"name" json:"name"`
 	Address          net.IP `db:"addr"`
 	Status           ServerStatus
 	Port             int
