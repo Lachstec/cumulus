@@ -6,9 +6,9 @@ import {
 } from "$env/static/public";
 
 const config = {
-  domain: PUBLIC_AUTH_DOMAIN,
-  clientId: PUBLIC_AUTH_CLIENT_ID,
-  audience: PUBLIC_AUTH_AUDIENCE, // Optional but needed for access tokens
-  cacheLocation: PUBLIC_AUTH_CACHE_LOCATION, // Optional: Use localStorage to persist tokens
+  domain: PUBLIC_AUTH_DOMAIN || "ask_auth0",
+  clientId: PUBLIC_AUTH_CLIENT_ID || "ask_auth0",
+  audience: PUBLIC_AUTH_AUDIENCE || "http://localhost:3001/api", // Optional but needed for access tokens
+  cacheLocation: PUBLIC_AUTH_CACHE_LOCATION || "localstorage", // Optional: Use localStorage to persist tokens
 };
 export default config;
