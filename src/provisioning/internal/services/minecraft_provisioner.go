@@ -216,14 +216,14 @@ func (m *MinecraftProvisioner) WaitForVolumeReady(ctx context.Context, volumeID 
 // NewGameServer provisions a new Gameserver with the specified flavour in openstack. The provisioned server
 // has an ephemeral disk and uses the default settings and config of the specified image
 // in openstack. Information about the server gets stored in the database.
-func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, name string, flavour types.Flavour, image types.Image) (*types.Server, error) {
+func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, server types.Server) (*types.Server, error) {
 	client, err := m.openstack.ComputeClient()
 	if err != nil {
 		log.Println("Error getting compute client: ", err)
 		return nil, err
 	}
 
-	volume, err := m.newPersistentVolume(ctx, name+"_volume")
+	volume, err := m.newPersistentVolume(ctx, server.Name+"_volume")
 	if err != nil {
 		log.Println("Error creating persistent volume: ", err)
 		return nil, err
@@ -241,7 +241,7 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, name string, f
 			DeleteOnTermination: true,
 			DestinationType:     servers.DestinationLocal,
 			SourceType:          servers.SourceImage,
-			UUID:                image.Value(),
+			UUID:                string(server.Image),
 		},
 		{
 			BootIndex:           1,
@@ -260,16 +260,16 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, name string, f
 		return nil, err
 	}
 
-	err = m.newKeyPair(ctx, name+"public_key", publicKey)
+	err = m.newKeyPair(ctx, server.Name+"public_key", publicKey)
 	if err != nil {
 		log.Println("Error saving pubkey to openstack: ", err)
 		return nil, err
 	}
 
 	opts := servers.CreateOpts{
-		Name:        name,
-		FlavorRef:   flavour.Value(),
-		ImageRef:    image.Value(),
+		Name:        server.Name,
+		FlavorRef:   string(server.Flavour),
+		ImageRef:    string(server.Image),
 		BlockDevice: blockDev,
 		UserData:    []byte(userData),
 		Networks: []servers.Network{
@@ -281,23 +281,29 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, name string, f
 
 	optsExt := keypairs.CreateOptsExt{
 		CreateOptsBuilder: opts,
-		KeyName:           name + "public_key",
+		KeyName:           server.Name + "public_key",
 	}
 
-	server, err := servers.Create(ctx, client, optsExt, nil).Extract()
+	gc_server, err := servers.Create(ctx, client, optsExt, nil).Extract()
 	if err != nil {
 		log.Println("Error spawning server: ", err)
 		return nil, err
 	}
 
-	addr, err := m.makeFloatingIp(ctx, server.ID)
+	addr, err := m.makeFloatingIp(ctx, gc_server.ID)
 	if err != nil {
 		log.Println("Error creating floating ip: ", err)
 		return nil, err
 	}
 
+	server.OpenstackID = gc_server.ID
+	server.Address = net.ParseIP(addr.FloatingIP)
+	server.Status = types.Running
+	server.Port = 25565
+	server.SSHKey = []byte(privateKey)
+
 	gameserver := types.Server{
-		OpenstackID:      server.ID,
+		OpenstackID:      gc_server.ID,
 		Name:             name,
 		Address:          net.ParseIP(addr.FloatingIP),
 		Status:           types.Running,
