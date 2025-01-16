@@ -7,7 +7,8 @@ import (
 )
 
 type ServerService struct {
-	store *db.ServerStore
+	//store *db.ServerStore
+	store db.Store[types.Server]
 }
 
 func NewServerService(conn *sqlx.DB) *ServerService {

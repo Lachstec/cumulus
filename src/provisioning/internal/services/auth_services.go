@@ -4,10 +4,6 @@ import (
 	"context"
 	jwtmiddleware "github.com/auth0/go-jwt-middleware/v2"
 	"github.com/auth0/go-jwt-middleware/v2/validator"
-	"encoding/json"
-	"github.com/Lachstec/mc-hosting/internal/types"
-	"io"
-	"net/http"
 	"net/url"
 )
 

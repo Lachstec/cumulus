@@ -48,10 +48,10 @@ func (b *ServerBackupStore) Find(predicate Predicate[types.Backup]) ([]types.Bac
 }
 
 func (b *ServerBackupStore) Add(backup types.Backup) (int64, error) {
-	var id int64
+	var ID int64
 	err := b.db.QueryRowx("INSERT INTO mch_provisioner.world_backups (openstack_id, server_id, timestamp, size) VALUES ($1, $2, $3, $4) RETURNING id;",
-		backup.OpenstackId,
-		backup.ServerId,
+		backup.OpenstackID,
+		backup.ServerID,
 		backup.Timestamp,
 		backup.Size,
 	).Scan(&id)
@@ -64,7 +64,7 @@ func (b *ServerBackupStore) Add(backup types.Backup) (int64, error) {
 
 func (b *ServerBackupStore) Update(backup types.Backup) (types.Backup, error) {
 	_, err := b.db.Exec("UPDATE mch_provisioner.world_backups SET server_id = $1, timestamp = $2, size = $3 WHERE id = $4",
-		backup.ServerId,
+		backup.ServerID,
 		backup.Timestamp,
 		backup.Size,
 		backup.Id,

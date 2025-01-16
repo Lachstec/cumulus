@@ -33,8 +33,8 @@ func TestServerStore(t *testing.T) {
 	backupStore := NewServerBackupStore(db.Db)
 
 	server := types.Server{
-		Id:               0,
-		OpenstackId:      "31e0683c-5455-4510-b3ba-3c02241a3eff",
+		ID:               0,
+		OpenstackID:      "31e0683c-5455-4510-b3ba-3c02241a3eff",
 		Name:             "Test Server",
 		Address:          net.ParseIP("192.168.1.1"),
 		Status:           types.Stopped,
@@ -62,9 +62,9 @@ func TestServerStore(t *testing.T) {
 	cmp.Equal(server, inserted)
 
 	backup := types.Backup{
-		Id:          0,
-		OpenstackId: "31e0683c-5455-4510-b3ba-3c02241a3eff",
-		ServerId:    inserted.Id,
+		ID:          0,
+		OpenstackID: "31e0683c-5455-4510-b3ba-3c02241a3eff",
+		ServerID:    inserted.ID,
 		Timestamp:   time.Now(),
 		Size:        4096,
 	}

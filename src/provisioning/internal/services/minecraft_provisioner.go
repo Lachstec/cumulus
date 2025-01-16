@@ -1,4 +1,4 @@
-package service
+package services
 
 import (
 	"context"
@@ -297,7 +297,7 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, name string, f
 	}
 
 	gameserver := types.Server{
-		OpenstackId:      server.ID,
+		OpenstackID:      server.ID,
 		Name:             name,
 		Address:          net.ParseIP(addr.FloatingIP),
 		Status:           types.Running,
@@ -318,15 +318,15 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, name string, f
 		return nil, err
 	}
 
-	gameserver, err = m.serverstore.GetById(id)
+	gameserver, err = m.serverstore.GetByID(id)
 	if err != nil {
 		log.Println("Error getting server from database: ", err)
 		return nil, err
 	}
 
 	backup := types.Backup{
-		OpenstackId: volume,
-		ServerId:    gameserver.Id,
+		OpenstackID: volume,
+		ServerID:    gameserver.ID,
 		Timestamp:   time.Now(),
 		Size:        10000,
 	}

@@ -11,7 +11,7 @@ type Predicate[T any] func(T) bool
 type Store[T any] interface {
 	// GetById searches the data store for a record with the given id.
 	// If a record was not found, the return value will be nil.
-	GetById(id int64) (T, error)
+	GetByID(id int64) (T, error)
 
 	// Find returns all records in the store where predicate is true.
 	Find(predicate Predicate[T]) ([]T, error)
