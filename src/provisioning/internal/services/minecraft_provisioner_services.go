@@ -216,7 +216,7 @@ func (m *MinecraftProvisioner) WaitForVolumeReady(ctx context.Context, volumeID 
 // NewGameServer provisions a new Gameserver with the specified flavour in openstack. The provisioned server
 // has an ephemeral disk and uses the default settings and config of the specified image
 // in openstack. Information about the server gets stored in the database.
-func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, server types.Server) (*types.Server, error) {
+func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, server *types.Server) (*types.Server, error) {
 	client, err := m.openstack.ComputeClient()
 	if err != nil {
 		log.Println("Error getting compute client: ", err)
@@ -302,21 +302,9 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, server types.S
 	server.Port = 25565
 	server.SSHKey = []byte(privateKey)
 
-	id, err := m.serverstore.Add(gameserver)
-	if err != nil {
-		log.Println("Error adding server to database: ", err)
-		return nil, err
-	}
-
-	gameserver, err = m.serverstore.GetByID(id)
-	if err != nil {
-		log.Println("Error getting server from database: ", err)
-		return nil, err
-	}
-
 	backup := types.Backup{
 		OpenstackID: volume,
-		ServerID:    gameserver.ID,
+		ServerID:    server.ID,
 		Timestamp:   time.Now(),
 		Size:        10000,
 	}
@@ -324,8 +312,8 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, server types.S
 	_, err = m.backupstore.Add(backup)
 
 	if err != nil {
-		log.Println("Error adding backup to database: ", err)
+		return nil, err
 	}
 
-	return &gameserver, nil
+	return server, nil
 }

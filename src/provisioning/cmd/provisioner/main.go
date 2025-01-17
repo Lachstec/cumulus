@@ -34,8 +34,26 @@ func db_init() *sqlx.DB {
 	return s
 }
 
-func openstack_init() *openstack.Client {
-	
+func cfg_init()  (config.Config, error) {
+	key, err := base64.StdEncoding.DecodeString("1YRCJE3rUygZv4zXUhBNUf1sDUIszdT2KAtczVYB85c=")
+	if err != nil {
+		return types.Nothing[config.Config](), err
+	}
+	cfg := config.Config{
+		Db:    config.DbConfig{},
+		Auth0: config.Auth0Config{},
+		Openstack: config.OpenStackConfig{
+			IdentityEndpoint: "<keystone_url>",
+			Username:         "<username>",
+			Password:         "<password>",
+			Domain:           "<domain>",
+			TenantName:       "<tenant_name>",
+		},
+		CryptoConfig: config.CryptoConfig{
+			EncryptionKey: key,
+		},
+	}
+	return cfg, nil
 }
 
 func genericEndpoint(c *gin.Context) {
@@ -60,25 +78,15 @@ func main() {
 	user_service := services.NewUserService(db)
 	auth_service := services.NewAuthService(url)
 
-	key, err := base64.StdEncoding.DecodeString("1YRCJE3rUygZv4zXUhBNUf1sDUIszdT2KAtczVYB85c=")
+	cfg, err := cfg_init()
 	if err != nil {
 		panic(err)
 	}
-	cfg := config.Config{
-		Db:    config.DbConfig{},
-		Auth0: config.Auth0Config{},
-		Openstack: config.OpenStackConfig{
-			IdentityEndpoint: "<keystone_url>",
-			Username:         "<username>",
-			Password:         "<password>",
-			Domain:           "<domain>",
-			TenantName:       "<tenant_name>",
-		},
-		CryptoConfig: config.CryptoConfig{
-			EncryptionKey: key,
-		},
-	}
 	openstack, err := openstack.NewClient(cfg)
+	if err != nil {
+		panic(err)
+	}
+
 	minecraft_provisioner_service := services.NewMinecraftProvisioner(db, openstack, cfg.CryptoConfig.EncryptionKey)
 
 	// initialize the router
@@ -193,18 +201,25 @@ func main() {
 		c.JSON(http.StatusOK, server)
 	})
 
-	//TODO
+	//start game server
 	router.POST("/servers/:serverid", func(c *gin.Context) {
 		serverid, err := urlParamToInt64(c.Param("serverid"))
 		if err != nil {
 			c.AbortWithError(http.StatusBadRequest, err)
 		}
-		var server types.Server
+		var server *types.Server
 		server, err = server_service.ReadServerByServerID(serverid)
 		if err != nil {
 			c.AbortWithError(http.StatusNotFound, err)
 		}
-
+		if server.Status != types.Stopped {
+			c.AbortWithStatusJSON(http.StatusBadRequest, "Server already running/restarting")
+		}
+		server, err = minecraft_provisioner_service.NewGameServer(c, server)
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+		}
+		c.JSON(http.StatusOK, server)
 	})
 	router.PUT("/servers/:serverid", genericEndpoint)
 
