@@ -1,18 +1,20 @@
 package main
 
 import (
+	"encoding/base64"
 	"fmt"
 	"net/http"
-	"net/url"
 	"strconv"
 
 	"github.com/Lachstec/mc-hosting/internal/config"
 	"github.com/Lachstec/mc-hosting/internal/db"
 	"github.com/Lachstec/mc-hosting/internal/services"
 	"github.com/Lachstec/mc-hosting/internal/types"
+	"github.com/Lachstec/mc-hosting/internal/openstack"
+	
+	"github.com/jmoiron/sqlx"
 	"github.com/gin-gonic/gin"
 	_ "github.com/jackc/pgx/v5/stdlib"
-	"github.com/jmoiron/sqlx"
 )
 
 func db_init() *sqlx.DB {
@@ -32,6 +34,10 @@ func db_init() *sqlx.DB {
 	return s
 }
 
+func openstack_init() *openstack.Client {
+	
+}
+
 func genericEndpoint(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, "Not implemented yet")
 }
@@ -49,12 +55,31 @@ func main() {
 	// initialize the database
 	db := db_init()
 
-	var url url.URL
-
 	// initialize the services
 	server_service := services.NewServerService(db)
 	user_service := services.NewUserService(db)
 	auth_service := services.NewAuthService(url)
+
+	key, err := base64.StdEncoding.DecodeString("1YRCJE3rUygZv4zXUhBNUf1sDUIszdT2KAtczVYB85c=")
+	if err != nil {
+		panic(err)
+	}
+	cfg := config.Config{
+		Db:    config.DbConfig{},
+		Auth0: config.Auth0Config{},
+		Openstack: config.OpenStackConfig{
+			IdentityEndpoint: "<keystone_url>",
+			Username:         "<username>",
+			Password:         "<password>",
+			Domain:           "<domain>",
+			TenantName:       "<tenant_name>",
+		},
+		CryptoConfig: config.CryptoConfig{
+			EncryptionKey: key,
+		},
+	}
+	openstack, err := openstack.NewClient(cfg)
+	minecraft_provisioner_service := services.NewMinecraftProvisioner(db, openstack, cfg.CryptoConfig.EncryptionKey)
 
 	// initialize the router
 	router := gin.Default()
@@ -169,7 +194,18 @@ func main() {
 	})
 
 	//TODO
-	router.POST("/servers/:serverid", genericEndpoint)
+	router.POST("/servers/:serverid", func(c *gin.Context) {
+		serverid, err := urlParamToInt64(c.Param("serverid"))
+		if err != nil {
+			c.AbortWithError(http.StatusBadRequest, err)
+		}
+		var server types.Server
+		server, err = server_service.ReadServerByServerID(serverid)
+		if err != nil {
+			c.AbortWithError(http.StatusNotFound, err)
+		}
+
+	})
 	router.PUT("/servers/:serverid", genericEndpoint)
 
 	router.PATCH("/servers/:serverid", func(c *gin.Context) {
