@@ -34,12 +34,12 @@ func db_init() *sqlx.DB {
 	return s
 }
 
-func cfg_init()  (config.Config, error) {
+func cfg_init()  (*config.Config, error) {
 	key, err := base64.StdEncoding.DecodeString("1YRCJE3rUygZv4zXUhBNUf1sDUIszdT2KAtczVYB85c=")
 	if err != nil {
-		return types.Nothing[config.Config](), err
+		return nil, err
 	}
-	cfg := config.Config{
+	cfg := &config.Config{
 		Db:    config.DbConfig{},
 		Auth0: config.Auth0Config{},
 		Openstack: config.OpenStackConfig{
@@ -76,7 +76,6 @@ func main() {
 	// initialize the services
 	server_service := services.NewServerService(db)
 	user_service := services.NewUserService(db)
-	auth_service := services.NewAuthService(url)
 
 	cfg, err := cfg_init()
 	if err != nil {

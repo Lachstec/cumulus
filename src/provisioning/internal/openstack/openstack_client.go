@@ -19,7 +19,7 @@ type Client struct {
 
 // NewClient creates a new Client that uses the
 // account specified in config to connect to OpenStack.
-func NewClient(config config.Config) (*Client, error) {
+func NewClient(config *config.Config) (*Client, error) {
 	authOpts := config.Openstack.AuthOptions()
 	ctx := context.Background()
 
