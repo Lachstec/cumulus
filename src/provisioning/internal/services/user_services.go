@@ -7,7 +7,7 @@ import (
 )
 
 type UserService struct {
-	store *db.UserStore
+	store db.Store[types.User]
 }
 
 func NewUserService(conn *sqlx.DB) *UserService {
@@ -16,24 +16,24 @@ func NewUserService(conn *sqlx.DB) *UserService {
 	}
 }
 
-func (c *UserService) ReadAllUsers() ([]types.User, error) {
+func (c *UserService) ReadAllUsers() ([]*types.User, error) {
 
-	users, err := c.store.Find(func(s types.User) bool { return true })
+	users, err := c.store.Find(func(s *types.User) bool { return true })
 	if err != nil {
 		return nil, err
 	}
 	return users, nil
 }
 
-func (c *UserService) ReadUserByUserID(userid int64) (types.User, error) {
-	user, err := c.store.Find(func(s types.User) bool { return s.ID == userid })
+func (c *UserService) ReadUserByUserID(userid int64) (*types.User, error) {
+	user, err := c.store.Find(func(s *types.User) bool { return s.ID == userid })
 	if err != nil {
-		return types.Nothing[types.User](), err
+		return nil, err
 	}
 	return user[0], nil
 }
 
-func (c *UserService) CreateUser(user types.User) (int64, error) {
+func (c *UserService) CreateUser(user *types.User) (int64, error) {
 	userid, err := c.store.Add(user)
 	if err != nil {
 		return 0, err
@@ -53,11 +53,11 @@ func (c *UserService) DeleteUserByUserID(userid int64) (error) {
 	return nil
 }
 
-func (c *UserService) UpdateUser(userid int64, user types.User) (types.User, error) {
+func (c *UserService) UpdateUser(userid int64, user *types.User) (*types.User, error) {
 	user.ID = userid
 	user, err := c.store.Update(user)
 	if err != nil {
-		return types.Nothing[types.User](), err
+		return nil, err
 	}
 	return user, nil
 }

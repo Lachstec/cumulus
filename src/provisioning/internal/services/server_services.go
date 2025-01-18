@@ -7,7 +7,6 @@ import (
 )
 
 type ServerService struct {
-	//store *db.ServerStore
 	store db.Store[types.Server]
 }
 
