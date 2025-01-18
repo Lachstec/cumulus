@@ -17,9 +17,9 @@ func NewServerService(conn *sqlx.DB) *ServerService {
 	}
 }
 
-func (c *ServerService) ReadAllServers() ([]types.Server, error) {
+func (c *ServerService) ReadAllServers() ([]*types.Server, error) {
 
-	servers, err := c.store.Find(func(s types.Server) bool { return true })
+	servers, err := c.store.Find(func(s *types.Server) bool { return true })
 	if err != nil {
 		return nil, err
 	}
@@ -27,11 +27,11 @@ func (c *ServerService) ReadAllServers() ([]types.Server, error) {
 }
 
 func (c *ServerService) ReadServerByServerID(serverid int64) (*types.Server, error) {
-	server, err := c.store.Find(func(s types.Server) bool { return s.ID == serverid })
+	server, err := c.store.Find(func(s *types.Server) bool { return s.ID == serverid })
 	if err != nil {
 		return nil, err
 	}
-	return &server[0], nil
+	return server[0], nil
 }
 
 func (c *ServerService) CreateServer(server *types.Server) (int64, error) {
@@ -47,18 +47,18 @@ func (c *ServerService) DeleteServerByServerID(serverid int64) (error) {
 	if err != nil {
 		return err
 	}
-	err = c.store.Delete(*server)
+	err = c.store.Delete(server)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (c *ServerService) UpdateServer(serverid int64, server types.Server) (types.Server, error) {
+func (c *ServerService) UpdateServer(serverid int64, server *types.Server) (*types.Server, error) {
 	server.ID = serverid
 	server, err := c.store.Update(server)
 	if err != nil {
-		return types.Nothing[types.Server](), err
+		return nil, err
 	}
 	return server, nil
 }

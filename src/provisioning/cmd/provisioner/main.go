@@ -221,6 +221,8 @@ func main() {
 		}
 		c.JSON(http.StatusOK, server)
 	})
+
+	//TODO
 	router.PUT("/servers/:serverid", genericEndpoint)
 
 	router.PATCH("/servers/:serverid", func(c *gin.Context) {
