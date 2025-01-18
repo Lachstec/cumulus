@@ -32,14 +32,13 @@ func TestServerStore(t *testing.T) {
 	serverStore := NewServerStore(db.Db)
 	backupStore := NewServerBackupStore(db.Db)
 
-	server := types.Server{
+	server := &types.Server{
 		ID:               0,
 		OpenstackID:      "31e0683c-5455-4510-b3ba-3c02241a3eff",
 		Name:             "Test Server",
 		Address:          net.ParseIP("192.168.1.1"),
 		Status:           types.Stopped,
 		Port:             1337,
-		Memory:           2056,
 		Game:             "Minecraft",
 		GameVersion:      "1.0.0",
 		GameMode:         types.Survival,
@@ -49,19 +48,19 @@ func TestServerStore(t *testing.T) {
 		SSHKey:           []byte("sample ssh key"),
 	}
 
-	id, err := serverStore.Add(server)
+	ID, err := serverStore.Add(server)
 	if err != nil {
 		t.Fatalf("unable to save server: %s", err)
 	}
 
-	inserted, err := serverStore.GetById(id)
+	inserted, err := serverStore.GetByID(ID)
 	if err != nil {
 		t.Fatalf("unable to get inserted server from database: %s", err)
 	}
 
 	cmp.Equal(server, inserted)
 
-	backup := types.Backup{
+	backup := &types.Backup{
 		ID:          0,
 		OpenstackID: "31e0683c-5455-4510-b3ba-3c02241a3eff",
 		ServerID:    inserted.ID,
@@ -69,12 +68,12 @@ func TestServerStore(t *testing.T) {
 		Size:        4096,
 	}
 
-	backupId, err := backupStore.Add(backup)
+	backupID, err := backupStore.Add(backup)
 	if err != nil {
 		t.Fatalf("unable to save backup: %s", err)
 	}
 
-	insertedBackup, err := backupStore.GetById(backupId)
+	insertedBackup, err := backupStore.GetByID(backupID)
 
 	if err != nil {
 		t.Fatalf("unable to get inserted backup from database: %s", err)
@@ -100,14 +99,14 @@ func TestServerStore(t *testing.T) {
 		t.Fatalf("unable to update server: %s", err)
 	}
 
-	t.Log(inserted.Id)
-	t.Log(updated.Id)
+	t.Log(inserted.ID)
+	t.Log(updated.ID)
 
 	if updated.Name != "This is a new name!" {
 		t.Fatalf("expected name to be 'This is a new name!', got %s", updated.Name)
 	}
 
-	find, err := serverStore.Find(func(s types.Server) bool { return s.Id == updated.Id })
+	find, err := serverStore.Find(func(s *types.Server) bool { return s.ID == updated.ID })
 	if err != nil {
 		t.Fatalf("unable to find server: %s", err)
 	}

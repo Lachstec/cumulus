@@ -302,12 +302,12 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, server *types.
 	server.Port = 25565
 	server.SSHKey = []byte(privateKey)
 
-	var backup *types.Backup
-
-	backup.OpenstackID = volume
-	backup.ServerID = server.ID
-	backup.Timestamp = time.Now()
-	backup.Size = 10000
+	backup := &types.Backup{
+		OpenstackID: volume,
+		ServerID:    server.ID,
+		Timestamp:   time.Now(),
+		Size:        10000,
+	}
 
 	_, err = m.backupstore.Add(backup)
 
