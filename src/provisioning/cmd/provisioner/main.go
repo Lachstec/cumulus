@@ -102,7 +102,7 @@ func main() {
 	})
 
 	router.POST("/users", func(c *gin.Context) {
-		var user types.User
+		var user *types.User
 		err := c.BindJSON(&user)
 		if err != nil {
 			c.AbortWithError(http.StatusBadRequest, err)
@@ -131,7 +131,7 @@ func main() {
 		if err != nil {
 			c.AbortWithError(http.StatusBadRequest, err)
 		}
-		var user types.User
+		var user *types.User
 		err = c.BindJSON(&user)
 		if err != nil {
 			c.AbortWithError(http.StatusBadRequest, err)
@@ -158,14 +158,14 @@ func main() {
 	// users/:userid/servers
 	router.GET("/users/:userid/servers", genericEndpoint)
 
-	router.GET("/self", func(c *gin.Context) {
+	/*router.GET("/self", func(c *gin.Context) {
 		token := c.GetHeader("Token")
 		user, err := auth_service.ValidateToken(token)
 		if err != nil {
 			c.AbortWithError(http.StatusUnauthorized, err)
 		}
 		c.JSON(http.StatusOK, user)
-	})
+	})*/
 
 	// CRUD servers
 	router.GET("/servers", func(c *gin.Context) {
@@ -177,7 +177,7 @@ func main() {
 	})
 
 	router.POST("/servers", func(c *gin.Context) {
-		var server types.Server
+		var server *types.Server
 		err := c.BindJSON(&server)
 		if err != nil {
 			c.AbortWithError(http.StatusBadRequest, err)
@@ -230,7 +230,7 @@ func main() {
 		if err != nil {
 			c.AbortWithError(http.StatusBadRequest, err)
 		}
-		var server types.Server
+		var server *types.Server
 		err = c.BindJSON(&server)
 		if err != nil {
 			c.AbortWithError(http.StatusBadRequest, err)
