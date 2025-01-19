@@ -73,10 +73,6 @@ func main() {
 	// initialize the database
 	db := db_init()
 
-	// initialize the services
-	server_service := services.NewServerService(db)
-	user_service := services.NewUserService(db)
-
 	cfg, err := cfg_init()
 	if err != nil {
 		panic(err)
@@ -86,6 +82,10 @@ func main() {
 		panic(err)
 	}
 
+
+	// initialize the services
+	server_service := services.NewServerService(db)
+	user_service := services.NewUserService(db)
 	minecraft_provisioner_service := services.NewMinecraftProvisioner(db, openstack, cfg.CryptoConfig.EncryptionKey)
 
 	// initialize the router
