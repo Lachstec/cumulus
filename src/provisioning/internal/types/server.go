@@ -109,6 +109,7 @@ const (
 
 type Server struct {
 	ID               int64
+	UserID			 int64 `db:"user_id"`
 	OpenstackID      string `db:"openstack_id"`
 	Name             string `db:"name" json:"name"`
 	Address          net.IP `db:"addr"`

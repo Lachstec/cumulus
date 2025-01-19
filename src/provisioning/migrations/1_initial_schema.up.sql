@@ -17,7 +17,6 @@ CREATE TYPE class as ENUM ('admin', 'user');
 -- Server table representing gameservers
 CREATE TABLE mch_provisioner.servers(
     id SERIAL PRIMARY KEY,         -- id of the server
-    openstack_id UUID NOT NULL,    -- UUID in openstack
     userid SERIAL NOT NULL REFERENCES mch_provisioner.users
         ON DELETE CASCADE,
     openstack_id UUID NOT NULL,    -- UUID in openstack
@@ -28,11 +27,13 @@ CREATE TABLE mch_provisioner.servers(
     status server_status NOT NULL, -- Current Server Status
     port INTEGER NOT NULL,         -- Port the Server is listening on
     flavour INTEGER NOT NULL,      -- Flavour the Server has
+    image VARCHAR(256) NOT NULL,
     game VARCHAR(128),             -- Which game this server is for
     game_version VARCHAR(128),     -- Which game version is running
     game_mode game_mode,           -- Which game mod is currently active
     difficulty difficulty,         -- Game difficulty
     whitelist_enabled BOOLEAN,     -- Whether the whitelist is enabled
+    pvp_enabled BOOLEAN
     players_max INTEGER,           -- How many Players are allowed
     ssh_key BYTEA                  -- SSH Key that can be used to connect to the gameserver
 );
