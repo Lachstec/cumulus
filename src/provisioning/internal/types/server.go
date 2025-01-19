@@ -112,17 +112,16 @@ type Server struct {
 	OpenstackID      string `db:"openstack_id"`
 	Name             string `db:"name" json:"name"`
 	Address          net.IP `db:"addr"`
-	Status           ServerStatus
-	Port             int
-	Flavour			 Flavour
-	Image			 Image
-	Memory           int `db:"memory_mb"`
-	Game             string
-	GameVersion      string   `db:"game_version"`
-	GameMode         GameMode `db:"game_mode"`
-	Difficulty       Difficulty
-	WhitelistEnabled bool `db:"whitelist_enabled"`
-	PlayersMax       int  `db:"players_max"`
-	PvP              PvP
+	Status           ServerStatus `db:"server_status"`
+	Port             int `db:"port"`
+	Flavour			 Flavour 
+	Image			 Image `db:"image" json:"image"`
+	Game             string `db:"game" json:"game"`
+	GameVersion      string   `db:"game_version" json:"game_version"`
+	GameMode         GameMode `db:"game_mode" json:"gamemode"`
+	Difficulty       Difficulty `db:"difficulty" json:"difficulty"`
+	WhitelistEnabled bool   `db:"whitelist_enabled" json:"whitelist_enabled"`
+	PvPEnabled 		 PvP  	`db:"pvp_enabled" json:"pvp_enabled"`
+	PlayersMax       int    `db:"players_max" json:"players_max"`
 	SSHKey           []byte `db:"ssh_key"`
 }

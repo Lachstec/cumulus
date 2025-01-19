@@ -27,7 +27,7 @@ CREATE TABLE mch_provisioner.servers(
     addr INET,                     -- IP-Address of the server
     status server_status NOT NULL, -- Current Server Status
     port INTEGER NOT NULL,         -- Port the Server is listening on
-    memory_mb INTEGER NOT NULL,    -- Amount of RAM the Server has
+    flavour INTEGER NOT NULL,      -- Flavour the Server has
     game VARCHAR(128),             -- Which game this server is for
     game_version VARCHAR(128),     -- Which game version is running
     game_mode game_mode,           -- Which game mod is currently active

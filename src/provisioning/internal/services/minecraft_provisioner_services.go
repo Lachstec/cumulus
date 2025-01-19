@@ -268,7 +268,7 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, server *types.
 
 	opts := servers.CreateOpts{
 		Name:        server.Name,
-		FlavorRef:   server.Flavour.ID,
+		FlavorRef:   types.Flavours[server.Flavour].ID,
 		ImageRef:    string(server.Image),
 		BlockDevice: blockDev,
 		UserData:    []byte(userData),
