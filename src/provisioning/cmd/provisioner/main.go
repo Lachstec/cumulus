@@ -94,7 +94,7 @@ func main() {
 	router.GET("/users", func(c *gin.Context) {
 		users, err := userService.ReadAllUsers()
 		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
 		}
 		c.JSON(http.StatusOK, users)
 	})
@@ -103,11 +103,11 @@ func main() {
 		var user *types.User
 		err := c.BindJSON(&user)
 		if err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
+			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
 		userid, err := userService.CreateUser(user)
 		if err != nil {
-			c.AbortWithError(http.StatusConflict, err)
+			_ = c.AbortWithError(http.StatusConflict, err)
 		}
 		c.JSON(http.StatusOK, userid)
 	})
@@ -115,11 +115,11 @@ func main() {
 	router.GET("/users/:userid", func(c *gin.Context) {
 		userid, err := urlParamToInt64(c.Param("userid"))
 		if err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
+			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
 		user, err := userService.ReadUserByUserID(userid)
 		if err != nil {
-			c.AbortWithError(http.StatusNotFound, err)
+			_ = c.AbortWithError(http.StatusNotFound, err)
 		}
 		c.JSON(http.StatusOK, user)
 	})
@@ -127,28 +127,28 @@ func main() {
 	router.PATCH("/users/:userid", func(c *gin.Context) {
 		userid, err := urlParamToInt64(c.Param("userid"))
 		if err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
+			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
 		var user *types.User
 		err = c.BindJSON(&user)
 		if err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
+			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
 		user, err = userService.UpdateUser(userid, user)
 		if err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
+			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		c.JSON((http.StatusOK), user)
+		c.JSON(http.StatusOK, user)
 	})
 
 	router.DELETE("/users/:userid", func(c *gin.Context) {
 		userid, err := urlParamToInt64(c.Param("userid"))
 		if err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
+			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
 		err = userService.DeleteUserByUserID(userid)
 		if err != nil {
-			c.AbortWithError(http.StatusGone, err)
+			_ = c.AbortWithError(http.StatusGone, err)
 		}
 		c.Status(http.StatusNoContent)
 	})
@@ -169,7 +169,7 @@ func main() {
 	router.GET("/servers", func(c *gin.Context) {
 		servers, err := serverService.ReadAllServers()
 		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
 		}
 		c.JSON(http.StatusOK, servers)
 	})
@@ -178,11 +178,11 @@ func main() {
 		var server *types.Server
 		err := c.BindJSON(&server)
 		if err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
+			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
 		serverid, err := serverService.CreateServer(server)
 		if err != nil {
-			c.AbortWithError(http.StatusConflict, err)
+			_ = c.AbortWithError(http.StatusConflict, err)
 		}
 		c.JSON(http.StatusOK, serverid)
 	})
@@ -190,11 +190,11 @@ func main() {
 	router.GET("/servers/:serverid", func(c *gin.Context) {
 		serverid, err := urlParamToInt64(c.Param("serverid"))
 		if err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
+			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
 		server, err := serverService.ReadServerByServerID(serverid)
 		if err != nil {
-			c.AbortWithError(http.StatusNotFound, err)
+			_ = c.AbortWithError(http.StatusNotFound, err)
 		}
 		c.JSON(http.StatusOK, server)
 	})
@@ -203,19 +203,19 @@ func main() {
 	router.POST("/servers/:serverid", func(c *gin.Context) {
 		serverid, err := urlParamToInt64(c.Param("serverid"))
 		if err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
+			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
 		var server *types.Server
 		server, err = serverService.ReadServerByServerID(serverid)
 		if err != nil {
-			c.AbortWithError(http.StatusNotFound, err)
+			_ = c.AbortWithError(http.StatusNotFound, err)
 		}
 		if server.Status != types.Stopped {
 			c.AbortWithStatusJSON(http.StatusBadRequest, "Server already running/restarting")
 		}
 		server, err = minecraftProvisionerService.NewGameServer(c, server)
 		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
 		}
 		c.JSON(http.StatusOK, server)
 	})
@@ -226,16 +226,16 @@ func main() {
 	router.PATCH("/servers/:serverid", func(c *gin.Context) {
 		serverid, err := urlParamToInt64(c.Param("serverid"))
 		if err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
+			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
 		var server *types.Server
 		err = c.BindJSON(&server)
 		if err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
+			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
 		server, err = serverService.UpdateServer(serverid, server)
 		if err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
+			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
 		c.JSON(http.StatusOK, server)
 	})
@@ -243,11 +243,11 @@ func main() {
 	router.DELETE("/servers/:serverid", func(c *gin.Context) {
 		serverid, err := urlParamToInt64(c.Param("serverid"))
 		if err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
+			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
 		err = serverService.DeleteServerByServerID(serverid)
 		if err != nil {
-			c.AbortWithError(http.StatusGone, err)
+			_ = c.AbortWithError(http.StatusGone, err)
 		}
 		c.Status(http.StatusNoContent)
 	})
@@ -259,5 +259,5 @@ func main() {
 	router.GET("/teapot", func(c *gin.Context) { c.Status(http.StatusTeapot) })
 
 	// run webserver
-	router.Run("localhost:10000")
+	_ = router.Run("localhost:10000")
 }
