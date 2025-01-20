@@ -25,7 +25,7 @@ func dbInit() *sqlx.DB {
 	}
 	mig := db.NewMigrator(s)
 
-	err = mig.Migrate("../../migrations")
+	err = mig.Migrate("./migrations")
 	if err != nil {
 		panic(err)
 	}
