@@ -18,6 +18,8 @@ type Config struct {
 	Openstack OpenStackConfig
 	// CryptoConfig configuration for cryptographic components
 	CryptoConfig CryptoConfig
+	// TracingConfig configuration for Jaeger enabled Tracing
+	TracingConfig TracingConfig
 }
 
 // LoadConfig loads the application configuration.
@@ -38,6 +40,8 @@ type Config struct {
 // OPENSTACK_DOMAIN Domain for openstack (default: osp)
 // OPENSTACK_TENANT_NAME Tenant to use for openstack (default: default)
 // CRYPTO_KEY: Key to use for encrypting SSH Keys for the game servers (default: super_secure_default_key1!)
+// TRACE_ENDPOINT: Endpoint where logs can be sent. Contains URL and Port. (default: localhost:4317)
+// TRACE_SERVICENAME: Name to pass as Servicename when sending logs to Jaeger. (default: mc-hosting)
 func LoadConfig() *Config {
 	err := godotenv.Load()
 	if err != nil {
@@ -70,6 +74,10 @@ func LoadConfig() *Config {
 		},
 		CryptoConfig: CryptoConfig{
 			EncryptionKey: []byte(getEnv("CRYPTO_KEY", "super_secure_default_key1!")),
+		},
+		TracingConfig: TracingConfig{
+			Endpoint:    getEnv("TRACE_ENDPOINT", "localhost:4317"),
+			ServiceName: getEnv("TRACE_SERVICENAME", "mc-hosting"),
 		},
 	}
 	return cfg

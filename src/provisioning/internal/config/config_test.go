@@ -21,6 +21,8 @@ func TestLoadConfig(t *testing.T) {
 	os.Setenv("OPENSTACK_DOMAIN", "default")
 	os.Setenv("OPENSTACK_TENANT_NAME", "my_tenant")
 	os.Setenv("CRYPTO_KEY", "my_secret_key")
+	os.Setenv("TRACE_ENDPOINT", "jaeger.dev:1337")
+	os.Setenv("TRACE_SERVICENAME", "provisioner")
 
 	defer func() {
 		os.Unsetenv("DB_HOST")
@@ -36,6 +38,8 @@ func TestLoadConfig(t *testing.T) {
 		os.Unsetenv("OPENSTACK_DOMAIN")
 		os.Unsetenv("OPENSTACK_TENANT_NAME")
 		os.Unsetenv("CRYPTO_KEY")
+		os.Unsetenv("TRACE_ENDPOINT")
+		os.Unsetenv("TRACE_SERVICENAME")
 	}()
 
 	cfg := LoadConfig()
@@ -54,6 +58,8 @@ func TestLoadConfig(t *testing.T) {
 	assert.Equal(t, url.URL{Scheme: "https", Host: "auth0.com", Path: "/test"}, cfg.Auth0.AuthURL)
 	assert.Equal(t, "https://mc-hosting.zip", cfg.Auth0.Audience)
 	assert.Equal(t, "sample_secret", cfg.Auth0.Secret)
+	assert.Equal(t, "jaeger.dev:1337", cfg.TracingConfig.Endpoint)
+	assert.Equal(t, "provisioner", cfg.TracingConfig.ServiceName)
 }
 
 func TestFallbackValues(t *testing.T) {
@@ -73,4 +79,6 @@ func TestFallbackValues(t *testing.T) {
 	assert.Equal(t, url.URL{Scheme: "http", Host: "localhost"}, cfg.Auth0.AuthURL)
 	assert.Equal(t, "http://localhost", cfg.Auth0.Audience)
 	assert.Equal(t, "secret", cfg.Auth0.Secret)
+	assert.Equal(t, "localhost:4317", cfg.TracingConfig.Endpoint)
+	assert.Equal(t, "mc-hosting", cfg.TracingConfig.ServiceName)
 }
