@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/base64"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -34,28 +33,6 @@ func dbInit() *sqlx.DB {
 	return s
 }
 
-func cfgInit() (*config.Config, error) {
-	key, err := base64.StdEncoding.DecodeString("1YRCJE3rUygZv4zXUhBNUf1sDUIszdT2KAtczVYB85c=")
-	if err != nil {
-		return nil, err
-	}
-	cfg := &config.Config{
-		Db:    config.DbConfig{},
-		Auth0: config.Auth0Config{},
-		Openstack: config.OpenStackConfig{
-			IdentityEndpoint: "<keystone_url>",
-			Username:         "<username>",
-			Password:         "<password>",
-			Domain:           "<domain>",
-			TenantName:       "<tenant_name>",
-		},
-		CryptoConfig: config.CryptoConfig{
-			EncryptionKey: key,
-		},
-	}
-	return cfg, nil
-}
-
 func genericEndpoint(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, "Not implemented yet")
 }
@@ -71,28 +48,24 @@ func urlParamToInt64(param string) (int64, error) {
 func main() {
 
 	// initialize the database
-	conn := dbInit()
-
-	cfg, err := cfgInit()
-	if err != nil {
-		panic(err)
-	}
-	ostack, err := openstack.NewClient(cfg)
+	db := dbInit()
+	cfg := config.LoadConfig()
+	openstack, err := openstack.NewClient(cfg)
 	if err != nil {
 		panic(err)
 	}
 
 	// initialize the services
-	serverService := services.NewServerService(conn)
-	userService := services.NewUserService(conn)
-	minecraftProvisionerService := services.NewMinecraftProvisioner(conn, ostack, cfg.CryptoConfig.EncryptionKey)
+	server_service := services.NewServerService(db)
+	user_service := services.NewUserService(db)
+	minecraft_provisioner_service := services.NewMinecraftProvisioner(db, openstack, cfg.CryptoConfig.EncryptionKey)
 
 	// initialize the router
 	router := gin.Default()
 
 	// CRUD users
 	router.GET("/users", func(c *gin.Context) {
-		users, err := userService.ReadAllUsers()
+		users, err := user_service.ReadAllUsers()
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 		}
@@ -105,7 +78,7 @@ func main() {
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		userid, err := userService.CreateUser(user)
+		userid, err := user_service.CreateUser(user)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusConflict, err)
 		}
@@ -117,7 +90,7 @@ func main() {
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		user, err := userService.ReadUserByUserID(userid)
+		user, err := user_service.ReadUserByUserID(userid)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusNotFound, err)
 		}
@@ -134,7 +107,7 @@ func main() {
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		user, err = userService.UpdateUser(userid, user)
+		user, err = user_service.UpdateUser(userid, user)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
@@ -146,7 +119,7 @@ func main() {
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		err = userService.DeleteUserByUserID(userid)
+		err = user_service.DeleteUserByUserID(userid)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusGone, err)
 		}
@@ -167,20 +140,21 @@ func main() {
 
 	// CRUD servers
 	router.GET("/servers", func(c *gin.Context) {
-		servers, err := serverService.ReadAllServers()
+		servers, err := server_service.ReadAllServers()
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 		}
 		c.JSON(http.StatusOK, servers)
 	})
 
+	//TODO server auch im Openstack erstellen
 	router.POST("/servers", func(c *gin.Context) {
 		var server *types.Server
 		err := c.BindJSON(&server)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		serverid, err := serverService.CreateServer(server)
+		serverid, err := server_service.CreateServer(server)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusConflict, err)
 		}
@@ -192,28 +166,28 @@ func main() {
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		server, err := serverService.ReadServerByServerID(serverid)
+		server, err := server_service.ReadServerByServerID(serverid)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusNotFound, err)
 		}
 		c.JSON(http.StatusOK, server)
 	})
 
-	//start game server
+	//TODO nur gameserver starten, nicht erstellen
 	router.POST("/servers/:serverid", func(c *gin.Context) {
 		serverid, err := urlParamToInt64(c.Param("serverid"))
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
 		var server *types.Server
-		server, err = serverService.ReadServerByServerID(serverid)
+		server, err = server_service.ReadServerByServerID(serverid)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusNotFound, err)
 		}
 		if server.Status != types.Stopped {
 			c.AbortWithStatusJSON(http.StatusBadRequest, "Server already running/restarting")
 		}
-		server, err = minecraftProvisionerService.NewGameServer(c, server)
+		server, err = minecraft_provisioner_service.NewGameServer(c, server)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 		}
@@ -233,7 +207,7 @@ func main() {
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		server, err = serverService.UpdateServer(serverid, server)
+		server, err = server_service.UpdateServer(serverid, server)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
@@ -245,7 +219,7 @@ func main() {
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		err = serverService.DeleteServerByServerID(serverid)
+		err = server_service.DeleteServerByServerID(serverid)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusGone, err)
 		}
