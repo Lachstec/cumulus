@@ -392,6 +392,9 @@ func (m *MinecraftProvisioner) DeleteGameServer(ctx context.Context, server type
 	for _, backup := range backups {
 		log.Println("Deleting backup: ", backup.OpenstackID)
 		err = volumes.Delete(ctx, storageClient, backup.OpenstackID, nil).ExtractErr()
+		if err != nil {
+			log.Println("Error deleting volume: ", err)
+		}
 		log.Println("Deleting backup: ", backup.OpenstackID)
 		err = m.WaitForVolumeReady(ctx, backup.OpenstackID, time.Minute*2)
 		if err != nil {
