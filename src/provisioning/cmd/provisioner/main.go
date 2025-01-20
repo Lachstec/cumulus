@@ -8,13 +8,13 @@ import (
 
 	"github.com/Lachstec/mc-hosting/internal/config"
 	"github.com/Lachstec/mc-hosting/internal/db"
+	"github.com/Lachstec/mc-hosting/internal/openstack"
 	"github.com/Lachstec/mc-hosting/internal/services"
 	"github.com/Lachstec/mc-hosting/internal/types"
-	"github.com/Lachstec/mc-hosting/internal/openstack"
-	
-	"github.com/jmoiron/sqlx"
+
 	"github.com/gin-gonic/gin"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/jmoiron/sqlx"
 )
 
 func db_init() *sqlx.DB {
@@ -34,7 +34,7 @@ func db_init() *sqlx.DB {
 	return s
 }
 
-func cfg_init()  (*config.Config, error) {
+func cfg_init() (*config.Config, error) {
 	key, err := base64.StdEncoding.DecodeString("1YRCJE3rUygZv4zXUhBNUf1sDUIszdT2KAtczVYB85c=")
 	if err != nil {
 		return nil, err
@@ -82,7 +82,6 @@ func main() {
 		panic(err)
 	}
 
-
 	// initialize the services
 	server_service := services.NewServerService(db)
 	user_service := services.NewUserService(db)
@@ -124,7 +123,7 @@ func main() {
 		}
 		c.JSON(http.StatusOK, user)
 	})
-	
+
 	router.PATCH("/users/:userid", func(c *gin.Context) {
 		userid, err := urlParamToInt64(c.Param("userid"))
 		if err != nil {
@@ -141,7 +140,7 @@ func main() {
 		}
 		c.JSON((http.StatusOK), user)
 	})
-	
+
 	router.DELETE("/users/:userid", func(c *gin.Context) {
 		userid, err := urlParamToInt64(c.Param("userid"))
 		if err != nil {
