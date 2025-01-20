@@ -33,14 +33,14 @@ func (s *UserStore) Find(predicate Predicate[*types.User]) ([]*types.User, error
 
 	var users []*types.User
 	for rows.Next() {
-		var user *types.User
+		var user types.User
 		err = rows.StructScan(&user)
 		if err != nil {
 			return nil, err
 		}
 
-		if predicate(user) {
-			users = append(users, user)
+		if predicate(&user) {
+			users = append(users, &user)
 		}
 	}
 
