@@ -25,15 +25,12 @@ func (c *UserService) ReadAllUsers() ([]*types.User, error) {
 	return users, nil
 }
 
-func (c *UserService) ReadUserByUserID(userid int64) (*types.User, error) {
+func (c *UserService) ReadUserByUserID(userid int64) ([]*types.User, error) {
 	user, err := c.store.Find(func(s *types.User) bool { return s.ID == userid })
 	if err != nil {
 		return nil, err
 	}
-	if err != nil {
-		return nil, err
-	}
-	return user[0], nil
+	return user, nil
 }
 
 func (c *UserService) CreateUser(user *types.User) (int64, error) {

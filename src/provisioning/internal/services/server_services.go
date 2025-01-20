@@ -25,15 +25,12 @@ func (c *ServerService) ReadAllServers() ([]*types.Server, error) {
 	return servers, nil
 }
 
-func (c *ServerService) ReadServerByServerID(serverid int64) (*types.Server, error) {
+func (c *ServerService) ReadServerByServerID(serverid int64) ([]*types.Server, error) {
 	server, err := c.store.Find(func(s *types.Server) bool { return s.ID == serverid })
 	if err != nil {
 		return nil, err
 	}
-	if len(server) == 0 {
-		return nil, err
-	}
-	return server[0], nil
+	return server, nil
 }
 
 func (c *ServerService) CreateServer(server *types.Server) (int64, error) {
@@ -44,12 +41,8 @@ func (c *ServerService) CreateServer(server *types.Server) (int64, error) {
 	return serverid, nil
 }
 
-func (c *ServerService) DeleteServerByServerID(serverid int64) (error) {
-	server, err := c.ReadServerByServerID(serverid)
-	if err != nil {
-		return err
-	}
-	err = c.store.Delete(server)
+func (c *ServerService) DeleteServer(server *types.Server) (error) {
+	err := c.store.Delete(server)
 	if err != nil {
 		return err
 	}
