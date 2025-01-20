@@ -1,7 +1,5 @@
 package types
 
-import "net"
-
 type ServerStatus string
 
 const (
@@ -45,9 +43,9 @@ const (
 type Server struct {
 	ID               int64
 	UserID           int64        `db:"userid"`
-	OpenstackID      string       `db:"openstack_id"`
+	OpenstackId      string       `db:"openstack_id"`
 	Name             string       `db:"name" json:"name"`
-	Address          net.IP       `db:"addr"`
+	Address          int64        `db:"addr"`
 	Status           ServerStatus `db:"status"`
 	Port             int          `db:"port"`
 	Flavour          int64        `db:"flavour"`
@@ -59,5 +57,5 @@ type Server struct {
 	WhitelistEnabled bool         `db:"whitelist_enabled" json:"whitelist_enabled"`
 	PvPEnabled       bool         `db:"pvp_enabled" json:"pvp_enabled"`
 	PlayersMax       int          `db:"players_max" json:"players_max"`
-	SSHKey           []byte       `db:"ssh_key"`
+	SSHKey           int64        `db:"ssh_key"`
 }

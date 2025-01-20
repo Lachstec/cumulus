@@ -6,7 +6,6 @@ import (
 	"context"
 	"crypto/ed25519"
 	"encoding/base64"
-	"encoding/pem"
 	"github.com/Lachstec/mc-hosting/internal/config"
 	"github.com/Lachstec/mc-hosting/internal/db"
 	openstack2 "github.com/Lachstec/mc-hosting/internal/openstack"
@@ -36,7 +35,7 @@ func NewTestConnection() *TestConnection {
 }
 
 func TestServerCreation(t *testing.T) {
-	// Just a random key, dont use for production!
+	// Just a random key, don't use for production!
 	key, err := base64.StdEncoding.DecodeString("1YRCJE3rUygZv4zXUhBNUf1sDUIszdT2KAtczVYB85c=")
 	if err != nil {
 		t.Fatal(err)
@@ -64,43 +63,15 @@ func TestServerCreation(t *testing.T) {
 	}
 	provisioner := NewMinecraftProvisioner(connection.Db, openstack, cfg.CryptoConfig.EncryptionKey)
 
-	server, err := provisioner.NewGameServer(ctx, "Testserver", types.Medium, types.Ubuntu24_04)
+	server, err := provisioner.NewGameServer(ctx, "Dev Server", types.Medium, types.Ubuntu24_04)
 	if err != nil {
 		t.Fatal("Failed to create server: ", err)
 	}
 
-	t.Log("Created server IP: ", server.Address.String())
-}
+	t.Log("Created server IP: ", server.Address)
 
-func TestGetSSHKey(t *testing.T) {
-	key, err := base64.StdEncoding.DecodeString("<key>")
-	if err != nil {
-		t.Fatal(err)
-	}
-	crypto := NewCryptoService([]byte(key))
-
-	conn := NewTestConnection()
-
-	serverstore := db.NewServerStore(conn.Db)
-
-	server, err := serverstore.Find(func(server types.Server) bool { return server.Name == "Testserver" })
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	decryptedKey, err := crypto.DecryptPrivateKey(string(server[0].SSHKey))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	k := ed25519.NewKeyFromSeed(decryptedKey)
-
-	privPem := pem.EncodeToMemory(&pem.Block{
-		Type:  "OPENSSH PRIVATE KEY",
-		Bytes: MarshalED25519PrivateKey(k),
-	})
-
-	t.Log("Key is:", string(privPem))
+	err = provisioner.DeleteGameServer(ctx, *server)
+	t.Log("Deleted server IP: ", server.Address)
 }
 
 func MarshalED25519PrivateKey(key ed25519.PrivateKey) []byte {
