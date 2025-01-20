@@ -1,4 +1,4 @@
-package service
+package services
 
 import (
 	"context"
@@ -15,6 +15,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"log"
 	"net"
+	"strconv"
 	"time"
 )
 
@@ -216,14 +217,14 @@ func (m *MinecraftProvisioner) WaitForVolumeReady(ctx context.Context, volumeID 
 // NewGameServer provisions a new Gameserver with the specified flavour in openstack. The provisioned server
 // has an ephemeral disk and uses the default settings and config of the specified image
 // in openstack. Information about the server gets stored in the database.
-func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, name string, flavour types.Flavour, image types.Image) (*types.Server, error) {
+func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, server *types.Server) (*types.Server, error) {
 	client, err := m.openstack.ComputeClient()
 	if err != nil {
 		log.Println("Error getting compute client: ", err)
 		return nil, err
 	}
 
-	volume, err := m.newPersistentVolume(ctx, name+"_volume")
+	volume, err := m.newPersistentVolume(ctx, server.Name+"_volume")
 	if err != nil {
 		log.Println("Error creating persistent volume: ", err)
 		return nil, err
@@ -241,7 +242,7 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, name string, f
 			DeleteOnTermination: true,
 			DestinationType:     servers.DestinationLocal,
 			SourceType:          servers.SourceImage,
-			UUID:                image.Value(),
+			UUID:                string(server.Image),
 		},
 		{
 			BootIndex:           1,
@@ -260,16 +261,16 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, name string, f
 		return nil, err
 	}
 
-	err = m.newKeyPair(ctx, name+"public_key", publicKey)
+	err = m.newKeyPair(ctx, server.Name+"public_key", publicKey)
 	if err != nil {
 		log.Println("Error saving pubkey to openstack: ", err)
 		return nil, err
 	}
 
 	opts := servers.CreateOpts{
-		Name:        name,
-		FlavorRef:   flavour.Value(),
-		ImageRef:    image.Value(),
+		Name:        server.Name,
+		FlavorRef:   strconv.FormatInt(types.Flavours[server.Flavour-1].ID, 10),
+		ImageRef:    string(server.Image),
 		BlockDevice: blockDev,
 		UserData:    []byte(userData),
 		Networks: []servers.Network{
@@ -281,52 +282,30 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, name string, f
 
 	optsExt := keypairs.CreateOptsExt{
 		CreateOptsBuilder: opts,
-		KeyName:           name + "public_key",
+		KeyName:           server.Name + "public_key",
 	}
 
-	server, err := servers.Create(ctx, client, optsExt, nil).Extract()
+	gcServer, err := servers.Create(ctx, client, optsExt, nil).Extract()
 	if err != nil {
 		log.Println("Error spawning server: ", err)
 		return nil, err
 	}
 
-	addr, err := m.makeFloatingIp(ctx, server.ID)
+	addr, err := m.makeFloatingIp(ctx, gcServer.ID)
 	if err != nil {
 		log.Println("Error creating floating ip: ", err)
 		return nil, err
 	}
 
-	gameserver := types.Server{
-		OpenstackId:      server.ID,
-		Name:             name,
-		Address:          net.ParseIP(addr.FloatingIP),
-		Status:           types.Running,
-		Port:             25565,
-		Memory:           flavour.AvailableRam(),
-		Game:             "Minecraft",
-		GameVersion:      "1.0.0",
-		GameMode:         types.Survival,
-		Difficulty:       types.Normal,
-		WhitelistEnabled: false,
-		PlayersMax:       2,
-		SSHKey:           []byte(privateKey),
-	}
+	server.OpenstackID = gcServer.ID
+	server.Address = net.ParseIP(addr.FloatingIP)
+	server.Status = types.Running
+	server.Port = 25565
+	server.SSHKey = []byte(privateKey)
 
-	id, err := m.serverstore.Add(gameserver)
-	if err != nil {
-		log.Println("Error adding server to database: ", err)
-		return nil, err
-	}
-
-	gameserver, err = m.serverstore.GetById(id)
-	if err != nil {
-		log.Println("Error getting server from database: ", err)
-		return nil, err
-	}
-
-	backup := types.Backup{
-		OpenstackId: volume,
-		ServerId:    gameserver.Id,
+	backup := &types.Backup{
+		OpenstackID: volume,
+		ServerID:    server.ID,
 		Timestamp:   time.Now(),
 		Size:        10000,
 	}
@@ -334,8 +313,8 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, name string, f
 	_, err = m.backupstore.Add(backup)
 
 	if err != nil {
-		log.Println("Error adding backup to database: ", err)
+		return nil, err
 	}
 
-	return &gameserver, nil
+	return server, nil
 }
