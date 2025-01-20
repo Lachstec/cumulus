@@ -35,64 +35,6 @@ const (
 	Disabled PvP = "false" //nolint:all
 )
 
-type Flavour struct {
-	ID string
-	Name string
-	RAM	int
-	Disk int
-	Ephemeral int
-	VCPUs int
-	Is_Public bool
-}
-
-var Flavours = []Flavour {
-	{
-		ID: "1",
-		Name: "m1.tiny",
-		RAM: 512,
-		Disk: 1,
-		Ephemeral: 0,
-		VCPUs: 1,
-		Is_Public: true,
-	},
-	{
-		ID: "2",
-		Name: "m1.small",
-		RAM: 2048,
-		Disk: 20,
-		Ephemeral: 0,
-		VCPUs: 1,
-		Is_Public: true,
-	},
-	{
-		ID: "3",
-		Name: "m1.medium",
-		RAM: 4096,
-		Disk: 40,
-		Ephemeral: 0,
-		VCPUs: 2,
-		Is_Public: true,
-	},
-	{
-		ID: "4",
-		Name: "m1.large",
-		RAM: 8192,
-		Disk: 80,
-		Ephemeral: 0,
-		VCPUs: 4,
-		Is_Public: true,
-	},
-	{
-		ID: "5",
-		Name: "m1.xlarge",
-		RAM: 16384,
-		Disk: 160,
-		Ephemeral: 0,
-		VCPUs: 8,
-		Is_Public: true,
-	},
-}
-
 type Image string
 
 const (
@@ -109,20 +51,20 @@ const (
 
 type Server struct {
 	ID               int64
-	UserID			 int64 `db:"user_id"`
-	OpenstackID      string `db:"openstack_id"`
-	Name             string `db:"name" json:"name"`
-	Address          net.IP `db:"addr"`
+	UserID           int64        `db:"user_id"`
+	OpenstackID      string       `db:"openstack_id"`
+	Name             string       `db:"name" json:"name"`
+	Address          net.IP       `db:"addr"`
 	Status           ServerStatus `db:"server_status"`
-	Port             int `db:"port"`
-	Flavour			 Flavour 
-	Image			 Image `db:"image" json:"image"`
-	Game             string `db:"game" json:"game"`
-	GameVersion      string   `db:"game_version" json:"game_version"`
-	GameMode         GameMode `db:"game_mode" json:"gamemode"`
+	Port             int          `db:"port"`
+	Flavour          Flavour
+	Image            Image      `db:"image" json:"image"`
+	Game             string     `db:"game" json:"game"`
+	GameVersion      string     `db:"game_version" json:"game_version"`
+	GameMode         GameMode   `db:"game_mode" json:"gamemode"`
 	Difficulty       Difficulty `db:"difficulty" json:"difficulty"`
-	WhitelistEnabled bool   `db:"whitelist_enabled" json:"whitelist_enabled"`
-	PvPEnabled 		 PvP  	`db:"pvp_enabled" json:"pvp_enabled"`
-	PlayersMax       int    `db:"players_max" json:"players_max"`
-	SSHKey           []byte `db:"ssh_key"`
+	WhitelistEnabled bool       `db:"whitelist_enabled" json:"whitelist_enabled"`
+	PvPEnabled       PvP        `db:"pvp_enabled" json:"pvp_enabled"`
+	PlayersMax       int        `db:"players_max" json:"players_max"`
+	SSHKey           []byte     `db:"ssh_key"`
 }
