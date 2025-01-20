@@ -30,6 +30,9 @@ func (c *UserService) ReadUserByUserID(userid int64) (*types.User, error) {
 	if err != nil {
 		return nil, err
 	}
+	if err != nil {
+		return nil, err
+	}
 	return user[0], nil
 }
 

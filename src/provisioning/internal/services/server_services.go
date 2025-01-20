@@ -30,6 +30,9 @@ func (c *ServerService) ReadServerByServerID(serverid int64) (*types.Server, err
 	if err != nil {
 		return nil, err
 	}
+	if len(server) == 0 {
+		return nil, err
+	}
 	return server[0], nil
 }
 
