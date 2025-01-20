@@ -14,7 +14,6 @@ import (
 	ports2 "github.com/gophercloud/gophercloud/v2/openstack/networking/v2/ports"
 	"github.com/jmoiron/sqlx"
 	"log"
-	"net"
 	"strconv"
 	"time"
 )
@@ -277,7 +276,7 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, server *types.
 		return nil, err
 	}
 
-	kid, err := m.newKeyPair(ctx, name+"public_key", publicKey, privateKey)
+	kid, err := m.newKeyPair(ctx, server.Name+"public_key", publicKey, privateKey)
 	if err != nil {
 		log.Println("Error saving pubkey to openstack: ", err)
 		return nil, err
@@ -313,7 +312,7 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, server *types.
 		return nil, err
 	}
 
-	ip, err := m.ipstore.Add(types.FloatingIP{
+	ip, err := m.ipstore.Add(&types.FloatingIP{
 		OpenstackId: addr.ID,
 		Ip:          addr.FloatingIP,
 	})
@@ -324,7 +323,7 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, server *types.
 	}
 
 	server.OpenstackId = gcServer.ID
-	server.Address = net.ParseIP(addr.FloatingIP)
+	server.Address = ip
 	server.Status = types.Running
 	server.Port = 25565
 	server.SSHKey = kid
@@ -407,7 +406,7 @@ func (m *MinecraftProvisioner) DeleteGameServer(ctx context.Context, server type
 		}
 	}
 
-	ip, err := m.ipstore.Find(func(ip types.FloatingIP) bool { return server.Address == ip.Id })
+	ip, err := m.ipstore.Find(func(ip *types.FloatingIP) bool { return server.Address == ip.Id })
 	if err != nil || len(ip) == 0 {
 		log.Println("Error finding ip: ", err)
 		return err
