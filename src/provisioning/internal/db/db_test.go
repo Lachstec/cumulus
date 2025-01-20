@@ -53,7 +53,7 @@ func TestServerStore(t *testing.T) {
 		t.Fatalf("unable to save server: %s", err)
 	}
 
-	inserted, err := serverStore.GetByID(ID)
+	inserted, err := serverStore.GetById(ID)
 	if err != nil {
 		t.Fatalf("unable to get inserted server from database: %s", err)
 	}
@@ -73,7 +73,7 @@ func TestServerStore(t *testing.T) {
 		t.Fatalf("unable to save backup: %s", err)
 	}
 
-	insertedBackup, err := backupStore.GetByID(backupID)
+	insertedBackup, err := backupStore.GetById(backupID)
 
 	if err != nil {
 		t.Fatalf("unable to get inserted backup from database: %s", err)

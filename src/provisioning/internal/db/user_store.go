@@ -13,7 +13,7 @@ func NewUserStore(db *sqlx.DB) Store[types.User] {
 	return &UserStore{db: db}
 }
 
-func (s *UserStore) GetByID(ID int64) (*types.User, error) {
+func (s *UserStore) GetById(ID int64) (*types.User, error) {
 	row := s.db.QueryRowx("SELECT * FROM mch_provisioner.users WHERE ID = $1;", ID)
 	var user *types.User
 	err := row.StructScan(&user)

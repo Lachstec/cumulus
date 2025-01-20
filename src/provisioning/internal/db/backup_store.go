@@ -13,7 +13,7 @@ func NewServerBackupStore(db *sqlx.DB) Store[types.Backup] {
 	return &ServerBackupStore{db: db}
 }
 
-func (b *ServerBackupStore) GetByID(ID int64) (*types.Backup, error) {
+func (b *ServerBackupStore) GetById(ID int64) (*types.Backup, error) {
 	row := b.db.QueryRowx("SELECT * FROM mch_provisioner.world_backups WHERE ID=$1", ID)
 	var backup *types.Backup
 	err := row.StructScan(&backup)

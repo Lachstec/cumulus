@@ -13,7 +13,7 @@ func NewServerStore(db *sqlx.DB) Store[types.Server] {
 	return &ServerStore{db: db}
 }
 
-func (s *ServerStore) GetByID(ID int64) (*types.Server, error) {
+func (s *ServerStore) GetById(ID int64) (*types.Server, error) {
 	row := s.db.QueryRowx("SELECT * FROM mch_provisioner.servers WHERE ID = $1;", ID)
 	var server *types.Server
 	err := row.StructScan(&server)
