@@ -62,7 +62,7 @@ func TestServerStore(t *testing.T) {
 		Ip:          "192.168.0.1",
 	}
 
-	iid, err := ipStore.Add(addr)
+	iid, err := ipStore.Add(&addr)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -202,7 +202,7 @@ func TestIpStore(t *testing.T) {
 	db := NewTestConnection()
 	ipStore := NewIPStore(db.Db)
 
-	id, err := ipStore.Add(types.FloatingIP{OpenstackId: "696d03a0-c5c3-4eba-878f-b0aca2d84cd0", Ip: "192.168.0.1"})
+	id, err := ipStore.Add(&types.FloatingIP{OpenstackId: "696d03a0-c5c3-4eba-878f-b0aca2d84cd0", Ip: "192.168.0.1"})
 	if err != nil {
 		t.Fatalf("unable to save ip: %s", err)
 	}
@@ -228,7 +228,7 @@ func TestIpStore(t *testing.T) {
 		t.Fatalf("unable to delete ip: %s", err)
 	}
 
-	ips, err := ipStore.Find(func(i types.FloatingIP) bool { return i.Id == updated.Id })
+	ips, err := ipStore.Find(func(i *types.FloatingIP) bool { return i.Id == updated.Id })
 	if err != nil {
 		t.Fatalf("unable to find ips: %s", err)
 	}

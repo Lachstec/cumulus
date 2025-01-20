@@ -1,7 +1,5 @@
 package types
 
-import "net"
-
 type ServerStatus string
 
 const (
@@ -47,7 +45,7 @@ type Server struct {
 	UserID           int64        `db:"userid"`
 	OpenstackId      string       `db:"openstack_id"`
 	Name             string       `db:"name" json:"name"`
-	Address          net.IP       `db:"addr"`
+	Address          int64        `db:"addr"`
 	Status           ServerStatus `db:"status"`
 	Port             int          `db:"port"`
 	Flavour          int64        `db:"flavour"`
