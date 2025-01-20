@@ -31,19 +31,34 @@ func TestServerStore(t *testing.T) {
 	db := NewTestConnection()
 	serverStore := NewServerStore(db.Db)
 	backupStore := NewServerBackupStore(db.Db)
+	userStore := NewUserStore(db.Db)
+
+	user := &types.User{
+		Sub:   "Bla",
+		Name:  "Testuser",
+		Class: string(types.Admin),
+	}
+
+	uid, err := userStore.Add(user)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	server := &types.Server{
-		ID:               0,
+		UserID:           uid,
 		OpenstackID:      "31e0683c-5455-4510-b3ba-3c02241a3eff",
 		Name:             "Test Server",
 		Address:          net.ParseIP("192.168.1.1"),
 		Status:           types.Stopped,
 		Port:             1337,
+		Flavour:          types.Flavours[2].ID,
+		Image:            "Ubuntu 20.04",
 		Game:             "Minecraft",
 		GameVersion:      "1.0.0",
 		GameMode:         types.Survival,
 		Difficulty:       types.Normal,
 		WhitelistEnabled: false,
+		PvPEnabled:       true,
 		PlayersMax:       2,
 		SSHKey:           []byte("sample ssh key"),
 	}

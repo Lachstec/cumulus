@@ -28,13 +28,6 @@ const (
 	Hard     Difficulty = "hard"     //nolint:all
 )
 
-type PvP string
-
-const (
-	Enabled  PvP = "true"  //nolint:all
-	Disabled PvP = "false" //nolint:all
-)
-
 type Image string
 
 const (
@@ -51,20 +44,20 @@ const (
 
 type Server struct {
 	ID               int64
-	UserID           int64        `db:"user_id"`
+	UserID           int64        `db:"userid"`
 	OpenstackID      string       `db:"openstack_id"`
 	Name             string       `db:"name" json:"name"`
 	Address          net.IP       `db:"addr"`
-	Status           ServerStatus `db:"server_status"`
+	Status           ServerStatus `db:"status"`
 	Port             int          `db:"port"`
-	Flavour          Flavour
-	Image            Image      `db:"image" json:"image"`
-	Game             string     `db:"game" json:"game"`
-	GameVersion      string     `db:"game_version" json:"game_version"`
-	GameMode         GameMode   `db:"game_mode" json:"gamemode"`
-	Difficulty       Difficulty `db:"difficulty" json:"difficulty"`
-	WhitelistEnabled bool       `db:"whitelist_enabled" json:"whitelist_enabled"`
-	PvPEnabled       PvP        `db:"pvp_enabled" json:"pvp_enabled"`
-	PlayersMax       int        `db:"players_max" json:"players_max"`
-	SSHKey           []byte     `db:"ssh_key"`
+	Flavour          int64        `db:"flavour"`
+	Image            Image        `db:"image" json:"image"`
+	Game             string       `db:"game" json:"game"`
+	GameVersion      string       `db:"game_version" json:"game_version"`
+	GameMode         GameMode     `db:"game_mode" json:"gamemode"`
+	Difficulty       Difficulty   `db:"difficulty" json:"difficulty"`
+	WhitelistEnabled bool         `db:"whitelist_enabled" json:"whitelist_enabled"`
+	PvPEnabled       bool         `db:"pvp_enabled" json:"pvp_enabled"`
+	PlayersMax       int          `db:"players_max" json:"players_max"`
+	SSHKey           []byte       `db:"ssh_key"`
 }

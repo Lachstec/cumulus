@@ -14,14 +14,19 @@ CREATE TYPE game_mode AS ENUM ('creative', 'adventure', 'survival', 'hardcore');
 
 CREATE TYPE class as ENUM ('admin', 'user');
 
+CREATE TABLE mch_provisioner.users(
+    id SERIAL PRIMARY KEY,
+    sub VARCHAR(256) NOT NULL,
+    name VARCHAR(256) NOT NULL,
+    class class NOT NULL
+);
+
 -- Server table representing gameservers
 CREATE TABLE mch_provisioner.servers(
     id SERIAL PRIMARY KEY,         -- id of the server
     userid SERIAL NOT NULL REFERENCES mch_provisioner.users
         ON DELETE CASCADE,
     openstack_id UUID NOT NULL,    -- UUID in openstack
-    userid SERIAL NOT NULL REFERENCES mch_provisioner.users
-        ON DELETE CASCADE,
     name VARCHAR(256) NOT NULL,    -- Name of the Server
     addr INET,                     -- IP-Address of the server
     status server_status NOT NULL, -- Current Server Status
@@ -33,16 +38,9 @@ CREATE TABLE mch_provisioner.servers(
     game_mode game_mode,           -- Which game mod is currently active
     difficulty difficulty,         -- Game difficulty
     whitelist_enabled BOOLEAN,     -- Whether the whitelist is enabled
-    pvp_enabled BOOLEAN
+    pvp_enabled BOOLEAN,
     players_max INTEGER,           -- How many Players are allowed
     ssh_key BYTEA                  -- SSH Key that can be used to connect to the gameserver
-);
-
-CREATE TABLE mch_provisioner.users(
-    id SERIAL PRIMARY KEY,
-    sub VARCHAR(256) NOT NULL,
-    name VARCHAR(256) NOT NULL,
-    class class NOT NULL,
 );
 
 -- Table storing server backup information
