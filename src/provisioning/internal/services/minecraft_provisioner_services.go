@@ -15,6 +15,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"log"
 	"net"
+	"strconv"
 	"time"
 )
 
@@ -268,7 +269,7 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, server *types.
 
 	opts := servers.CreateOpts{
 		Name:        server.Name,
-		FlavorRef:   server.Flavour.ID,
+		FlavorRef:   strconv.FormatInt(types.Flavours[server.Flavour-1].ID, 10),
 		ImageRef:    string(server.Image),
 		BlockDevice: blockDev,
 		UserData:    []byte(userData),
@@ -284,19 +285,19 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, server *types.
 		KeyName:           server.Name + "public_key",
 	}
 
-	gc_server, err := servers.Create(ctx, client, optsExt, nil).Extract()
+	gcServer, err := servers.Create(ctx, client, optsExt, nil).Extract()
 	if err != nil {
 		log.Println("Error spawning server: ", err)
 		return nil, err
 	}
 
-	addr, err := m.makeFloatingIp(ctx, gc_server.ID)
+	addr, err := m.makeFloatingIp(ctx, gcServer.ID)
 	if err != nil {
 		log.Println("Error creating floating ip: ", err)
 		return nil, err
 	}
 
-	server.OpenstackID = gc_server.ID
+	server.OpenstackID = gcServer.ID
 	server.Address = net.ParseIP(addr.FloatingIP)
 	server.Status = types.Running
 	server.Port = 25565
