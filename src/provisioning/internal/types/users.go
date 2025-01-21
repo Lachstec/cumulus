@@ -4,7 +4,7 @@ type Class string
 
 const (
 	Admin Class = "admin" //nolint:all
-	Customer Class = "customer" //nolint:all
+	Customer Class = "user" //nolint:all
 )
 
 type User struct {
