@@ -49,8 +49,7 @@ func (c *ServerService) DeleteServer(server *types.Server) (error) {
 	return nil
 }
 
-func (c *ServerService) UpdateServer(serverid int64, server *types.Server) (*types.Server, error) {
-	server.ID = serverid
+func (c *ServerService) UpdateServer(server *types.Server) (*types.Server, error) {
 	server, err := c.store.Update(server)
 	if err != nil {
 		return nil, err
