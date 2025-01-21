@@ -68,6 +68,7 @@ func (s *MockUserStore) Update(user *types.User) (*types.User, error) {
 }
 
 func TestReadAllUsers(t *testing.T) {
+	t.Parallel()
 	service := NewUserService(NewMockUserStore())
 	users, err := service.ReadAllUsers()
 	if err != nil {
@@ -78,6 +79,7 @@ func TestReadAllUsers(t *testing.T) {
 }
 
 func TestReadUser(t *testing.T) {
+	t.Parallel()
 	service := NewUserService(NewMockUserStore())
 	user, err := service.ReadUserByUserID(1)
 	if err != nil {
@@ -92,6 +94,7 @@ func TestReadUser(t *testing.T) {
 }
 
 func TestDeleteUser(t *testing.T) {
+	t.Parallel()
 	service := NewUserService(NewMockUserStore())
 	user, err := service.ReadUserByUserID(1)
 	if err != nil {
@@ -116,6 +119,7 @@ func TestDeleteUser(t *testing.T) {
 }
 
 func TestUpdateUser(t *testing.T) {
+	t.Parallel()
 	service := NewUserService(NewMockUserStore())
 	user, err := service.ReadUserByUserID(1)
 	if err != nil {
@@ -137,6 +141,7 @@ func TestUpdateUser(t *testing.T) {
 }
 
 func TestNewUser(t *testing.T) {
+	t.Parallel()
 	service := NewUserService(NewMockUserStore())
 	user := types.User{
 		Sub:   "Subby",
