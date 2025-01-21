@@ -15,14 +15,14 @@ func NewUserStore(db *sqlx.DB) Store[types.User] {
 
 func (s *UserStore) GetById(ID int64) (*types.User, error) {
 	row := s.db.QueryRowx("SELECT * FROM mch_provisioner.users WHERE ID = $1;", ID)
-	var user *types.User
+	var user types.User
 	err := row.StructScan(&user)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return user, nil
+	return &user, nil
 }
 
 func (s *UserStore) Find(predicate Predicate[*types.User]) ([]*types.User, error) {
@@ -62,9 +62,9 @@ func (s *UserStore) Add(user *types.User) (int64, error) {
 }
 
 func (s *UserStore) Update(user *types.User) (*types.User, error) {
-	var updated *types.User
+	var updated types.User
 	err := s.db.QueryRowx(
-		"UPDATE mch_provisioner.users SET sub = $1, name = $2, class = $3, WHERE ID = $4 RETURNING *;",
+		"UPDATE mch_provisioner.users SET sub = $1, name = $2, class = $3 WHERE ID = $4 RETURNING *;",
 		user.Sub,
 		user.Name,
 		user.Class,
@@ -73,7 +73,7 @@ func (s *UserStore) Update(user *types.User) (*types.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	return updated, nil
+	return &updated, nil
 }
 
 func (s *UserStore) Delete(user *types.User) error {
