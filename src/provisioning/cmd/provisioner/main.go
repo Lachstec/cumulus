@@ -90,10 +90,14 @@ func main() {
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		user, err := user_service.ReadUserByUserID(userid)
+		users, err := user_service.ReadUserByUserID(userid)
 		if err != nil {
-			_ = c.AbortWithError(http.StatusNotFound, err)
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
 		}
+		if len(users) == 0 {
+			c.AbortWithStatus(http.StatusNotFound)
+		}
+		user := users[0]
 		c.JSON(http.StatusOK, user)
 	})
 
@@ -103,11 +107,12 @@ func main() {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
 		var user *types.User
+		user.ID = userid
 		err = c.BindJSON(&user)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		user, err = user_service.UpdateUser(userid, user)
+		user, err = user_service.UpdateUser(user)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
@@ -119,7 +124,15 @@ func main() {
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		err = user_service.DeleteUserByUserID(userid)
+		users, err := user_service.ReadUserByUserID(userid)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+		}
+		if len(users) == 0 {
+			c.AbortWithStatus(http.StatusBadRequest)
+		}
+		user := users[0]
+		err = user_service.DeleteUser(user)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusGone, err)
 		}
@@ -166,10 +179,14 @@ func main() {
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		server, err := server_service.ReadServerByServerID(serverid)
+		servers, err := server_service.ReadServerByServerID(serverid)
 		if err != nil {
-			_ = c.AbortWithError(http.StatusNotFound, err)
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
 		}
+		if len(servers) == 0 {
+			c.AbortWithStatus(http.StatusNotFound)
+		}
+		server := servers[0]
 		c.JSON(http.StatusOK, server)
 	})
 
@@ -179,11 +196,14 @@ func main() {
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		var server *types.Server
-		server, err = server_service.ReadServerByServerID(serverid)
+		servers, err := server_service.ReadServerByServerID(serverid)
 		if err != nil {
-			_ = c.AbortWithError(http.StatusNotFound, err)
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
 		}
+		if len(servers) == 0 {
+			c.AbortWithStatus(http.StatusNotFound)
+		}
+		server := servers[0]
 		if server.Status != types.Stopped {
 			c.AbortWithStatusJSON(http.StatusBadRequest, "Server already running/restarting")
 		}
@@ -203,11 +223,12 @@ func main() {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
 		var server *types.Server
+		server.ID = serverid
 		err = c.BindJSON(&server)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		server, err = server_service.UpdateServer(serverid, server)
+		server, err = server_service.UpdateServer(server)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
@@ -219,7 +240,15 @@ func main() {
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		err = server_service.DeleteServerByServerID(serverid)
+		servers, err := server_service.ReadServerByServerID(serverid)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+		}
+		if len(servers) == 0 {
+			c.AbortWithStatus(http.StatusBadRequest)
+		}
+		server := servers[0]
+		err = server_service.DeleteServer(server)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusGone, err)
 		}

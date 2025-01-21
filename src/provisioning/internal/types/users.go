@@ -3,8 +3,8 @@ package types
 type Class string
 
 const (
-	Admin    Class = "admin"    //nolint:all
-	Customer Class = "customer" //nolint:all
+	Admin Class = "admin" //nolint:all
+	Customer Class = "user" //nolint:all
 )
 
 func (c Class) Value() string {
