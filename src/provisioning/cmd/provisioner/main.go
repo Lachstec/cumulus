@@ -7,7 +7,6 @@ import (
 
 	"github.com/Lachstec/mc-hosting/internal/config"
 	"github.com/Lachstec/mc-hosting/internal/db"
-	"github.com/Lachstec/mc-hosting/internal/openstack"
 	"github.com/Lachstec/mc-hosting/internal/services"
 	"github.com/Lachstec/mc-hosting/internal/types"
 
@@ -49,16 +48,16 @@ func main() {
 
 	// initialize the database
 	db := dbInit()
-	cfg := config.LoadConfig()
-	openstack, err := openstack.NewClient(cfg)
-	if err != nil {
-		panic(err)
-	}
+	// cfg := config.LoadConfig()
+	// openstack, err := openstack.NewClient(cfg)
+	// if err != nil {
+	//	panic(err)
+	// }
 
 	// initialize the services
 	server_service := services.NewServerService(db)
 	user_service := services.NewUserService(db)
-	minecraft_provisioner_service := services.NewMinecraftProvisioner(db, openstack, cfg.CryptoConfig.EncryptionKey)
+	// minecraft_provisioner_service := services.NewMinecraftProvisioner(db, openstack, cfg.CryptoConfig.EncryptionKey)
 
 	// initialize the router
 	router := gin.Default()
@@ -106,17 +105,27 @@ func main() {
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		var user *types.User
+
+		users, err := user_service.ReadUserByUserID(userid)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+		}
+
+		if len(users) == 0 {
+			c.AbortWithStatus(http.StatusNotFound)
+		}
+
+		user := users[0]
 		user.ID = userid
 		err = c.BindJSON(&user)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		user, err = user_service.UpdateUser(user)
+		updated, err := user_service.UpdateUser(user)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		c.JSON(http.StatusOK, user)
+		c.JSON(http.StatusOK, updated)
 	})
 
 	router.DELETE("/users/:userid", func(c *gin.Context) {
@@ -207,7 +216,7 @@ func main() {
 		if server.Status != types.Stopped {
 			c.AbortWithStatusJSON(http.StatusBadRequest, "Server already running/restarting")
 		}
-		server, err = minecraft_provisioner_service.NewGameServer(c, server)
+		// server, err = minecraft_provisioner_service.NewGameServer(c, server)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 		}
