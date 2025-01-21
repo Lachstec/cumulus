@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"net/http"
 	"strconv"
 
@@ -10,7 +11,6 @@ import (
 	"github.com/Lachstec/mc-hosting/internal/openstack"
 	"github.com/Lachstec/mc-hosting/internal/services"
 	"github.com/Lachstec/mc-hosting/internal/types"
-
 	"github.com/gin-gonic/gin"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
@@ -106,17 +106,27 @@ func main() {
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		var user *types.User
+
+		users, err := user_service.ReadUserByUserID(userid)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+		}
+
+		if len(users) == 0 {
+			c.AbortWithStatus(http.StatusNotFound)
+		}
+
+		user := users[0]
 		user.ID = userid
 		err = c.BindJSON(&user)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		user, err = user_service.UpdateUser(user)
+		updated, err := user_service.UpdateUser(user)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		c.JSON(http.StatusOK, user)
+		c.JSON(http.StatusOK, updated)
 	})
 
 	router.DELETE("/users/:userid", func(c *gin.Context) {
