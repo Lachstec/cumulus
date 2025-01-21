@@ -237,3 +237,49 @@ func TestIpStore(t *testing.T) {
 		t.Fatalf("expected 0 ips, got %d", len(ips))
 	}
 }
+
+func TestUserStore(t *testing.T) {
+	db := NewTestConnection()
+	userStore := NewUserStore(db.Db)
+
+	user := types.User{
+		Sub:   "Test Sub",
+		Name:  "Test User",
+		Class: types.Admin.Value(),
+	}
+
+	id, err := userStore.Add(&user)
+	if err != nil {
+		t.Fatalf("unable to save user: %s", err)
+	}
+
+	dbUser, err := userStore.GetById(id)
+	if err != nil {
+		t.Fatalf("unable to get user by id: %s", err)
+	}
+
+	assert.Equal(t, dbUser.Sub, "Test Sub")
+	assert.Equal(t, dbUser.Name, "Test User")
+	assert.Equal(t, dbUser.Class, types.Admin.Value())
+
+	dbUser.Sub = "Updated Sub"
+
+	updated, err := userStore.Update(dbUser)
+	if err != nil {
+		t.Fatalf("unable to update user: %s", err)
+	}
+	assert.Equal(t, updated.Sub, "Updated Sub")
+
+	err = userStore.Delete(dbUser)
+	if err != nil {
+		t.Fatalf("unable to delete user: %s", err)
+	}
+
+	users, err := userStore.Find(func(u *types.User) bool { return u.ID == dbUser.ID })
+	if err != nil {
+		t.Fatalf("unable to find users: %s", err)
+	}
+	if len(users) != 0 {
+		t.Fatalf("expected 0 users, got %d", len(users))
+	}
+}
