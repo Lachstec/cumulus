@@ -48,24 +48,27 @@ func urlParamToInt64(param string) (int64, error) {
 func main() {
 
 	// initialize the database
-	db := dbInit()
+	database := dbInit()
 	cfg := config.LoadConfig()
 	openstack, err := openstack.NewClient(cfg)
 	if err != nil {
 		panic(err)
 	}
 
+	serverStore := db.NewServerStore(database)
+	userStore := db.NewUserStore(database)
+
 	// initialize the services
-	server_service := services.NewServerService(db)
-	user_service := services.NewUserService(db)
-	minecraft_provisioner_service := services.NewMinecraftProvisioner(db, openstack, cfg.CryptoConfig.EncryptionKey)
+	serverService := services.NewServerService(serverStore)
+	userService := services.NewUserService(userStore)
+	minecraftProvisionerService := services.NewMinecraftProvisioner(database, openstack, cfg.CryptoConfig.EncryptionKey)
 
 	// initialize the router
 	router := gin.Default()
 
 	// CRUD users
 	router.GET("/users", func(c *gin.Context) {
-		users, err := user_service.ReadAllUsers()
+		users, err := userService.ReadAllUsers()
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 		}
@@ -78,7 +81,7 @@ func main() {
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		userid, err := user_service.CreateUser(user)
+		userid, err := userService.CreateUser(user)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusConflict, err)
 		}
@@ -90,7 +93,7 @@ func main() {
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		users, err := user_service.ReadUserByUserID(userid)
+		users, err := userService.ReadUserByUserID(userid)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 		}
@@ -107,7 +110,7 @@ func main() {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
 
-		users, err := user_service.ReadUserByUserID(userid)
+		users, err := userService.ReadUserByUserID(userid)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 		}
@@ -122,7 +125,7 @@ func main() {
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		updated, err := user_service.UpdateUser(user)
+		updated, err := userService.UpdateUser(user)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
@@ -134,7 +137,7 @@ func main() {
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		users, err := user_service.ReadUserByUserID(userid)
+		users, err := userService.ReadUserByUserID(userid)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 		}
@@ -142,7 +145,7 @@ func main() {
 			c.AbortWithStatus(http.StatusBadRequest)
 		}
 		user := users[0]
-		err = user_service.DeleteUser(user)
+		err = userService.DeleteUser(user)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusGone, err)
 		}
@@ -163,7 +166,7 @@ func main() {
 
 	// CRUD servers
 	router.GET("/servers", func(c *gin.Context) {
-		servers, err := server_service.ReadAllServers()
+		servers, err := serverService.ReadAllServers()
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 		}
@@ -177,7 +180,7 @@ func main() {
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		serverid, err := server_service.CreateServer(server)
+		serverid, err := serverService.CreateServer(server)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusConflict, err)
 		}
@@ -189,7 +192,7 @@ func main() {
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		servers, err := server_service.ReadServerByServerID(serverid)
+		servers, err := serverService.ReadServerByServerID(serverid)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 		}
@@ -206,7 +209,7 @@ func main() {
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		servers, err := server_service.ReadServerByServerID(serverid)
+		servers, err := serverService.ReadServerByServerID(serverid)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 		}
@@ -217,7 +220,7 @@ func main() {
 		if server.Status != types.Stopped {
 			c.AbortWithStatusJSON(http.StatusBadRequest, "Server already running/restarting")
 		}
-		server, err = minecraft_provisioner_service.NewGameServer(c, server)
+		server, err = minecraftProvisionerService.NewGameServer(c, server)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 		}
@@ -238,7 +241,7 @@ func main() {
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		server, err = server_service.UpdateServer(server)
+		server, err = serverService.UpdateServer(server)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
@@ -250,7 +253,7 @@ func main() {
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		servers, err := server_service.ReadServerByServerID(serverid)
+		servers, err := serverService.ReadServerByServerID(serverid)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 		}
@@ -258,7 +261,7 @@ func main() {
 			c.AbortWithStatus(http.StatusBadRequest)
 		}
 		server := servers[0]
-		err = server_service.DeleteServer(server)
+		err = serverService.DeleteServer(server)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusGone, err)
 		}
