@@ -126,7 +126,7 @@ func main() {
 		}
 		users, err := user_service.ReadUserByUserID(userid)
 		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
 		}
 		if len(users) == 0 {
 			c.AbortWithStatus(http.StatusBadRequest)
@@ -242,7 +242,7 @@ func main() {
 		}
 		servers, err := server_service.ReadServerByServerID(serverid)
 		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
 		}
 		if len(servers) == 0 {
 			c.AbortWithStatus(http.StatusBadRequest)
