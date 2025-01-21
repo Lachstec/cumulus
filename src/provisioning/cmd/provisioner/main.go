@@ -2,15 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/Lachstec/mc-hosting/internal/openstack"
+
 	"net/http"
 	"strconv"
 
 	"github.com/Lachstec/mc-hosting/internal/config"
 	"github.com/Lachstec/mc-hosting/internal/db"
+	"github.com/Lachstec/mc-hosting/internal/openstack"
 	"github.com/Lachstec/mc-hosting/internal/services"
 	"github.com/Lachstec/mc-hosting/internal/types"
-
 	"github.com/gin-gonic/gin"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
