@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/Lachstec/mc-hosting/internal/openstack"
 	"net/http"
 	"strconv"
 
@@ -48,16 +49,16 @@ func main() {
 
 	// initialize the database
 	db := dbInit()
-	// cfg := config.LoadConfig()
-	// openstack, err := openstack.NewClient(cfg)
-	// if err != nil {
-	//	panic(err)
-	// }
+	cfg := config.LoadConfig()
+	openstack, err := openstack.NewClient(cfg)
+	if err != nil {
+		panic(err)
+	}
 
 	// initialize the services
 	server_service := services.NewServerService(db)
 	user_service := services.NewUserService(db)
-	// minecraft_provisioner_service := services.NewMinecraftProvisioner(db, openstack, cfg.CryptoConfig.EncryptionKey)
+	minecraft_provisioner_service := services.NewMinecraftProvisioner(db, openstack, cfg.CryptoConfig.EncryptionKey)
 
 	// initialize the router
 	router := gin.Default()
@@ -216,7 +217,7 @@ func main() {
 		if server.Status != types.Stopped {
 			c.AbortWithStatusJSON(http.StatusBadRequest, "Server already running/restarting")
 		}
-		// server, err = minecraft_provisioner_service.NewGameServer(c, server)
+		server, err = minecraft_provisioner_service.NewGameServer(c, server)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 		}
