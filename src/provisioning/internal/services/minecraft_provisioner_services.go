@@ -232,7 +232,7 @@ func (m *MinecraftProvisioner) WaitForVolumeReady(ctx context.Context, volumeID 
 // NewGameServer provisions a new Gameserver with the specified flavour in openstack. The provisioned server
 // has an ephemeral disk and uses the default settings and config of the specified image
 // in openstack. Information about the server gets stored in the database.
-func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, server *types.Server) (*types.Server, error) {
+func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, server *types.Server, user *types.User) (*types.Server, error) {
 	client, err := m.openstack.ComputeClient()
 	if err != nil {
 		log.Println("Error getting compute client: ", err)
@@ -327,6 +327,16 @@ func (m *MinecraftProvisioner) NewGameServer(ctx context.Context, server *types.
 	server.Status = types.Running
 	server.Port = 25565
 	server.SSHKey = kid
+	server.OpenstackId = gcServer.ID
+	server.UserID = user.ID
+
+	id, err := m.serverstore.Add(server)
+	if err != nil {
+		log.Println("Error adding server: ", err)
+		return nil, err
+	}
+
+	server.ID = id
 
 	backup := &types.Backup{
 		OpenstackID: volume,
