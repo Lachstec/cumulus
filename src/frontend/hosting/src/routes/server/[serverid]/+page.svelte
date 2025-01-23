@@ -27,7 +27,7 @@
   });
 
   async function sendSettings() {
-    console.log("Button")
+    console.log("Button");
   }
 </script>
 
@@ -35,7 +35,11 @@
   <div class="grid gap-6 mb-6 md:grid-cols-2">
     <div>
       <Label for="server_name" class="mb-2">Server Name</Label>
-      <Input type="text" id="server_name" placeholder="Placeholder Name" required />
+      <Input
+        type="text"
+        id="server_name"
+        placeholder="Placeholder Name"
+        required />
     </div>
     <div>
       <Label for="pvp_toggle" class="mb-2">PVP</Label>
@@ -63,12 +67,13 @@
       <Label>
         Select a Gamemode
         <Select
-                id="game_mode"
-                class="mt-2"
-                items={gameMode}
-                bind:value={selected_gameMode} />
+          id="game_mode"
+          class="mt-2"
+          items={gameMode}
+          bind:value={selected_gameMode} />
       </Label>
     </div>
   </div>
-  <Button size="md" color="green" on:click = { () => sendSettings }><FloppyDiskSolid class="w-5 h-5 me-2" />Save</Button>
+  <Button size="md" color="green" on:click={() => sendSettings}
+    ><FloppyDiskSolid class="w-5 h-5 me-2" />Save</Button>
 </form>

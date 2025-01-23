@@ -52,7 +52,9 @@
 {#if $isAuthenticated}
   <div class="flex items-center space-x-4" id="user-menu">
     <Avatar src={$user?.picture} />
-    <div class="space-y-1 font-medium dark:text-white">{$user?.nickname.substring(0, userStrLength)}</div>
+    <div class="space-y-1 font-medium dark:text-white">
+      {$user?.nickname.substring(0, userStrLength)}
+    </div>
     <NavHamburger class1="w-full md:flex md:w-auto md:order-1" />
   </div>
   <Dropdown placement="bottom" triggeredBy="#user-menu">
