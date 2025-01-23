@@ -13,7 +13,7 @@
     </NavBrand>
     <NavUl>
       <NavLi href="/" active={true}>Home</NavLi>
-      <NavLi href="/user/1/servers">Server</NavLi>
+      <NavLi href="/server">Server</NavLi>
       <NavLi href="/pricing">Pricing</NavLi>
       <NavLi href="/user">Users</NavLi>
     </NavUl>
