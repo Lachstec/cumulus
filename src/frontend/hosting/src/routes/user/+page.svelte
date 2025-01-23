@@ -16,7 +16,7 @@
     ID: number;
     Sub: "";
     name: string;
-    role: string;
+    class: string;
   };
 
   let data: UserData[];
@@ -74,7 +74,7 @@
         <TableHeadCell>Options</TableHeadCell>
       </TableHead>
       <TableBody tableBodyClass="divide-y">
-        {#each data as { name, role, ID }}
+        {#each data as { name, class: role, ID }}
           <TableBodyRow>
             <TableBodyCell>{name}</TableBodyCell>
             <TableBodyCell>{role}</TableBodyCell>

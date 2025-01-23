@@ -42,8 +42,8 @@
   let selectedName = $state(data.name);
   let selectedRole = $state(data.role);
   let roles = [
-    { value: "Admin", name: "Admin" },
-    { value: "User", name: "User" },
+    { value: "Admin", name: "admin" },
+    { value: "User", name: "user" },
   ];
 
   async function updateData() {
