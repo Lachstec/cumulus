@@ -1,6 +1,7 @@
 package config
 
 import (
+	"encoding/base64"
 	"github.com/joho/godotenv"
 	"log"
 	"net/url"
@@ -53,6 +54,11 @@ func LoadConfig() *Config {
 		log.Fatalln("Invalid url for Auth0")
 	}
 
+	key, err := base64.StdEncoding.DecodeString(getEnv("CRYPTO_KEY", "1YRCJE3rUygZv4zXUhBNUf1sDUIszdT2KAtczVYB85c="))
+	if err != nil {
+		log.Fatalln("Invalid Encryption Key!")
+	}
+
 	cfg := &Config{
 		Db: DbConfig{
 			Host:     getEnv("DB_HOST", "localhost"),
@@ -73,7 +79,7 @@ func LoadConfig() *Config {
 			TenantName:       getEnv("OPENSTACK_TENANT_NAME", "default"),
 		},
 		CryptoConfig: CryptoConfig{
-			EncryptionKey: []byte(getEnv("CRYPTO_KEY", "super_secure_default_key1!")),
+			EncryptionKey: []byte(key),
 		},
 		TracingConfig: TracingConfig{
 			Endpoint:    getEnv("TRACE_ENDPOINT", "localhost:4317"),

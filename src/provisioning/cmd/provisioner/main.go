@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	"net/http"
 	"strconv"
@@ -46,7 +47,6 @@ func urlParamToInt64(param string) (int64, error) {
 }
 
 func main() {
-
 	// initialize the database
 	database := dbInit()
 	cfg := config.LoadConfig()
@@ -180,11 +180,26 @@ func main() {
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		serverid, err := serverService.CreateServer(server)
+
+		//TODO: Hier muss das Token von Auth0 verarbeitet werden und der passende User rausgesucht.
+		user := types.User{
+			ID:    1,
+			Sub:   "Samplesub",
+			Name:  "Sampleuser",
+			Class: types.Admin.Value(),
+		}
+
+		srv, err := minecraftProvisionerService.NewGameServer(c, server, &user)
+
+		if err != nil {
+			log.Println("error creating new game server:", err)
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+		}
+		// serverid, err := serverService.CreateServer(server)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusConflict, err)
 		}
-		c.JSON(http.StatusOK, serverid)
+		c.JSON(http.StatusOK, srv.ID)
 	})
 
 	router.GET("/servers/:serverid", func(c *gin.Context) {
@@ -220,7 +235,6 @@ func main() {
 		if server.Status != types.Stopped {
 			c.AbortWithStatusJSON(http.StatusBadRequest, "Server already running/restarting")
 		}
-		server, err = minecraftProvisionerService.NewGameServer(c, server)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 		}
