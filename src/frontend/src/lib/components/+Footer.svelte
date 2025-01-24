@@ -23,8 +23,8 @@
   <FooterLinkGroup
     ulClass="flex flex-wrap items-center mt-3 text-sm text-gray-500 dark:text-gray-400 sm:mt-0">
     <FooterLink href="/about">About</FooterLink>
-    <FooterLink href="/">Privacy Policy</FooterLink>
-    <FooterLink href="/">Contact</FooterLink>
+    <FooterLink href="/src/frontend/static">Privacy Policy</FooterLink>
+    <FooterLink href="/src/frontend/static">Contact</FooterLink>
     <FooterIcon href="https://github.com/Lachstec/mc-hosting">
       <GithubSolid
         class="w-5 h-5 text-gray-500 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white" />
