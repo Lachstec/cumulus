@@ -11,9 +11,9 @@
   } from "flowbite-svelte";
   import auth from "$lib/service/auth_service";
   import type { Auth0Client } from "@auth0/auth0-spa-js";
-  import { PUBLIC_BACKEND_URL} from "$env/static/public";
+  import { PUBLIC_BACKEND_URL } from "$env/static/public";
 
-  let backend_url = PUBLIC_BACKEND_URL
+  let backend_url = PUBLIC_BACKEND_URL;
 
   type UserData = {
     ID: number;

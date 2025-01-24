@@ -1,11 +1,11 @@
 <script lang="ts">
-  import {Alert, Button, Card, Modal, Spinner} from "flowbite-svelte";
-  import {CheckCircleSolid} from "flowbite-svelte-icons";
-  import {v4 as uuidv4} from 'uuid';
-  import {PUBLIC_REQUESTER_NAME} from "$env/static/public";
-  import { PUBLIC_BACKEND_URL} from "$env/static/public";
+  import { Alert, Button, Card, Modal, Spinner } from "flowbite-svelte";
+  import { CheckCircleSolid } from "flowbite-svelte-icons";
+  import { v4 as uuidv4 } from "uuid";
+  import { PUBLIC_REQUESTER_NAME } from "$env/static/public";
+  import { PUBLIC_BACKEND_URL } from "$env/static/public";
 
-  let backend_url = PUBLIC_BACKEND_URL
+  let backend_url = PUBLIC_BACKEND_URL;
 
   let cards = [
     { ID: 1, title: "Tiny", ram: 512, disk: 1, cpu: 1, cost: 2 },
@@ -54,24 +54,22 @@
     isLoading = false;
     modalOpen = false;
 
-    if(response?.status === 200) {
+    if (response?.status === 200) {
       responseOK = true;
     } else {
       responseError = true;
       errorMsg = await response?.text();
     }
   }
-
-
 </script>
 
 {#if responseOK}
-  <Alert color="green" on:close={() => responseOK = false}>
+  <Alert color="green" on:close={() => (responseOK = false)}>
     <span class="font-medium">Success!</span> Your server has been created.
   </Alert>
 {/if}
 {#if responseError}
-  <Alert color="red" on:close={() => responseError = false}>
+  <Alert color="red" on:close={() => (responseError = false)}>
     <span class="font-medium">Error!</span> Something went wrong. Error: {errorMsg}
   </Alert>
 {/if}
@@ -115,15 +113,20 @@
             {card.cpu} vCPUs</span>
         </li>
       </ul>
-      <Button class="w-full" on:click={() => (orderServer(card.ID - 1))} disabled={isLoading}
-        >Choose Flavour</Button>
+      <Button
+        class="w-full"
+        on:click={() => orderServer(card.ID - 1)}
+        disabled={isLoading}>Choose Flavour</Button>
     </Card>
   {/each}
 </div>
 
-<Modal title="Please Wait, Creating your Server" bind:open={modalOpen} size="xs">
+<Modal
+  title="Please Wait, Creating your Server"
+  bind:open={modalOpen}
+  size="xs">
   <div class="flex flex-col items-center justify-center text-center space-y-4">
-    <Spinner/>
+    <Spinner />
     <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
       This window will close when creation is finished.
     </p>
