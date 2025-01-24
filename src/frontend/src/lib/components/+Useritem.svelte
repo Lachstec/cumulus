@@ -67,14 +67,14 @@
     <DropdownItem href="/user/1/servers">My Servers</DropdownItem>
     <DropdownDivider />
     <DropdownItem
-      ><a class="nav-link" href="/src/frontend/static#" on:click={logout}>Sign Out</a
+      ><a class="nav-link" href="#" on:click={logout}>Sign Out</a
       ></DropdownItem>
   </Dropdown>
 {:else}
   <div class="flex items-center space-x-4">
     <Avatar />
     <div class="space-y-1 font-medium dark:text-white">
-      <a class="nav-link" href="/src/frontend/static#" on:click={login}>Sign In</a>
+      <a class="nav-link" href="#" on:click={login}>Sign In</a>
     </div>
     <NavHamburger class1="w-full md:flex md:w-auto md:order-1" />
   </div>
