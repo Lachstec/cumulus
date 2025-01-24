@@ -1,7 +1,11 @@
 <script lang="ts">
-  import { Card, Button, Spinner, Modal, Alert } from "flowbite-svelte";
-  import { CheckCircleSolid } from "flowbite-svelte-icons";
+  import {Alert, Button, Card, Modal, Spinner} from "flowbite-svelte";
+  import {CheckCircleSolid} from "flowbite-svelte-icons";
   import {v4 as uuidv4} from 'uuid';
+  import {PUBLIC_REQUESTER_NAME} from "$env/static/public";
+  import { PUBLIC_BACKEND_URL} from "$env/static/public";
+
+  let backend_url = PUBLIC_BACKEND_URL
 
   let cards = [
     { ID: 1, title: "Tiny", ram: 512, disk: 1, cpu: 1, cost: 2 },
@@ -24,13 +28,15 @@
     isLoading = true;
     modalOpen = true;
     let response = null;
+    // Name needs to be unique
     const uuid = uuidv4();
+    // Ability to track who ordered a server
     try {
-      response = await fetch("http://localhost:10000/servers", {
+      response = await fetch(`${backend_url}/servers`, {
         method: "POST",
         body: JSON.stringify({
           flavour: cards[flavour].ID,
-          name: "MyServer" + uuid,
+          name: PUBLIC_REQUESTER_NAME + "_" + uuid,
           image: "29a24dc0-b24b-4cc8-b43b-a8a4c6916d0f",
           game: "minecraft",
           game_version: "latest",

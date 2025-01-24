@@ -11,6 +11,9 @@
   } from "flowbite-svelte";
   import auth from "$lib/service/auth_service";
   import type { Auth0Client } from "@auth0/auth0-spa-js";
+  import { PUBLIC_BACKEND_URL} from "$env/static/public";
+
+  let backend_url = PUBLIC_BACKEND_URL
 
   type UserData = {
     ID: number;
@@ -25,7 +28,7 @@
   async function getAllUsers() {
     auth0Client = await auth.createClient();
     const token = await auth0Client.getTokenSilently();
-    const res = await fetch("http://localhost:10000/users", {
+    const res = await fetch(`${backend_url}/users`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -41,7 +44,7 @@
   let isVisible = false;
 
   function deleteUser(ID: number) {
-    fetch(`http://localhost:10000/users/${ID}`, {
+    fetch(`${backend_url}/users/${ID}`, {
       method: "DELETE",
     })
       .then((res) => {
