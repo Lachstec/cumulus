@@ -19,10 +19,10 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-          cache-dependency-path: './src/frontend/hosting/package-lock.json'
+          cache-dependency-path: './src/frontend/package-lock.json'
       - name: Install dependencies
         run: npm install
-        working-directory: ./src/frontend/hosting
+        working-directory: ./src/frontend/frontend
       - name: Check formatting with Prettier
-        working-directory: ./src/frontend/hosting  # Run Prettier in the same directory
+        working-directory: ./src/frontend/frontend  # Run Prettier in the same directory
         run: npx prettier --check "**/*.{ts,tsx,js,md,mdx,css,yaml,html,svelte}"
