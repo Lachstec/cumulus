@@ -155,7 +155,7 @@ func main() {
 		if err != nil {
 			ctx.AbortWithError(http.StatusBadRequest, err)
 		}
-		servers, err := server_service.ReadServerByUserID(userid)
+		servers, err := serverService.ReadServerByUserID(userid)
 		if err != nil {
 			ctx.AbortWithError(http.StatusInternalServerError, err)
 		}
