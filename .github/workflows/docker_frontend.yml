@@ -36,8 +36,8 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: ./src/frontend/hosting
-          file: ./src/frontend/hosting/Dockerfile
+          context: ./src/frontend
+          file: ./src/frontend/Dockerfile
           push: true
           tags: ghcr.io/lachstec/frontend:dev
           labels: |
