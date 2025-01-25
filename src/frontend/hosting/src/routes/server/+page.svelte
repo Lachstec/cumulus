@@ -1,6 +1,11 @@
 <script lang="ts">
-  import { Card, Button } from "flowbite-svelte";
+  import { Alert, Button, Card, Modal, Spinner } from "flowbite-svelte";
   import { CheckCircleSolid } from "flowbite-svelte-icons";
+  import { v4 as uuidv4 } from "uuid";
+  import { PUBLIC_REQUESTER_NAME } from "$env/static/public";
+  import { PUBLIC_BACKEND_URL } from "$env/static/public";
+
+  let backend_url = PUBLIC_BACKEND_URL;
 
   let cards = [
     { ID: 1, title: "Tiny", ram: 512, disk: 1, cpu: 1, cost: 2 },
@@ -10,15 +15,29 @@
     { ID: 5, title: "X-Large", ram: 16384, disk: 160, cpu: 8, cost: 100 },
   ];
 
+  // While waiting for Response
+  let isLoading = false;
+  let modalOpen = false;
+
+  //alerts
+  let responseOK = false;
+  let responseError = false;
+  let errorMsg = "generic Error";
+
   async function orderServer(flavour: number) {
+    isLoading = true;
+    modalOpen = true;
     let response = null;
+    // Name needs to be unique
+    const uuid = uuidv4();
+    // Ability to track who ordered a server
     try {
-      response = await fetch("http://localhost:10000/servers", {
+      response = await fetch(`${backend_url}/servers`, {
         method: "POST",
         body: JSON.stringify({
           flavour: cards[flavour].ID,
-          name: "MyServer",
-          image: "d6d1835c-7180-4ca9-b4a1-470afbd8b398",
+          name: PUBLIC_REQUESTER_NAME + "_" + uuid,
+          image: "29a24dc0-b24b-4cc8-b43b-a8a4c6916d0f",
           game: "minecraft",
           game_version: "latest",
           gamemode: "survival",
@@ -32,8 +51,28 @@
       console.log(err);
     }
     console.log(response);
+    isLoading = false;
+    modalOpen = false;
+
+    if (response?.status === 200) {
+      responseOK = true;
+    } else {
+      responseError = true;
+      errorMsg = await response?.text();
+    }
   }
 </script>
+
+{#if responseOK}
+  <Alert color="green" on:close={() => (responseOK = false)}>
+    <span class="font-medium">Success!</span> Your server has been created.
+  </Alert>
+{/if}
+{#if responseError}
+  <Alert color="red" on:close={() => (responseError = false)}>
+    <span class="font-medium">Error!</span> Something went wrong. Error: {errorMsg}
+  </Alert>
+{/if}
 
 <div
   class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 p-4">
@@ -74,8 +113,22 @@
             {card.cpu} vCPUs</span>
         </li>
       </ul>
-      <Button class="w-full" on:click={() => orderServer(card.ID - 1)}
-        >Choose Flavour</Button>
+      <Button
+        class="w-full"
+        on:click={() => orderServer(card.ID - 1)}
+        disabled={isLoading}>Choose Flavour</Button>
     </Card>
   {/each}
 </div>
+
+<Modal
+  title="Please Wait, Creating your Server"
+  bind:open={modalOpen}
+  size="xs">
+  <div class="flex flex-col items-center justify-center text-center space-y-4">
+    <Spinner />
+    <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+      This window will close when creation is finished.
+    </p>
+  </div>
+</Modal>
