@@ -33,6 +33,14 @@ func (c *ServerService) ReadServerByServerID(serverid int64) ([]*types.Server, e
 	return server, nil
 }
 
+func (c *ServerService) ReadServerByUserID(userid int64) ([]*types.Server, error) {
+	server, err := c.store.Find(func(s *types.Server) bool { return s.UserID == userid})
+	if err != nil {
+		return nil, err
+	}
+	return server, nil
+}
+
 func (c *ServerService) CreateServer(server *types.Server) (int64, error) {
 	serverid, err := c.store.Add(server)
 	if err != nil {

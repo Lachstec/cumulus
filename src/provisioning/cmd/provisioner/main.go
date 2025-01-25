@@ -47,7 +47,6 @@ func urlParamToInt64(param string) (int64, error) {
 
 func main() {
 
-	// initialize the database
 	db := dbInit()
 	cfg := config.LoadConfig()
 	openstack, err := openstack.NewClient(cfg)
@@ -55,15 +54,12 @@ func main() {
 		panic(err)
 	}
 
-	// initialize the services
 	server_service := services.NewServerService(db)
 	user_service := services.NewUserService(db)
 	minecraft_provisioner_service := services.NewMinecraftProvisioner(db, openstack, cfg.CryptoConfig.EncryptionKey)
 
-	// initialize the router
 	router := gin.Default()
 
-	// CRUD users
 	router.GET("/users", func(c *gin.Context) {
 		users, err := user_service.ReadAllUsers()
 		if err != nil {
@@ -139,19 +135,18 @@ func main() {
 		c.Status(http.StatusNoContent)
 	})
 
-	// users/:userid/servers
-	router.GET("/users/:userid/servers", genericEndpoint)
-
-	/*router.GET("/self", func(c *gin.Context) {
-		token := c.GetHeader("Token")
-		user, err := auth_service.ValidateToken(token)
+	router.GET("/users/:userid/servers", func(ctx *gin.Context) {
+		userid, err := urlParamToInt64(ctx.Param("userid"))
 		if err != nil {
-			c.AbortWithError(http.StatusUnauthorized, err)
+			ctx.AbortWithError(http.StatusBadRequest, err)
 		}
-		c.JSON(http.StatusOK, user)
-	})*/
+		servers, err := server_service.ReadServerByUserID(userid)
+		if err != nil {
+			ctx.AbortWithError(http.StatusInternalServerError, err)
+		}
+		ctx.JSON(http.StatusOK, servers)
+	})
 
-	// CRUD servers
 	router.GET("/servers", func(c *gin.Context) {
 		servers, err := server_service.ReadAllServers()
 		if err != nil {
@@ -261,6 +256,5 @@ func main() {
 	// teapot
 	router.GET("/teapot", func(c *gin.Context) { c.Status(http.StatusTeapot) })
 
-	// run webserver
 	_ = router.Run("localhost:10000")
 }
