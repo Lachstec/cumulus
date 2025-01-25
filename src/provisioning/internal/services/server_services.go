@@ -3,16 +3,15 @@ package services
 import (
 	"github.com/Lachstec/mc-hosting/internal/db"
 	"github.com/Lachstec/mc-hosting/internal/types"
-	"github.com/jmoiron/sqlx"
 )
 
 type ServerService struct {
 	store db.Store[types.Server]
 }
 
-func NewServerService(conn *sqlx.DB) *ServerService {
+func NewServerService(store db.Store[types.Server]) *ServerService {
 	return &ServerService{
-		store: db.NewServerStore(conn),
+		store: store,
 	}
 }
 

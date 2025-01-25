@@ -11,6 +11,9 @@
   import { ExclamationCircleOutline } from "flowbite-svelte-icons";
   import type { PageData } from "./$types";
   import { page } from "$app/stores";
+  import { PUBLIC_BACKEND_URL } from "$env/static/public";
+
+  let backend_url = PUBLIC_BACKEND_URL;
 
   let { data }: { data: PageData } = $props();
 
@@ -42,8 +45,8 @@
   let selectedName = $state(data.name);
   let selectedRole = $state(data.role);
   let roles = [
-    { value: "Admin", name: "Admin" },
-    { value: "User", name: "User" },
+    { value: "Admin", name: "admin" },
+    { value: "User", name: "user" },
   ];
 
   async function updateData() {
@@ -55,7 +58,7 @@
       }
 
       const response = await fetch(
-        `http://localhost:10000/users/${$page.params.userid}`,
+        `${backend_url}/users/${$page.params.userid}`,
         {
           method: "PATCH",
           headers: {
@@ -81,7 +84,7 @@
   async function deleteUser() {
     try {
       const response = await fetch(
-        `http://localhost:10000/users/${$page.params.userid}`,
+        `${backend_url}/users/${$page.params.userid}`,
         { method: "DELETE" },
       );
       if (response.ok) {
