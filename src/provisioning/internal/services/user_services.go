@@ -40,7 +40,7 @@ func (c *UserService) CreateUser(user *types.User) (int64, error) {
 	return userid, nil
 }
 
-func (c *UserService) DeleteUser(user *types.User) error {
+func (c *UserService) DeleteUser(user *types.User) (error) {
 	err := c.store.Delete(user)
 	if err != nil {
 		return err

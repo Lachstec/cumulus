@@ -63,10 +63,8 @@ func main() {
 	userService := services.NewUserService(userStore)
 	minecraftProvisionerService := services.NewMinecraftProvisioner(database, openstack, cfg.CryptoConfig.EncryptionKey)
 
-	// initialize the router
 	router := gin.Default()
 
-	// CRUD users
 	router.GET("/users", func(c *gin.Context) {
 		users, err := userService.ReadAllUsers()
 		if err != nil {
@@ -152,19 +150,18 @@ func main() {
 		c.Status(http.StatusNoContent)
 	})
 
-	// users/:userid/servers
-	router.GET("/users/:userid/servers", genericEndpoint)
-
-	/*router.GET("/self", func(c *gin.Context) {
-		token := c.GetHeader("Token")
-		user, err := auth_service.ValidateToken(token)
+	router.GET("/users/:userid/servers", func(ctx *gin.Context) {
+		userid, err := urlParamToInt64(ctx.Param("userid"))
 		if err != nil {
-			c.AbortWithError(http.StatusUnauthorized, err)
+			ctx.AbortWithError(http.StatusBadRequest, err)
 		}
-		c.JSON(http.StatusOK, user)
-	})*/
+		servers, err := serverService.ReadServerByUserID(userid)
+		if err != nil {
+			ctx.AbortWithError(http.StatusInternalServerError, err)
+		}
+		ctx.JSON(http.StatusOK, servers)
+	})
 
-	// CRUD servers
 	router.GET("/servers", func(c *gin.Context) {
 		servers, err := serverService.ReadAllServers()
 		if err != nil {
@@ -288,6 +285,5 @@ func main() {
 	// teapot
 	router.GET("/teapot", func(c *gin.Context) { c.Status(http.StatusTeapot) })
 
-	// run webserver
 	_ = router.Run("localhost:10000")
 }
