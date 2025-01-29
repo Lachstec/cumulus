@@ -1,14 +1,13 @@
 <script lang="ts">
   import { Toggle, Input, Label, Select, Button } from "flowbite-svelte";
-  import { FloppyDiskSolid } from "flowbite-svelte-icons";
-  import { onMount } from "svelte";
-  let selected_gameMode: String;
-  let selected_gameDiff: String;
-  let selected_version: String;
+  import { FloppyDiskSolid, TrashBinSolid } from "flowbite-svelte-icons";
+  import {PUBLIC_BACKEND_URL, PUBLIC_REQUESTER_NAME} from "$env/static/public";
+
+  // Drop Downs
   let gameDiff = [
     { value: "peaceful", name: "Peaceful" },
     { value: "easy", name: "Easy" },
-    { value: "medium", name: "Medium" },
+    { value: "normal", name: "Medium" },
     { value: "hard", name: "Hard" },
   ];
 
@@ -19,16 +18,54 @@
     { value: "spectator", name: "Spectator" },
   ];
 
-  let versions: String[] = ["latest"];
-  onMount(async () => {
-    const res = await fetch("https://mc-versions-api.net/api/java");
-    const data = await res.json();
-    versions = versions.concat(data.result);
-  });
+  // GET
+  let { data } = $props();
+  let {server, versions} = data
 
-  async function sendSettings() {
-    console.log("Button");
+  // PATCH
+  async function updateServer() {
+    console.log("Update Button");
+    console.log(server)
+    try {
+      const response = await fetch(`${PUBLIC_BACKEND_URL}/servers/${server.ID}`,{
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: server.name,
+          image: "29a24dc0-b24b-4cc8-b43b-a8a4c6916d0f",
+          game: "minecraft",
+          game_version: "latest",
+          gamemode: "survival",
+          difficulty: "normal",
+          whitelist_enabled: true,
+          pvp_enabled: true,
+          players_max: 10,
+        }),
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
+
+  // DELETE
+  async function deleteServer() {
+    console.log("Delete Button");
+    try {
+      const response = await fetch(`${PUBLIC_BACKEND_URL}/servers/${server.ID}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+      const data = await response.json();
+      console.log("Update successful:", data);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
 </script>
 
 <form class="p-8 max-w-7xl mx-auto mt-16 bg-white dark:bg-gray-900 h-screen">
@@ -38,12 +75,14 @@
       <Input
         type="text"
         id="server_name"
-        placeholder="Placeholder Name"
-        required />
+        placeholder="{server.name}"
+        required
+        disabled
+      />
     </div>
     <div>
       <Label for="pvp_toggle" class="mb-2">PVP</Label>
-      <Toggle checked={true} id="pvp_toggle"></Toggle>
+      <Toggle checked={server.pvp_enabled} id="pvp_toggle"></Toggle>
     </div>
     <div>
       <Label>
@@ -52,12 +91,12 @@
           id="game_difficulty"
           class="mt-2"
           items={gameDiff}
-          bind:value={selected_gameDiff} />
+          bind:value={server.difficulty} />
       </Label>
     </div>
     <div>
       <Label>Select a version</Label>
-      <Select id="game_version" class="mt-2" bind:value={selected_version}>
+      <Select id="game_version" class="mt-2" bind:value={server.game_version} >
         {#each versions as version}
           <option value={version}>{version}</option>
         {/each}
@@ -70,10 +109,13 @@
           id="game_mode"
           class="mt-2"
           items={gameMode}
-          bind:value={selected_gameMode} />
+          bind:value={server.gamemode} />
       </Label>
     </div>
   </div>
-  <Button size="md" color="green" on:click={() => sendSettings}
+  <Button class="mr-1" size="md" color="green" on:click={updateServer}
     ><FloppyDiskSolid class="w-5 h-5 me-2" />Save</Button>
+
+  <Button class="mr-1" size="md" color="red" on:click={deleteServer}
+    ><TrashBinSolid class="w-5 h-5 me-2" />Delete</Button>
 </form>

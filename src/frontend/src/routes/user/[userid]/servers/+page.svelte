@@ -36,7 +36,7 @@
       </TableHeadCell>
     </TableHead>
     <TableBody tableBodyClass="divide-y">
-      {#each data.servers as { ID, Status, name, ip, game_version, gamemode, difficulty, players_max, pvp }}
+      {#each data.servers as { ID, Status, name, ip, game_version, gamemode, difficulty, players_max, pvp_enabled}}
         <TableBodyRow>
           <TableBodyCell>{(name.length > 20) ? name.substring(0,20) + "..." : name}</TableBodyCell>
           <TableBodyCell><Indicator color={(Status === "running" ? "green" : "red")}/></TableBodyCell>
@@ -46,7 +46,7 @@
           <TableBodyCell>{difficulty}</TableBodyCell>
           <TableBodyCell>{players_max}</TableBodyCell>
           <TableBodyCell>
-            {#if pvp}
+            {#if pvp_enabled}
               <svg
                 class="w-6 h-6 text-gray-800 dark:text-white"
                 aria-hidden="true"
