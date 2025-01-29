@@ -7,8 +7,10 @@
     TableBodyRow,
     TableHead,
     TableHeadCell,
+    Indicator,
   } from "flowbite-svelte";
   let { data } = $props();
+  let indicatorColor = "black"
 </script>
 
 <div class="p-8 mt-16 bg-white dark:bg-gray-900 h-screen">
@@ -22,6 +24,7 @@
     </caption>
     <TableHead>
       <TableHeadCell>Server Name</TableHeadCell>
+      <TableHeadCell>Status</TableHeadCell>
       <TableHeadCell>IP</TableHeadCell>
       <TableHeadCell>Version</TableHeadCell>
       <TableHeadCell>Mode</TableHeadCell>
@@ -33,14 +36,15 @@
       </TableHeadCell>
     </TableHead>
     <TableBody tableBodyClass="divide-y">
-      {#each data.servers as { id, name, ip, version, mode, difficulty, maxPlayers, pvp }}
+      {#each data.servers as { ID, Status, name, ip, game_version, gamemode, difficulty, players_max, pvp }}
         <TableBodyRow>
-          <TableBodyCell>{name}</TableBodyCell>
+          <TableBodyCell>{(name.length > 20) ? name.substring(0,20) + "..." : name}</TableBodyCell>
+          <TableBodyCell><Indicator color={(Status === "running" ? "green" : "red")}/></TableBodyCell>
           <TableBodyCell>{ip}</TableBodyCell>
-          <TableBodyCell>{version}</TableBodyCell>
-          <TableBodyCell>{mode}</TableBodyCell>
+          <TableBodyCell>{game_version}</TableBodyCell>
+          <TableBodyCell>{gamemode}</TableBodyCell>
           <TableBodyCell>{difficulty}</TableBodyCell>
-          <TableBodyCell>{maxPlayers}</TableBodyCell>
+          <TableBodyCell>{players_max}</TableBodyCell>
           <TableBodyCell>
             {#if pvp}
               <svg
@@ -78,7 +82,7 @@
           </TableBodyCell>
           <TableBodyCell>
             <a
-              href="../../server/{id}"
+              href="../../server/{ID}"
               class="font-medium text-primary-600 hover:underline dark:text-primary-500"
               >Edit</a>
           </TableBodyCell>
