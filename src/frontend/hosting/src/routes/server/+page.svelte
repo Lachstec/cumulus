@@ -31,7 +31,7 @@
         body: JSON.stringify({
           flavour: cards[flavour].ID,
           name: "MyServer" + uuid,
-          image: "29a24dc0-b24b-4cc8-b43b-a8a4c6916d0f",
+          image: "d6d1835c-7180-4ca9-b4a1-470afbd8b398",
           game: "minecraft",
           game_version: "latest",
           gamemode: "survival",
