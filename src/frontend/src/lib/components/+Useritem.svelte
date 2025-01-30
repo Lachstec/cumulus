@@ -46,15 +46,16 @@
 
   const authStatus = $isAuthenticated;
   const userData = $user;
-  const userStrLength = 20;
+  const userStrLength = 15;
 </script>
 
+<div class="md:order-2">
 {#if $isAuthenticated}
-  <div class="flex items-center space-x-4" id="user-menu">
-    <Avatar src={$user?.picture} />
-    <div class="space-y-1 font-medium dark:text-white">
-      {$user?.nickname.substring(0, userStrLength)}
-    </div>
+  <div class="flex items-center space-x-4">
+    <Avatar src={$user?.picture} id="user-menu"/>
+    <!--<div class="space-y-1 font-medium dark:text-white">
+      {$user?.nickname.length > 18 ? $user?.nickname.substring(0, userStrLength) + "..." : $user.nickname}
+    </div>-->
     <NavHamburger class1="w-full md:flex md:w-auto md:order-1" />
   </div>
   <Dropdown placement="bottom" triggeredBy="#user-menu">
@@ -72,10 +73,11 @@
   </Dropdown>
 {:else}
   <div class="flex items-center space-x-4">
-    <Avatar />
     <div class="space-y-1 font-medium dark:text-white">
       <a class="nav-link" href="/#" on:click={login}>Sign In</a>
     </div>
+    <Avatar />
     <NavHamburger class1="w-full md:flex md:w-auto md:order-1" />
   </div>
 {/if}
+</div>
