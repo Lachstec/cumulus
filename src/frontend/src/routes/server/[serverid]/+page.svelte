@@ -42,6 +42,7 @@
           players_max: 10,
         }),
       });
+      console.log(response);
     } catch (error) {
       console.error(error);
     }
