@@ -153,11 +153,11 @@ func main() {
 	router.GET("/users/:userid/servers", func(ctx *gin.Context) {
 		userid, err := urlParamToInt64(ctx.Param("userid"))
 		if err != nil {
-			ctx.AbortWithError(http.StatusBadRequest, err)
+			_ = ctx.AbortWithError(http.StatusBadRequest, err)
 		}
 		servers, err := serverService.ReadServerByUserID(userid)
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
+			_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		}
 		ctx.JSON(http.StatusOK, servers)
 	})
@@ -244,19 +244,19 @@ func main() {
 	router.PATCH("/servers/:serverid", func(c *gin.Context) {
 		serverid, err := urlParamToInt64(c.Param("serverid"))
 		if err != nil {
-		    log.Println("Error: %v", err)
+			log.Printf("Error: %v\n", err)
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
 		servers, err := serverService.ReadServerByServerID(serverid)
 		if err != nil {
-		    _ = c.AbortWithError(http.StatusBadRequest, err)
+			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
 
-        if len(servers) == 0 {
-            c.AbortWithStatus(http.StatusNotFound)
-        }
+		if len(servers) == 0 {
+			c.AbortWithStatus(http.StatusNotFound)
+		}
 
-        server := servers[0]
+		server := servers[0]
 
 		err = c.BindJSON(&server)
 		if err != nil {
