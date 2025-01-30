@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Toggle, Input, Label, Select, Button, NumberInput, Textarea } from "flowbite-svelte";
   import { FloppyDiskSolid, TrashBinSolid, CaretLeftSolid } from "flowbite-svelte-icons";
-  import {PUBLIC_BACKEND_URL, PUBLIC_REQUESTER_NAME} from "$env/static/public";
+  import { PUBLIC_BACKEND_URL } from "$env/static/public";
 
   // Drop Downs
   let gameDiff = [
