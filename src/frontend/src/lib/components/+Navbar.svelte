@@ -3,7 +3,7 @@
   import Useritem from "./+Useritem.svelte";
 </script>
 
-<div class="relative px-8 mb-16">
+<!--<div class="relative px-8 mb-16">-->
   <Navbar class="px-2 sm:px-4 py-2.5 fixed w-full z-20 top-0 start-0 border-b">
     <NavBrand href="/">
       <img src="/images/logo.png" class="me-3 h-6 sm:h-9" alt="Hosting Logo" />
@@ -19,4 +19,4 @@
     </NavUl>
     <Useritem></Useritem>
   </Navbar>
-</div>
+<!--</div>-->

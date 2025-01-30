@@ -73,7 +73,7 @@
     <span class="font-medium">Error!</span> Something went wrong. Error: {errorMsg}
   </Alert>
 {/if}
-
+<div class="p-8 bg-white dark:bg-gray-900 ">
 <div
   class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 p-4">
   {#each cards as card}
@@ -120,7 +120,7 @@
     </Card>
   {/each}
 </div>
-
+</div>
 <Modal
   title="Please Wait, Creating your Server"
   bind:open={modalOpen}
