@@ -24,7 +24,6 @@
 
   // PATCH
   async function updateServer() {
-    console.log("Update Button");
     console.log(server)
     try {
       const response = await fetch(`${PUBLIC_BACKEND_URL}/servers/${server.ID}`,{
@@ -34,7 +33,6 @@
         },
         body: JSON.stringify({
           name: server.name,
-          image: "29a24dc0-b24b-4cc8-b43b-a8a4c6916d0f",
           game: "minecraft",
           game_version: "latest",
           gamemode: "survival",
@@ -51,7 +49,6 @@
 
   // DELETE
   async function deleteServer() {
-    console.log("Delete Button");
     try {
       const response = await fetch(`${PUBLIC_BACKEND_URL}/servers/${server.ID}`, {
         method: "DELETE",
