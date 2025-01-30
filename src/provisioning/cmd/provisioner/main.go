@@ -244,19 +244,29 @@ func main() {
 	router.PATCH("/servers/:serverid", func(c *gin.Context) {
 		serverid, err := urlParamToInt64(c.Param("serverid"))
 		if err != nil {
+		    log.Println("Error: %v", err)
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		var server *types.Server
-		server.ID = serverid
+		servers, err := serverService.ReadServerByServerID(serverid)
+		if err != nil {
+		    _ = c.AbortWithError(http.StatusBadRequest, err)
+		}
+
+        if len(servers) == 0 {
+            c.AbortWithStatus(http.StatusNotFound)
+        }
+
+        server := servers[0]
+
 		err = c.BindJSON(&server)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		server, err = serverService.UpdateServer(server)
+		srv, err := serverService.UpdateServer(server)
 		if err != nil {
 			_ = c.AbortWithError(http.StatusBadRequest, err)
 		}
-		c.JSON(http.StatusOK, server)
+		c.JSON(http.StatusOK, srv)
 	})
 
 	router.DELETE("/servers/:serverid", func(c *gin.Context) {
