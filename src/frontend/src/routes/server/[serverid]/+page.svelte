@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Toggle, Input, Label, Select, Button } from "flowbite-svelte";
-  import { FloppyDiskSolid, TrashBinSolid } from "flowbite-svelte-icons";
+  import { Toggle, Input, Label, Select, Button, NumberInput, Textarea } from "flowbite-svelte";
+  import { FloppyDiskSolid, TrashBinSolid, CaretLeftSolid } from "flowbite-svelte-icons";
   import {PUBLIC_BACKEND_URL, PUBLIC_REQUESTER_NAME} from "$env/static/public";
 
   // Drop Downs
@@ -20,27 +20,20 @@
 
   // GET
   let { data } = $props();
-  let {server, versions} = data
-
+  let {server, versions} = data;
+  let updatedServer = server;
+  let whitelistVis = $derived(updatedServer.whitelist_enabled);
   // PATCH
   async function updateServer() {
-    console.log(server)
+    console.log(updatedServer)
+    console.log("Whitelist:" + updatedServer.whitelist_enabled)
     try {
       const response = await fetch(`${PUBLIC_BACKEND_URL}/servers/${server.ID}`,{
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          name: server.name,
-          game: "minecraft",
-          game_version: "latest",
-          gamemode: "survival",
-          difficulty: "normal",
-          whitelist_enabled: true,
-          pvp_enabled: true,
-          players_max: 10,
-        }),
+        body: JSON.stringify( updatedServer ),
       });
       console.log(response);
     } catch (error) {
@@ -73,14 +66,14 @@
       <Input
         type="text"
         id="server_name"
-        placeholder="{server.name}"
+        placeholder="{updatedServer.name}"
         required
         disabled
       />
     </div>
     <div>
       <Label for="pvp_toggle" class="mb-2">PVP</Label>
-      <Toggle checked={server.pvp_enabled} id="pvp_toggle"></Toggle>
+      <Toggle bind:checked={updatedServer.pvp_enabled} id="pvp_toggle"></Toggle>
     </div>
     <div>
       <Label>
@@ -89,12 +82,12 @@
           id="game_difficulty"
           class="mt-2"
           items={gameDiff}
-          bind:value={server.difficulty} />
+          bind:value={updatedServer.difficulty} />
       </Label>
     </div>
     <div>
       <Label>Select a version</Label>
-      <Select id="game_version" class="mt-2" bind:value={server.game_version} >
+      <Select id="game_version" class="mt-2" bind:value={updatedServer.game_version} >
         {#each versions as version}
           <option value={version}>{version}</option>
         {/each}
@@ -107,13 +100,43 @@
           id="game_mode"
           class="mt-2"
           items={gameMode}
-          bind:value={server.gamemode} />
+          bind:value={updatedServer.gamemode} />
       </Label>
     </div>
+    <div>
+      <Label>
+        Maximum Number of Players
+        <NumberInput
+          id="players_max"
+          class="mt-2"
+          bind:value={updatedServer.players_max} />
+      </Label>
+    </div>
+    <div>
+      <Label for="whitelist_toggle" class="mb-2">Whitelist</Label>
+      <Toggle
+        bind:checked={updatedServer.whitelist_enabled}
+        id="whitelist_toggle"></Toggle>
+    </div>
+    {#if updatedServer.whitelist_enabled}
+      <div>
+          <Label for="whitelist_textarea" class="mb-2">Whitelisted Users</Label>
+          <Textarea
+            id="whitelist_textarea"
+            placeholder="Your message"
+            rows="4"
+            name="whitelist_message"
+          />
+      </div>
+    {/if}
   </div>
+  <Button class="mr-1" size="md" color="yellow" href="../user/{server.ID}/servers"
+  ><CaretLeftSolid class="w-5 h-5 me-2" />Back</Button>
+
   <Button class="mr-1" size="md" color="green" on:click={updateServer}
     ><FloppyDiskSolid class="w-5 h-5 me-2" />Save</Button>
 
   <Button class="mr-1" size="md" color="red" on:click={deleteServer}
     ><TrashBinSolid class="w-5 h-5 me-2" />Delete</Button>
+
 </form>
