@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from "$app/state";
   import { Heading, P } from "flowbite-svelte";
-  import { PUBLIC_BACKEND_URL } from "$env/static/public";
+  import { env } from "$env/dynamic/public";
 </script>
 
 <div class="p-8 bg-white dark:bg-gray-900">
@@ -14,7 +14,7 @@
     <P
       class="mb-6 text-lg lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400 text-center"
       >{page.status}: {page.error?.message}</P>
-    {#if PUBLIC_BACKEND_URL.includes("localhost")}
+    {#if env.PUBLIC_BACKEND_URL.includes("localhost")}
       <P
         class="mb-6 text-lg lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400 text-center"
         >Is the Backend Running?</P>

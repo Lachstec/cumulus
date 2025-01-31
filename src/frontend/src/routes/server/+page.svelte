@@ -2,10 +2,9 @@
   import { Alert, Button, Card, Modal, Spinner } from "flowbite-svelte";
   import { CheckCircleSolid } from "flowbite-svelte-icons";
   import { v4 as uuidv4 } from "uuid";
-  import { PUBLIC_REQUESTER_NAME } from "$env/static/public";
-  import { PUBLIC_BACKEND_URL } from "$env/static/public";
+  import { env } from "$env/dynamic/public";
 
-  let backend_url = PUBLIC_BACKEND_URL;
+  let backend_url = env.PUBLIC_BACKEND_URL;
 
   let cards = [
     { ID: 1, title: "Tiny", ram: 512, disk: 1, cpu: 1, cost: 2 },
@@ -36,7 +35,7 @@
         method: "POST",
         body: JSON.stringify({
           flavour: cards[flavour].ID,
-          name: PUBLIC_REQUESTER_NAME + "_" + uuid,
+          name: env.PUBLIC_REQUESTER_NAME + "_" + uuid,
           image: "d6d1835c-7180-4ca9-b4a1-470afbd8b398",
           game: "minecraft",
           game_version: "latest",

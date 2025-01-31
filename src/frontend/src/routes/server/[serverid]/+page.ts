@@ -1,10 +1,10 @@
 import type { PageLoad } from "./$types";
-import { PUBLIC_BACKEND_URL } from "$env/static/public";
+import { env } from "$env/dynamic/public";
 
 export const load: PageLoad = async ({ fetch, params }) => {
   // First get Servers from Backend
   const serverRes = await fetch(
-    `${PUBLIC_BACKEND_URL}/servers/${params.serverid}`,
+    `${env.PUBLIC_BACKEND_URL}/servers/${params.serverid}`,
   );
   const server = await serverRes.json();
   //console.log(server);
