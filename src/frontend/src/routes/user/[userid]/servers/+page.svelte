@@ -10,7 +10,7 @@
     Indicator,
   } from "flowbite-svelte";
   let { data } = $props();
-  let indicatorColor = "black"
+  let indicatorColor = "black";
 </script>
 
 <div class="p-8 bg-white dark:bg-gray-900">
@@ -36,10 +36,15 @@
       </TableHeadCell>
     </TableHead>
     <TableBody tableBodyClass="divide-y">
-      {#each data.servers as { ID, Status, name, ip, game_version, gamemode, difficulty, players_max, pvp_enabled}}
+      {#each data.servers as { ID, Status, name, ip, game_version, gamemode, difficulty, players_max, pvp_enabled }}
         <TableBodyRow>
-          <TableBodyCell>{(name.length > 20) ? name.substring(0,20) + "..." : name}</TableBodyCell>
-          <TableBodyCell><Indicator color={(Status === "running" ? "green" : "red")}/></TableBodyCell>
+          <TableBodyCell
+            >{name.length > 20
+              ? name.substring(0, 20) + "..."
+              : name}</TableBodyCell>
+          <TableBodyCell
+            ><Indicator
+              color={Status === "running" ? "green" : "red"} /></TableBodyCell>
           <TableBodyCell>{ip}</TableBodyCell>
           <TableBodyCell>{game_version}</TableBodyCell>
           <TableBodyCell>{gamemode}</TableBodyCell>

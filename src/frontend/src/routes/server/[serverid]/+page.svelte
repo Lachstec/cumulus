@@ -1,6 +1,18 @@
 <script lang="ts">
-  import { Toggle, Input, Label, Select, Button, NumberInput, Textarea } from "flowbite-svelte";
-  import { FloppyDiskSolid, TrashBinSolid, CaretLeftSolid } from "flowbite-svelte-icons";
+  import {
+    Toggle,
+    Input,
+    Label,
+    Select,
+    Button,
+    NumberInput,
+    Textarea,
+  } from "flowbite-svelte";
+  import {
+    FloppyDiskSolid,
+    TrashBinSolid,
+    CaretLeftSolid,
+  } from "flowbite-svelte-icons";
   import { PUBLIC_BACKEND_URL } from "$env/static/public";
 
   // Drop Downs
@@ -20,21 +32,24 @@
 
   // GET
   let { data } = $props();
-  let {server, versions} = data;
+  let { server, versions } = data;
   let updatedServer = server;
   let whitelistVis = $derived(updatedServer.whitelist_enabled);
   // PATCH
   async function updateServer() {
-    console.log(updatedServer)
-    console.log("Whitelist:" + updatedServer.whitelist_enabled)
+    console.log(updatedServer);
+    console.log("Whitelist:" + updatedServer.whitelist_enabled);
     try {
-      const response = await fetch(`${PUBLIC_BACKEND_URL}/servers/${server.ID}`,{
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${PUBLIC_BACKEND_URL}/servers/${server.ID}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedServer),
         },
-        body: JSON.stringify( updatedServer ),
-      });
+      );
       console.log(response);
     } catch (error) {
       console.error(error);
@@ -44,19 +59,21 @@
   // DELETE
   async function deleteServer() {
     try {
-      const response = await fetch(`${PUBLIC_BACKEND_URL}/servers/${server.ID}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        }
-      });
+      const response = await fetch(
+        `${PUBLIC_BACKEND_URL}/servers/${server.ID}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
       const data = await response.json();
       console.log("Update successful:", data);
     } catch (error) {
       console.error(error);
     }
   }
-
 </script>
 
 <form class="p-8 max-w-7xl mx-auto mt-16 bg-white dark:bg-gray-900 h-screen">
@@ -66,10 +83,9 @@
       <Input
         type="text"
         id="server_name"
-        placeholder="{updatedServer.name}"
+        placeholder={updatedServer.name}
         required
-        disabled
-      />
+        disabled />
     </div>
     <div>
       <Label for="pvp_toggle" class="mb-2">PVP</Label>
@@ -87,7 +103,10 @@
     </div>
     <div>
       <Label>Select a version</Label>
-      <Select id="game_version" class="mt-2" bind:value={updatedServer.game_version} >
+      <Select
+        id="game_version"
+        class="mt-2"
+        bind:value={updatedServer.game_version}>
         {#each versions as version}
           <option value={version}>{version}</option>
         {/each}
@@ -120,23 +139,25 @@
     </div>
     {#if updatedServer.whitelist_enabled}
       <div>
-          <Label for="whitelist_textarea" class="mb-2">Whitelisted Users</Label>
-          <Textarea
-            id="whitelist_textarea"
-            placeholder="Your message"
-            rows="4"
-            name="whitelist_message"
-          />
+        <Label for="whitelist_textarea" class="mb-2">Whitelisted Users</Label>
+        <Textarea
+          id="whitelist_textarea"
+          placeholder="Your message"
+          rows="4"
+          name="whitelist_message" />
       </div>
     {/if}
   </div>
-  <Button class="mr-1" size="md" color="yellow" href="../user/{server.ID}/servers"
-  ><CaretLeftSolid class="w-5 h-5 me-2" />Back</Button>
+  <Button
+    class="mr-1"
+    size="md"
+    color="yellow"
+    href="../user/{server.ID}/servers"
+    ><CaretLeftSolid class="w-5 h-5 me-2" />Back</Button>
 
   <Button class="mr-1" size="md" color="green" on:click={updateServer}
     ><FloppyDiskSolid class="w-5 h-5 me-2" />Save</Button>
 
   <Button class="mr-1" size="md" color="red" on:click={deleteServer}
     ><TrashBinSolid class="w-5 h-5 me-2" />Delete</Button>
-
 </form>

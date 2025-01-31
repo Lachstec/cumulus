@@ -7,9 +7,7 @@
     FooterIcon,
     DarkMode,
   } from "flowbite-svelte";
-  import {
-    GithubSolid,
-  } from "flowbite-svelte-icons";
+  import { GithubSolid } from "flowbite-svelte-icons";
   let btnClass =
     "w-5 h-5 text-gray-500 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white";
 </script>

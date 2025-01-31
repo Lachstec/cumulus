@@ -73,53 +73,55 @@
     <span class="font-medium">Error!</span> Something went wrong. Error: {errorMsg}
   </Alert>
 {/if}
-<div class="p-8 bg-white dark:bg-gray-900 ">
-<div
-  class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 p-4">
-  {#each cards as card}
-    <Card padding="xl">
-      <h5 class="mb-4 text-xl font-medium text-gray-500 dark:text-gray-400">
-        {card.title}
-      </h5>
-      <div class="flex items-baseline text-gray-900 dark:text-white">
-        <span class="text-5xl font-extrabold tracking-tight">{card.cost}</span>
-        <span class="text-3xl font-semibold">€</span>
-        <span class="ms-1 text-xl font-normal text-gray-500 dark:text-gray-400"
-          >/month</span>
-      </div>
-      <!-- List -->
-      <ul class="my-7 space-y-4">
-        <li class="flex space-x-2 rtl:space-x-reverse">
-          <CheckCircleSolid
-            class="w-4 h-4 text-primary-600 dark:text-primary-500" />
+<div class="p-8 bg-white dark:bg-gray-900">
+  <div
+    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 p-4">
+    {#each cards as card}
+      <Card padding="xl">
+        <h5 class="mb-4 text-xl font-medium text-gray-500 dark:text-gray-400">
+          {card.title}
+        </h5>
+        <div class="flex items-baseline text-gray-900 dark:text-white">
+          <span class="text-5xl font-extrabold tracking-tight"
+            >{card.cost}</span>
+          <span class="text-3xl font-semibold">€</span>
           <span
-            class="text-base font-normal leading-tight text-gray-500 dark:text-gray-400">
-            {card.ram} MB RAM
-          </span>
-        </li>
-        <li class="flex space-x-2 rtl:space-x-reverse">
-          <CheckCircleSolid
-            class="w-4 h-4 text-primary-600 dark:text-primary-500" />
-          <span
-            class="text-base font-normal leading-tight text-gray-500 dark:text-gray-400">
-            {card.disk} GB Data
-          </span>
-        </li>
-        <li class="flex space-x-2 rtl:space-x-reverse">
-          <CheckCircleSolid
-            class="w-4 h-4 text-primary-600 dark:text-primary-500" />
-          <span
-            class="text-base font-normal leading-tight text-gray-500 dark:text-gray-400">
-            {card.cpu} vCPUs</span>
-        </li>
-      </ul>
-      <Button
-        class="w-full"
-        on:click={() => orderServer(card.ID - 1)}
-        disabled={isLoading}>Choose Flavour</Button>
-    </Card>
-  {/each}
-</div>
+            class="ms-1 text-xl font-normal text-gray-500 dark:text-gray-400"
+            >/month</span>
+        </div>
+        <!-- List -->
+        <ul class="my-7 space-y-4">
+          <li class="flex space-x-2 rtl:space-x-reverse">
+            <CheckCircleSolid
+              class="w-4 h-4 text-primary-600 dark:text-primary-500" />
+            <span
+              class="text-base font-normal leading-tight text-gray-500 dark:text-gray-400">
+              {card.ram} MB RAM
+            </span>
+          </li>
+          <li class="flex space-x-2 rtl:space-x-reverse">
+            <CheckCircleSolid
+              class="w-4 h-4 text-primary-600 dark:text-primary-500" />
+            <span
+              class="text-base font-normal leading-tight text-gray-500 dark:text-gray-400">
+              {card.disk} GB Data
+            </span>
+          </li>
+          <li class="flex space-x-2 rtl:space-x-reverse">
+            <CheckCircleSolid
+              class="w-4 h-4 text-primary-600 dark:text-primary-500" />
+            <span
+              class="text-base font-normal leading-tight text-gray-500 dark:text-gray-400">
+              {card.cpu} vCPUs</span>
+          </li>
+        </ul>
+        <Button
+          class="w-full"
+          on:click={() => orderServer(card.ID - 1)}
+          disabled={isLoading}>Choose Flavour</Button>
+      </Card>
+    {/each}
+  </div>
 </div>
 <Modal
   title="Please Wait, Creating your Server"
