@@ -62,7 +62,7 @@
 </script>
 
 <ul>
-  <div class="p-8 mt-16 bg-white dark:bg-gray-900 h-screen">
+  <div class="p-8 bg-white dark:bg-gray-900">
     <Table>
       <caption
         class="p-5 text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800">

@@ -4,6 +4,13 @@
   import "../app.css";
 </script>
 
-<Navbar></Navbar>
-<slot></slot>
-<Footer></Footer>
+<div class="flex flex-col min-h-screen">
+  <Navbar />
+
+  <!-- Main Content with Proper Padding -->
+  <main class="flex-grow pt-[55px] pb-[55spx]">
+    <slot />
+  </main>
+
+  <Footer />
+</div>

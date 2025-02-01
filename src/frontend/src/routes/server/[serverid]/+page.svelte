@@ -1,14 +1,25 @@
 <script lang="ts">
-  import { Toggle, Input, Label, Select, Button } from "flowbite-svelte";
-  import { FloppyDiskSolid } from "flowbite-svelte-icons";
-  import { onMount } from "svelte";
-  let selected_gameMode: String;
-  let selected_gameDiff: String;
-  let selected_version: String;
+  import {
+    Toggle,
+    Input,
+    Label,
+    Select,
+    Button,
+    NumberInput,
+    Textarea,
+  } from "flowbite-svelte";
+  import {
+    FloppyDiskSolid,
+    TrashBinSolid,
+    CaretLeftSolid,
+  } from "flowbite-svelte-icons";
+  import { PUBLIC_BACKEND_URL } from "$env/static/public";
+
+  // Drop Downs
   let gameDiff = [
     { value: "peaceful", name: "Peaceful" },
     { value: "easy", name: "Easy" },
-    { value: "medium", name: "Medium" },
+    { value: "normal", name: "Medium" },
     { value: "hard", name: "Hard" },
   ];
 
@@ -19,15 +30,49 @@
     { value: "spectator", name: "Spectator" },
   ];
 
-  let versions: String[] = ["latest"];
-  onMount(async () => {
-    const res = await fetch("https://mc-versions-api.net/api/java");
-    const data = await res.json();
-    versions = versions.concat(data.result);
-  });
+  // GET
+  let { data } = $props();
+  let { server, versions } = data;
+  let updatedServer = server;
+  let whitelistVis = $derived(updatedServer.whitelist_enabled);
+  // PATCH
+  async function updateServer() {
+    console.log(updatedServer);
+    console.log("Whitelist:" + updatedServer.whitelist_enabled);
+    try {
+      const response = await fetch(
+        `${PUBLIC_BACKEND_URL}/servers/${server.ID}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedServer),
+        },
+      );
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
-  async function sendSettings() {
-    console.log("Button");
+  // DELETE
+  async function deleteServer() {
+    try {
+      const response = await fetch(
+        `${PUBLIC_BACKEND_URL}/servers/${server.ID}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      const data = await response.json();
+      console.log("Update successful:", data);
+    } catch (error) {
+      console.error(error);
+    }
   }
 </script>
 
@@ -38,12 +83,13 @@
       <Input
         type="text"
         id="server_name"
-        placeholder="Placeholder Name"
-        required />
+        placeholder={updatedServer.name}
+        required
+        disabled />
     </div>
     <div>
       <Label for="pvp_toggle" class="mb-2">PVP</Label>
-      <Toggle checked={true} id="pvp_toggle"></Toggle>
+      <Toggle bind:checked={updatedServer.pvp_enabled} id="pvp_toggle"></Toggle>
     </div>
     <div>
       <Label>
@@ -52,12 +98,15 @@
           id="game_difficulty"
           class="mt-2"
           items={gameDiff}
-          bind:value={selected_gameDiff} />
+          bind:value={updatedServer.difficulty} />
       </Label>
     </div>
     <div>
       <Label>Select a version</Label>
-      <Select id="game_version" class="mt-2" bind:value={selected_version}>
+      <Select
+        id="game_version"
+        class="mt-2"
+        bind:value={updatedServer.game_version}>
         {#each versions as version}
           <option value={version}>{version}</option>
         {/each}
@@ -70,10 +119,45 @@
           id="game_mode"
           class="mt-2"
           items={gameMode}
-          bind:value={selected_gameMode} />
+          bind:value={updatedServer.gamemode} />
       </Label>
     </div>
+    <div>
+      <Label>
+        Maximum Number of Players
+        <NumberInput
+          id="players_max"
+          class="mt-2"
+          bind:value={updatedServer.players_max} />
+      </Label>
+    </div>
+    <div>
+      <Label for="whitelist_toggle" class="mb-2">Whitelist</Label>
+      <Toggle
+        bind:checked={updatedServer.whitelist_enabled}
+        id="whitelist_toggle"></Toggle>
+    </div>
+    {#if updatedServer.whitelist_enabled}
+      <div>
+        <Label for="whitelist_textarea" class="mb-2">Whitelisted Users</Label>
+        <Textarea
+          id="whitelist_textarea"
+          placeholder="Your message"
+          rows="4"
+          name="whitelist_message" />
+      </div>
+    {/if}
   </div>
-  <Button size="md" color="green" on:click={() => sendSettings}
+  <Button
+    class="mr-1"
+    size="md"
+    color="yellow"
+    href="../user/{server.ID}/servers"
+    ><CaretLeftSolid class="w-5 h-5 me-2" />Back</Button>
+
+  <Button class="mr-1" size="md" color="green" on:click={updateServer}
     ><FloppyDiskSolid class="w-5 h-5 me-2" />Save</Button>
+
+  <Button class="mr-1" size="md" color="red" on:click={deleteServer}
+    ><TrashBinSolid class="w-5 h-5 me-2" />Delete</Button>
 </form>
