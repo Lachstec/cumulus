@@ -1,8 +1,8 @@
 import { error } from "@sveltejs/kit";
 import type { PageLoad } from "./$types";
-import { PUBLIC_BACKEND_URL } from "$env/static/public";
+import { env } from "$env/dynamic/public";
 
-let backend_url = PUBLIC_BACKEND_URL;
+let backend_url = env.PUBLIC_BACKEND_URL;
 
 export const load: PageLoad = async ({ params }) => {
   const url = `${backend_url}/users/${params.userid}`;
