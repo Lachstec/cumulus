@@ -13,7 +13,7 @@
     TrashBinSolid,
     CaretLeftSolid,
   } from "flowbite-svelte-icons";
-  import { PUBLIC_BACKEND_URL } from "$env/static/public";
+  import { env } from "$env/dynamic/public";
 
   // Drop Downs
   let gameDiff = [
@@ -41,7 +41,7 @@
     console.log("Whitelist:" + updatedServer.whitelist_enabled);
     try {
       const response = await fetch(
-        `${PUBLIC_BACKEND_URL}/servers/${server.ID}`,
+        `${env.PUBLIC_BACKEND_URL}/servers/${server.ID}`,
         {
           method: "PATCH",
           headers: {

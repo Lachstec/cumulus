@@ -11,9 +11,9 @@
   import { ExclamationCircleOutline } from "flowbite-svelte-icons";
   import type { PageData } from "./$types";
   import { page } from "$app/stores";
-  import { PUBLIC_BACKEND_URL } from "$env/static/public";
+  import { env } from "$env/dynamic/public";
 
-  let backend_url = PUBLIC_BACKEND_URL;
+  let backend_url = env.PUBLIC_BACKEND_URL;
 
   let { data }: { data: PageData } = $props();
 

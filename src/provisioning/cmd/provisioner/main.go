@@ -15,6 +15,7 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
+	"github.com/gin-contrib/cors"
 )
 
 func dbInit() *sqlx.DB {
@@ -64,6 +65,8 @@ func main() {
 	minecraftProvisionerService := services.NewMinecraftProvisioner(database, openstack, cfg.CryptoConfig.EncryptionKey)
 
 	router := gin.Default()
+
+	router.Use(cors.Default())
 
 	router.GET("/users", func(c *gin.Context) {
 		users, err := userService.ReadAllUsers()
@@ -295,5 +298,5 @@ func main() {
 	// teapot
 	router.GET("/teapot", func(c *gin.Context) { c.Status(http.StatusTeapot) })
 
-	_ = router.Run("localhost:10000")
+	_ = router.Run("0.0.0.0:10000")
 }
