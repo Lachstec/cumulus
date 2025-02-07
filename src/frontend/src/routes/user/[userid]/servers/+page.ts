@@ -1,8 +1,14 @@
+export const ssr = false;
+
 import type { PageLoad } from "./$types";
 import { env } from "$env/dynamic/public";
 import auth from "$lib/service/auth_service";
 
 export const load: PageLoad = async ({ fetch }) => {
+  const ip = '10.32.6.17'
+  const response = await fetch(`/status/?ip=${ip}`);
+  console.log(await response.json());
+
   const auth0Client = await auth.createClient();
   const token = await auth0Client.getTokenSilently();
 

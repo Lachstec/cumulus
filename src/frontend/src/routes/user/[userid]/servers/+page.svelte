@@ -8,6 +8,7 @@
     TableHead,
     TableHeadCell,
     Indicator,
+    Span
   } from "flowbite-svelte";
   let { data } = $props();
   let indicatorColor = "black";
@@ -23,13 +24,13 @@
       </p>
     </caption>
     <TableHead>
+      <TableHeadCell class="!p-1"></TableHeadCell>
       <TableHeadCell>Server Name</TableHeadCell>
-      <TableHeadCell>Status</TableHeadCell>
       <TableHeadCell>IP</TableHeadCell>
       <TableHeadCell>Version</TableHeadCell>
       <TableHeadCell>Mode</TableHeadCell>
       <TableHeadCell>Difficulty</TableHeadCell>
-      <TableHeadCell>Max Players</TableHeadCell>
+      <TableHeadCell>Players</TableHeadCell>
       <TableHeadCell>PVP</TableHeadCell>
       <TableHeadCell>
         <span class="sr-only">Edit</span>
@@ -38,18 +39,19 @@
     <TableBody tableBodyClass="divide-y">
       {#each data.servers as { ID, Status, name, ip, game_version, gamemode, difficulty, players_max, pvp_enabled }}
         <TableBodyRow>
-          <TableBodyCell
-            >{name.length > 20
-              ? name.substring(0, 20) + "..."
-              : name}</TableBodyCell>
-          <TableBodyCell
-            ><Indicator
-              color={Status === "running" ? "green" : "red"} /></TableBodyCell>
+          <TableBodyCell class="!p-1">
+            <Indicator color={Status === "running" ? "green" : "red"}/>
+          </TableBodyCell>
+          <TableBodyCell>
+            <Span>
+              {name.length > 20 ? name.substring(0, 20) + "..." : name}
+            </Span>
+          </TableBodyCell>
           <TableBodyCell>{ip}</TableBodyCell>
           <TableBodyCell>{game_version}</TableBodyCell>
           <TableBodyCell>{gamemode}</TableBodyCell>
           <TableBodyCell>{difficulty}</TableBodyCell>
-          <TableBodyCell>{players_max}</TableBodyCell>
+          <TableBodyCell>/{players_max}</TableBodyCell>
           <TableBodyCell>
             {#if pvp_enabled}
               <svg
