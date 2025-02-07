@@ -9,11 +9,45 @@
     TableHeadCell,
     Indicator,
     Span,
-    P
+    P, Progressbar
   } from "flowbite-svelte";
+  import { sineInOut } from 'svelte/easing';
   import {goto} from "$app/navigation";
   let { data } = $props();
   let indicatorColor = "black";
+  let latestData = $state([...data.serverHealth]); // Make a reactive copy
+  let progress = $state(0);
+  const updateInterval = 10; // interval in secondes
+
+
+  async function fetchHealth() {
+    let serverHealth = [];
+
+    for (let i = 0; i < data.servers.length; i++) {
+      const server = data.servers[i];
+      const resStatus = await fetch(`/status/?ip=${server.ip}`);
+      const health = await resStatus.json();
+      serverHealth.push(health);
+    }
+
+    // Update each item reactively
+    latestData.forEach((_, i) => {
+      latestData[i] = serverHealth[i];
+    });
+
+    //console.log("Updated health:", latestData);
+  }
+
+  $effect(()=>{
+    const interval = setInterval(fetchHealth, updateInterval * 1000);
+    const progressInterval = setInterval(()=>{
+      progress = (progress +100 /updateInterval) % 101;}, 1000);
+    return () => {
+      clearInterval(interval);
+      clearInterval(progressInterval);
+    };
+  })
+
 </script>
 
 <div class="p-8 bg-white dark:bg-gray-900">
@@ -23,12 +57,14 @@
     </P>
   {:else}
   <Table hoverable="true">
-    <caption
-      class="p-5 text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+    <caption class="p-5 text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800">
       Your Server(s)
-      <p class="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">
+      <div class="flex justify-between items-center w-full">
+      <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
         View and setup your Servers. To edit a Server, just click on it.
-      </p>
+      </span>
+        <Progressbar class="w-40" progress={progress} size="h-4" animate tweenDuration={500} easing={sineInOut}/>
+      </div>
     </caption>
     <TableHead>
       <TableHeadCell class="!p-1"></TableHeadCell>
@@ -53,11 +89,11 @@
             </Span>
           </TableBodyCell>
           <TableBodyCell>{ip}</TableBodyCell>
-          <TableBodyCell>{data.serverHealth[index].roundTripLatency}ms</TableBodyCell>
+          <TableBodyCell>{latestData[index]?.roundTripLatency}ms</TableBodyCell>
           <TableBodyCell>{game_version}</TableBodyCell>
           <TableBodyCell>{gamemode}</TableBodyCell>
           <TableBodyCell>{difficulty}</TableBodyCell>
-          <TableBodyCell>{data.serverHealth[index].players.online}/{players_max}</TableBodyCell>
+          <TableBodyCell>{latestData[index]?.players.online}/{players_max}</TableBodyCell>
           <TableBodyCell>
             {#if pvp_enabled}
               <svg

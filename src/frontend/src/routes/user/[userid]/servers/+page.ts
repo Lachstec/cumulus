@@ -33,7 +33,7 @@ export const load: PageLoad = async ({ fetch }) => {
     const health = await resStatus.json();
     serverHealth.push(health);
   }
-  console.log(servers);
-  console.log(serverHealth);
+  //console.log(servers);
+  //console.log(serverHealth);
   return { servers, serverHealth }; //Packed into an object
 };

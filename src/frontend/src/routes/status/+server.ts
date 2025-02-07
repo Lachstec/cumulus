@@ -11,7 +11,6 @@ export const GET: RequestHandler = async ({url}) =>{
 
     try {
         const result = await util.status(ip, 25565, options);
-        console.log(result); // Debugging output
         return json(result);
     } catch (error) {
         console.error("Error fetching server status:", error);
