@@ -11,6 +11,7 @@
     Span,
     P
   } from "flowbite-svelte";
+  import {goto} from "$app/navigation";
   let { data } = $props();
   let indicatorColor = "black";
 </script>
@@ -21,30 +22,28 @@
       You currently do not have any servers
     </P>
   {:else}
-  <Table>
+  <Table hoverable="true">
     <caption
       class="p-5 text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800">
       Your Server(s)
       <p class="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">
-        View and setup your Servers
+        View and setup your Servers. To edit a Server, just click on it.
       </p>
     </caption>
     <TableHead>
       <TableHeadCell class="!p-1"></TableHeadCell>
       <TableHeadCell>Server Name</TableHeadCell>
       <TableHeadCell>IP</TableHeadCell>
+      <TableHeadCell>Ping</TableHeadCell>
       <TableHeadCell>Version</TableHeadCell>
       <TableHeadCell>Mode</TableHeadCell>
       <TableHeadCell>Difficulty</TableHeadCell>
       <TableHeadCell>Players</TableHeadCell>
       <TableHeadCell>PVP</TableHeadCell>
-      <TableHeadCell>
-        <span class="sr-only">Edit</span>
-      </TableHeadCell>
     </TableHead>
     <TableBody tableBodyClass="divide-y">
-      {#each data.servers as { ID, Status, name, ip, game_version, gamemode, difficulty, players_max, pvp_enabled }}
-        <TableBodyRow>
+      {#each data.servers as { ID, Status, name, ip, game_version, gamemode, difficulty, players_max, pvp_enabled }, index}
+        <TableBodyRow on:click={()=>goto(`../../server/${ID}`)}>
           <TableBodyCell class="!p-1">
             <Indicator color={Status === "running" ? "green" : "red"}/>
           </TableBodyCell>
@@ -54,10 +53,11 @@
             </Span>
           </TableBodyCell>
           <TableBodyCell>{ip}</TableBodyCell>
+          <TableBodyCell>{data.serverHealth[index].roundTripLatency}ms</TableBodyCell>
           <TableBodyCell>{game_version}</TableBodyCell>
           <TableBodyCell>{gamemode}</TableBodyCell>
           <TableBodyCell>{difficulty}</TableBodyCell>
-          <TableBodyCell>/{players_max}</TableBodyCell>
+          <TableBodyCell>{data.serverHealth[index].players.online}/{players_max}</TableBodyCell>
           <TableBodyCell>
             {#if pvp_enabled}
               <svg
@@ -92,12 +92,6 @@
                   d="M6 18 17.94 6M18 18 6.06 6" />
               </svg>
             {/if}
-          </TableBodyCell>
-          <TableBodyCell>
-            <a
-              href="../../server/{ID}"
-              class="font-medium text-primary-600 hover:underline dark:text-primary-500"
-              >Edit</a>
           </TableBodyCell>
         </TableBodyRow>
       {/each}
