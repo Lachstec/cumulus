@@ -28,8 +28,7 @@ export const load: PageLoad = async ({ fetch }) => {
       },
     })
     const serverip = await healthResponse.json();
-    //console.log(serverip[0]);
-    server.ip = serverip[0].Ip;
+    server.ip = serverip.Ip;
     const resStatus = await fetch(`/status/?ip=${server.ip}`)
     const data = await resStatus.json();
     serverHealth.push({data});

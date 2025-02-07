@@ -15,8 +15,9 @@ func NewFloatingIPService(store db.Store[types.FloatingIP]) *FloatingIPService {
 	}
 }
 
-func (c *FloatingIPService) ReadIpByServerID(serverid int64) ([]*types.FloatingIP, error) {
-	floatingip, err := c.store.Find(func(s *types.FloatingIP) bool { return s.Id == serverid })
+func (c *FloatingIPService) ReadIpByServerID(serverid int64) (*types.FloatingIP, error) {
+	//floatingip, err := c.store.Find(func(s *types.FloatingIP) bool { return s.Id == serverid })
+	floatingip, err := c.store.GetById(serverid)
 	if err != nil {
 		return nil, err
 	}
