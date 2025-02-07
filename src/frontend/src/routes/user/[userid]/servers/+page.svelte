@@ -8,13 +8,19 @@
     TableHead,
     TableHeadCell,
     Indicator,
-    Span
+    Span,
+    P
   } from "flowbite-svelte";
   let { data } = $props();
   let indicatorColor = "black";
 </script>
 
 <div class="p-8 bg-white dark:bg-gray-900">
+  {#if data.status === -1}
+    <P>
+      You currently do not have any servers
+    </P>
+  {:else}
   <Table>
     <caption
       class="p-5 text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800">
@@ -97,4 +103,5 @@
       {/each}
     </TableBody>
   </Table>
+  {/if}
 </div>

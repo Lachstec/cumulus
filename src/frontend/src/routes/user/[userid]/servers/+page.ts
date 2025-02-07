@@ -14,10 +14,13 @@ export const load: PageLoad = async ({ fetch }) => {
     },
   });
   const servers = await res.json();
-  const ip = '10.32.6.17'
-  const response = await fetch(`/status/?ip=${ip}`);
-  console.log(await response.json());
 
+  let status = 0;
+  if (!servers) {
+    status = -1;
+    return { status };
+  }
+  let serverHealth = [];
   for (const server of servers) {
     const healthResponse = await fetch(`${env.PUBLIC_BACKEND_URL}/servers/${server.ID}/health`, {
       headers: {
@@ -25,9 +28,13 @@ export const load: PageLoad = async ({ fetch }) => {
       },
     })
     const serverip = await healthResponse.json();
-    console.log(serverip[0]);
+    //console.log(serverip[0]);
     server.ip = serverip[0].Ip;
+    const resStatus = await fetch(`/status/?ip=${server.ip}`)
+    const data = await resStatus.json();
+    serverHealth.push({data});
   }
   console.log(servers);
-  return { servers }; //Packed into an object
+  console.log(serverHealth);
+  return { servers, serverHealth }; //Packed into an object
 };

@@ -10,7 +10,7 @@ export const GET: RequestHandler = async ({url}) =>{
     };
 
     try {
-        const result = await util.status('10.32.6.17', 25565, options);
+        const result = await util.status(ip, 25565, options);
         console.log(result); // Debugging output
         return json(result);
     } catch (error) {

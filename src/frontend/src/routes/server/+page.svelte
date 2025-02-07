@@ -71,17 +71,17 @@
   }
 </script>
 
-{#if responseOK}
-  <Alert color="green" on:close={() => (responseOK = false)}>
-    <span class="font-medium">Success!</span> Your server has been created.
-  </Alert>
-{/if}
-{#if responseError}
-  <Alert color="red" on:close={() => (responseError = false)}>
-    <span class="font-medium">Error!</span> Something went wrong. Error: {errorMsg}
-  </Alert>
-{/if}
 <div class="p-8 bg-white dark:bg-gray-900">
+  {#if responseOK}
+    <Alert color="green" on:close={() => (responseOK = false)}>
+      <span class="font-medium">Success!</span> Your server has been created.
+    </Alert>
+  {/if}
+  {#if responseError}
+    <Alert color="red" on:close={() => (responseError = false)}>
+      <span class="font-medium">Error!</span> Something went wrong. Error: {errorMsg}
+    </Alert>
+  {/if}
   <div
     class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 p-4">
     {#each cards as card}
