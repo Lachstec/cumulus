@@ -24,7 +24,6 @@
   let responseError = false;
   let errorMsg = "generic Error";
 
-
   async function orderServer(flavour: number) {
     //Auth
     const auth0Client = await auth.createClient();
