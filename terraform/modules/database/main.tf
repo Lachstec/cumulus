@@ -86,7 +86,11 @@ resource "openstack_compute_instance_v2" "pgsql" {
     port = openstack_networking_port_v2.pgsql_ports[count.index].id
   }
 
-  user_data = file("${path.module}/postgres-init.sh")
+  user_data = templatefile("${path.module}/postgres-init.sh.tpl", {
+    pg_user = var.postgres_user
+    pg_password = var.postgres_password
+    postgres_subnet_cidr = var.postgres_subnet_cidr
+  })
 }
 
 # Create an internal port for the pgpool instance on the dedicated network

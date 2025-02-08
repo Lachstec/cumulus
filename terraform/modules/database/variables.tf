@@ -58,3 +58,16 @@ variable "pgpool_security_group_name" {
   description = "Name of the security group for pgpool instances"
   
 }
+
+##############################
+# Database User
+##############################
+variable "postgres_user" {
+  description = "Name of the postgres user that should get created"
+  type = string
+}
+
+variable "postgres_password" {
+  description = "Password of the postgres user that should get created"
+  type = string
+}
