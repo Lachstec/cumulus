@@ -117,5 +117,27 @@ resource "openstack_compute_instance_v2" "pgpool" {
     port = openstack_networking_port_v2.pgpool_port.id
   }
 
+  provisioner "file" {
+    source      = "${path.module}/failover.sh"
+    destination = "/etc/pgpool2/failover.sh" 
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /etc/pgpool2/failover.sh"
+    ]
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sed -i 's/^#failover_command = \".*\"/failover_command = \"/etc/pgpool2/failover.sh %d %H %P %R %r %M\"/' /etc/pgpool2/pgpool.conf",
+      "sed -i 's/^#health_check_period = 0/health_check_period = 5/' /etc/pgpool2/pgpool.conf",
+      "sed -i 's/^#health_check_timeout = 20/health_check_timeout = 10/' /etc/pgpool2/pgpool.conf",
+      "sed -i 's/^#health_check_user = \"\"/health_check_user = \"${PGPOOL_USER}\"/' /etc/pgpool2/pgpool.conf",
+      "sed -i 's/^#health_check_password = \"\"/health_check_password = \"${PGPOOL_PASSWORD}\"/' /etc/pgpool2/pgpool.conf",
+      "systemctl restart pgpool2"
+    ]
+  }
+
   user_data = file("${path.module}/pgpool-init.sh")
 }
