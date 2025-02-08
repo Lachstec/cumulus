@@ -71,3 +71,13 @@ variable "postgres_password" {
   description = "Password of the postgres user that should get created"
   type = string
 }
+
+variable "pgpool_user" {
+  type        = string
+  description = "The user for Pgpool health checks"
+}
+
+variable "pgpool_password" {
+  type        = string
+  description = "The password for Pgpool health checks"
+}
