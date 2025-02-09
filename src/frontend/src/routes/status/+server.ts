@@ -2,11 +2,11 @@ import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = async ({ url }) => {
-  const util = await import("minecraft-server-util"); // ✅ Dynamic import for CommonJS
+  const util = await import("minecraft-server-util");
   const ip = String(url.searchParams.get("ip"));
   const options = {
     timeout: 1000 * 5, // 5 seconds
-    enableSRV: true, // Enable SRV record lookup
+    enableSRV: true,
   };
 
   try {
