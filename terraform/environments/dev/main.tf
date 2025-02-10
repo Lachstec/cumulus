@@ -1,3 +1,8 @@
+resource "openstack_networking_router_v2" "backend_post_router" {
+  name = "backend-post-router"
+  external_network_id = "6f530989-999a-49e6-9197-8a33ae7bfce7"
+}
+
 module "database" {
   source = "../../modules/database"
 
@@ -68,4 +73,15 @@ module "backend" {
   backend_auth0_url      = "https://your-tenant.auth0.com/"
   backend_auth0_clientid = "your-client-id"
   backend_auth0_audience = "your-audience"
+}
+
+
+resource "openstack_networking_router_interface_v2" "router_interface" {
+    router_id = openstack_networking_router_v2.backend_post_router.id
+    subnet_id = module.backend.backend_subnet_id
+}
+
+resource "openstack_networking_router_interface_v2" "pg_router_interface" {
+    router_id = openstack_networking_router_v2.backend_post_router.id
+    subnet_id = module.database.pg_subnet_id
 }

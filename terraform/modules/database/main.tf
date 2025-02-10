@@ -32,6 +32,7 @@ resource "openstack_networking_subnet_v2" "pg_subnet" {
   name            = var.postgres_subnet_name
   network_id      = openstack_networking_network_v2.pg_network.id
   cidr            = var.postgres_subnet_cidr
+  gateway_ip      = "10.10.10.1"
   ip_version      = 4
   dns_nameservers = ["8.8.8.8", "8.8.4.4"]
 }
@@ -138,16 +139,16 @@ resource "openstack_networking_secgroup_rule_v2" "allow_external_pgpool" {
 
 
 # Create the router
-resource "openstack_networking_router_v2" "router" {
-  name                = "postgres-router"
-  external_network_id = "6f530989-999a-49e6-9197-8a33ae7bfce7"
-}
+#resource "openstack_networking_router_v2" "router" {
+#  name                = "postgres-router"
+#  external_network_id = "6f530989-999a-49e6-9197-8a33ae7bfce7"
+#}
 
 # Attach the router to your network
-resource "openstack_networking_router_interface_v2" "router_interface" {
-  router_id = openstack_networking_router_v2.router.id
-  subnet_id = openstack_networking_subnet_v2.pg_subnet.id
-}
+#resource "openstack_networking_router_interface_v2" "router_interface" {
+#  router_id = openstack_networking_router_v2.router.id
+#  subnet_id = openstack_networking_subnet_v2.pg_subnet.id
+#}
 
 # Create internal ports to hook up the PostgreSQL instances
 resource "openstack_networking_port_v2" "pgsql_ports" {

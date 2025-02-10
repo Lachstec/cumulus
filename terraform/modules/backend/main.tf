@@ -31,6 +31,7 @@ resource "openstack_networking_subnet_v2" "backend_subnet" {
   name = var.backend_subnet_name
   network_id = openstack_networking_network_v2.backend_network.id
   cidr = var.backend_subnet_cidr
+  gateway_ip = "10.10.10.17"
   ip_version = 4
   dns_nameservers = ["8.8.8.8", "8.8.4.4"]
 }
@@ -93,15 +94,15 @@ resource "openstack_networking_secgroup_rule_v2" "backend_allow_dns" {
   security_group_id = openstack_networking_secgroup_v2.backend_secgroup.id
 }
 
-resource "openstack_networking_router_v2" "backend_router" {
-  name = var.backend_router_name
-  external_network_id = "6f530989-999a-49e6-9197-8a33ae7bfce7"
-}
+#resource "openstack_networking_router_v2" "backend_router" {
+#  name = var.backend_router_name
+#  external_network_id = "6f530989-999a-49e6-9197-8a33ae7bfce7"
+#}
 
-resource "openstack_networking_router_interface_v2" "router_interface" {
-    router_id = openstack_networking_router_v2.backend_router.id
-    subnet_id = openstack_networking_subnet_v2.backend_subnet.id
-}
+#resource "openstack_networking_router_interface_v2" "router_interface" {
+#    router_id = openstack_networking_router_v2.backend_router.id
+#    subnet_id = openstack_networking_subnet_v2.backend_subnet.id
+#}
 
 resource "openstack_networking_port_v2" "backend_ports" {
   count = 2
