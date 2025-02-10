@@ -81,3 +81,8 @@ variable "pgpool_password" {
   type        = string
   description = "The password for Pgpool health checks"
 }
+
+variable "backend_cidr" {
+  description = "CIDR for the backend subnet"
+  type = string
+}

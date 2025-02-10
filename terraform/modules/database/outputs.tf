@@ -17,3 +17,8 @@ output "pg_subnet_id" {
   description = "ID of the dedicated PostgreSQL subnet"
   value       = openstack_networking_subnet_v2.pg_subnet.id
 }
+
+output "pg_subnet_cidr" {
+  description = "CIDR of the dedicated PostgreSQL subnet"
+  value = openstack_networking_subnet_v2.pg_subnet.cidr
+}

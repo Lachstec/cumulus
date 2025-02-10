@@ -1,3 +1,16 @@
+terraform {
+  required_providers {
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0"
+    }
+    openstack = {
+      source  = "terraform-provider-openstack/openstack"
+      version = "~> 3.0.0"
+    }
+  }
+}
+
 # Create a Keypair for the database instances
 resource "tls_private_key" "generated" {
   algorithm = "RSA"
@@ -113,9 +126,20 @@ resource "openstack_networking_secgroup_rule_v2" "pgpool_allow_dns" {
   security_group_id = openstack_networking_secgroup_v2.pgpool_sg.id
 }
 
+resource "openstack_networking_secgroup_rule_v2" "allow_external_pgpool" {
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  protocol          = "tcp"
+  port_range_min    = 9999
+  port_range_max    = 9999
+  remote_ip_prefix  = var.backend_cidr
+  security_group_id = openstack_networking_secgroup_v2.pgpool_sg.id
+}
+
+
 # Create the router
 resource "openstack_networking_router_v2" "router" {
-  name                = "my-router"
+  name                = "postgres-router"
   external_network_id = "6f530989-999a-49e6-9197-8a33ae7bfce7"
 }
 

@@ -6,7 +6,7 @@ terraform {
     }
     openstack = {
       source  = "terraform-provider-openstack/openstack"
-      version = "~> 1.53.0"
+      version = "~> 3.0.0"
     }
   }
 }
@@ -14,4 +14,3 @@ terraform {
 provider "openstack" {
   insecure = true
 }
-

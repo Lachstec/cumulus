@@ -36,6 +36,7 @@ docker run -d \
     -e AUTH0_URL="${AUTH0_URL}" \
     -e AUTH0_AUDIENCE="${AUTH0_AUDIENCE}" \
     -e AUTH0_SECRET="${AUTH0_SECRET}" \
+    -p "10000:10000" \
     ghcr.io/lachstec/provisioner:dev
 
 echo "==== Successfully started backend container ===="

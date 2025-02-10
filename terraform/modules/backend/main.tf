@@ -1,3 +1,16 @@
+terraform {
+  required_providers {
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0"
+    }
+    openstack = {
+      source  = "terraform-provider-openstack/openstack"
+      version = "~> 3.0.0"
+    }
+  }
+}
+
 # Create a Keypair for the backend instances
 resource "tls_private_key" "generated" {
   algorithm = "RSA"
@@ -16,7 +29,7 @@ resource "openstack_networking_network_v2" "backend_network" {
 
 resource "openstack_networking_subnet_v2" "backend_subnet" {
   name = var.backend_subnet_name
-  network_id = openstack_networking_network_v2.backend_network
+  network_id = openstack_networking_network_v2.backend_network.id
   cidr = var.backend_subnet_cidr
   ip_version = 4
   dns_nameservers = ["8.8.8.8", "8.8.4.4"]
@@ -77,7 +90,7 @@ resource "openstack_networking_secgroup_rule_v2" "backend_allow_dns" {
   port_range_min    = 53
   port_range_max    = 53
   remote_ip_prefix  = "0.0.0.0/0"
-  security_group_id = openstack_networking_secgroup_v2.postgres_sg.id
+  security_group_id = openstack_networking_secgroup_v2.backend_secgroup.id
 }
 
 resource "openstack_networking_router_v2" "backend_router" {
@@ -139,20 +152,20 @@ resource "openstack_lb_loadbalancer_v2" "backend_loadbalancer" {
 }
 
 resource "openstack_lb_listener_v2" "backend_loadbalancer_listener" {
-  name = var.backend_loadbalancer_name + "_listener"
+  name = format("%s/%s",var.backend_loadbalancer_name,"_listener")
   protocol = "TCP"
   protocol_port = var.backend_port
   loadbalancer_id = openstack_lb_loadbalancer_v2.backend_loadbalancer.id
 }
 
 resource "openstack_lb_pool_v2" "backend_loadbalancer_pool" {
-    name = var.backend_loadbalancer_name + "_pool"
+  name = format("%s/%s",var.backend_loadbalancer_name,"_pool")
     protocol = "TCP"
     lb_method = "ROUND_ROBIN"
     listener_id = openstack_lb_listener_v2.backend_loadbalancer_listener.id
 }
 
-resource "openstack_lb_pool_member_v2" "backend_loadbalancer_pool_members" {
+resource "openstack_lb_member_v2" "backend_loadbalancer_members" {
   count             = 2
   pool_id           = openstack_lb_pool_v2.backend_loadbalancer_pool.id
   address           = openstack_compute_instance_v2.backend_servers[count.index].access_ip_v4
@@ -160,7 +173,7 @@ resource "openstack_lb_pool_member_v2" "backend_loadbalancer_pool_members" {
   subnet_id         = openstack_networking_subnet_v2.backend_subnet.id
 }
 
-resource "openstack_lb_healthmonitor_v2" "backend_loadbalancer_healthcheck" {
+resource "openstack_lb_monitor_v2" "backend_loadbalancer_healthcheck" {
   pool_id = openstack_lb_pool_v2.backend_loadbalancer_pool.id
   type = "HTTP"
   delay             = 5
