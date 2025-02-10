@@ -10,3 +10,7 @@ module "database" {
   pgpool_user        = var.pgpool_user
   pgpool_password    = var.pgpool_password
 }
+
+module "backend" {
+  source = "../../modules/backend"
+}
