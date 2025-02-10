@@ -12,6 +12,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /provisioner ./cmd/provisioner
 FROM scratch
 WORKDIR /
 COPY --from=build /provisioner /provisioner
+COPY migrations/ /migrations
 EXPOSE 42069
 
 CMD ["./provisioner"]
