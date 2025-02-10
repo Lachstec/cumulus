@@ -56,7 +56,7 @@ variable "postgres_security_group_name" {
 
 variable "pgpool_security_group_name" {
   description = "Name of the security group for pgpool instances"
-  
+  default = "pgpool-sg"
 }
 
 ##############################
