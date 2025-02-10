@@ -2,26 +2,26 @@
 # PostgreSQL Instance Variables
 ##############################
 variable "postgres_image_id" {
-    description = "Image ID for postgres database nodes"
-    type = string
+  description = "Image ID for postgres database nodes"
+  type        = string
 }
 
 variable "postgres_flavor_id" {
-    description = "Flavor ID for postgres database nodes"
-    type = string
+  description = "Flavor ID for postgres database nodes"
+  type        = string
 }
 
 ##############################
 # pgpool Instance Variables
 ##############################
 variable "pgpool_image_id" {
-    description = "Image ID for pgpool node"
-    type = string
+  description = "Image ID for pgpool node"
+  type        = string
 }
 
 variable "pgpool_flavor_id" {
-    description = "Flavor ID for pgpool node"
-    type = string
+  description = "Flavor ID for pgpool node"
+  type        = string
 }
 
 ##############################
@@ -29,34 +29,34 @@ variable "pgpool_flavor_id" {
 ##############################
 variable "postgres_network_name" {
   description = "Name for the dedicated PostgreSQL/pgpool network"
-  type = string
-  default = "postgres-network"
+  type        = string
+  default     = "postgres-network"
 }
 
 variable "postgres_subnet_name" {
   description = "Name for the dedicated PostgreSQL/pgpool subnet"
-  type = string
+  type        = string
   default     = "postgres-subnet"
 }
 
 variable "postgres_subnet_cidr" {
   description = "CIDR for the dedicated PostgreSQL/pgpool subnet"
-  type = string
-  default = "10.10.10.0/28"
+  type        = string
+  default     = "10.10.10.0/28"
 }
 
 ##############################
 # Security Groups
 ##############################
 variable "postgres_security_group_name" {
-    description = "Name of the security group for postgres instances"
-    type = string
-    default = "postgres-sg"
+  description = "Name of the security group for postgres instances"
+  type        = string
+  default     = "postgres-sg"
 }
 
 variable "pgpool_security_group_name" {
   description = "Name of the security group for pgpool instances"
-  default = "pgpool-sg"
+  default     = "pgpool-sg"
 }
 
 ##############################
@@ -64,12 +64,12 @@ variable "pgpool_security_group_name" {
 ##############################
 variable "postgres_user" {
   description = "Name of the postgres user that should get created"
-  type = string
+  type        = string
 }
 
 variable "postgres_password" {
   description = "Password of the postgres user that should get created"
-  type = string
+  type        = string
 }
 
 variable "pgpool_user" {
