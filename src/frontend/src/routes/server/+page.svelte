@@ -3,6 +3,7 @@
   import { CheckCircleSolid } from "flowbite-svelte-icons";
   import { v4 as uuidv4 } from "uuid";
   import { env } from "$env/dynamic/public";
+  import auth from "$lib/service/auth_service";
 
   let backend_url = env.PUBLIC_BACKEND_URL;
 
@@ -24,6 +25,10 @@
   let errorMsg = "generic Error";
 
   async function orderServer(flavour: number) {
+    //Auth
+    const auth0Client = await auth.createClient();
+    const token = await auth0Client.getTokenSilently();
+
     isLoading = true;
     modalOpen = true;
     let response = null;
@@ -33,6 +38,9 @@
     try {
       response = await fetch(`${backend_url}/servers`, {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           flavour: cards[flavour].ID,
           name: env.PUBLIC_REQUESTER_NAME + "_" + uuid,
@@ -62,17 +70,17 @@
   }
 </script>
 
-{#if responseOK}
-  <Alert color="green" on:close={() => (responseOK = false)}>
-    <span class="font-medium">Success!</span> Your server has been created.
-  </Alert>
-{/if}
-{#if responseError}
-  <Alert color="red" on:close={() => (responseError = false)}>
-    <span class="font-medium">Error!</span> Something went wrong. Error: {errorMsg}
-  </Alert>
-{/if}
 <div class="p-8 bg-white dark:bg-gray-900">
+  {#if responseOK}
+    <Alert color="green" on:close={() => (responseOK = false)}>
+      <span class="font-medium">Success!</span> Your server has been created.
+    </Alert>
+  {/if}
+  {#if responseError}
+    <Alert color="red" on:close={() => (responseError = false)}>
+      <span class="font-medium">Error!</span> Something went wrong. Error: {errorMsg}
+    </Alert>
+  {/if}
   <div
     class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 p-4">
     {#each cards as card}

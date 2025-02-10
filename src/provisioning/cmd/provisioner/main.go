@@ -12,10 +12,10 @@ import (
 	"github.com/Lachstec/mc-hosting/internal/openstack"
 	"github.com/Lachstec/mc-hosting/internal/services"
 	"github.com/Lachstec/mc-hosting/internal/types"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
-	"github.com/gin-contrib/cors"
 )
 
 func dbInit() *sqlx.DB {
@@ -58,10 +58,12 @@ func main() {
 
 	serverStore := db.NewServerStore(database)
 	userStore := db.NewUserStore(database)
+	ipStore := db.NewIPStore(database)
 
 	// initialize the services
 	serverService := services.NewServerService(serverStore)
 	userService := services.NewUserService(userStore)
+	floatingIpService := services.NewFloatingIPService(ipStore)
 	minecraftProvisionerService := services.NewMinecraftProvisioner(database, openstack, cfg.CryptoConfig.EncryptionKey)
 
 	router := gin.Default()
@@ -293,7 +295,17 @@ func main() {
 	})
 
 	// servers/:serverid/health
-	router.GET("/servers/:serverid/health", genericEndpoint)
+	router.GET("/servers/:serverid/health", func(c *gin.Context) {
+		serverid, err := urlParamToInt64(c.Param("serverid"))
+		if err != nil {
+			_ = c.AbortWithError(http.StatusBadRequest, err)
+		}
+		ip, err := floatingIpService.ReadIpByServerID(serverid)
+		if err != nil {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+		}
+		c.JSON(http.StatusOK, ip)
+	})
 
 	// teapot
 	router.GET("/teapot", func(c *gin.Context) { c.Status(http.StatusTeapot) })

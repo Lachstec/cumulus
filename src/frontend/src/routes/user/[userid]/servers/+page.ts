@@ -1,3 +1,5 @@
+export const ssr = false;
+
 import type { PageLoad } from "./$types";
 import { env } from "$env/dynamic/public";
 import auth from "$lib/service/auth_service";
@@ -12,5 +14,29 @@ export const load: PageLoad = async ({ fetch }) => {
     },
   });
   const servers = await res.json();
-  return { servers }; //Packed into an object
+
+  let status = 0;
+  if (!servers) {
+    status = -1;
+    return { status };
+  }
+  let serverHealth = [];
+  for (const server of servers) {
+    const healthResponse = await fetch(
+      `${env.PUBLIC_BACKEND_URL}/servers/${server.ID}/health`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    const serverip = await healthResponse.json();
+    server.ip = serverip.Ip;
+    const resStatus = await fetch(`/status/?ip=${server.ip}`);
+    const health = await resStatus.json();
+    serverHealth.push(health);
+  }
+  //console.log(servers);
+  //console.log(serverHealth);
+  return { servers, serverHealth }; //Packed into an object
 };
