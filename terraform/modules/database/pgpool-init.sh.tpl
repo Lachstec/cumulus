@@ -80,6 +80,7 @@ echo "health_check_period = 5" >> /etc/pgpool2/pgpool.conf
 echo "health_check_timeout = 10" >> /etc/pgpool2/pgpool.conf
 echo "health_check_user = '${pgpool_user}'" >> /etc/pgpool2/pgpool.conf
 echo "health_check_password = '${pgpool_password}'" >> /etc/pgpool2/pgpool.conf
+echo "replication_mode = on" >> /etc/pgpool2/pgpool.con
 
 # Restart pgpool2 to apply changes
 systemctl restart pgpool2
