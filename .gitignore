@@ -29,3 +29,9 @@ go.work.sum
 
 # Remove act (used for local testing of github workflows)
 act
+
+# Remove Terraform related files
+*.terraform
+*.tfvars
+*.tfstate*
+*.hcl
