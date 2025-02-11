@@ -19,7 +19,7 @@ module "database" {
   postgres_password  = var.postgres_password
   pgpool_user        = var.pgpool_user
   pgpool_password    = var.pgpool_password
-  backend_cidr = "10.10.10.16/28"
+  backend_cidr       = "10.10.10.16/28"
 }
 
 module "backend" {
@@ -85,3 +85,8 @@ resource "openstack_networking_router_interface_v2" "pg_router_interface" {
     router_id = openstack_networking_router_v2.backend_post_router.id
     subnet_id = module.database.pg_subnet_id
 }
+
+
+# Get floating IP for the load balancers
+# Init auth 0
+# Start Frontend
