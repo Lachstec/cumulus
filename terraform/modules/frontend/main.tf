@@ -11,16 +11,6 @@ terraform {
   }
 }
 
-provider "openstack" {
-  auth_url     = "#"
-  region       = "#"
-  password     = "#"
-  domain_name  = "#"
-  user_name     = "#"
-  tenant_name   = "#"
-  insecure = true
-}
-
 # Create a Keypair for the backend instances
 resource "tls_private_key" "generated" {
   algorithm = "RSA"
@@ -48,6 +38,22 @@ resource "openstack_networking_subnet_v2" "frontend_subnet" {
 # Create a dedicated security group for the frontend
 resource "openstack_networking_secgroup_v2" "frontend_secgroup" {
   name = var.frontend_security_group_name
+}
+
+resource "openstack_networking_secgroup_rule_v2" "frontend_allow_icmp" {
+  direction         = "ingress"
+  ethertype        = "IPv4"
+  protocol         = "icmp"
+  security_group_id = openstack_networking_secgroup_v2.frontend_secgroup.id
+}
+
+resource "openstack_networking_secgroup_rule_v2" "frontend_allow_http" {
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  protocol          = "tcp"
+  port_range_min    = 80
+  port_range_max    = 443
+  security_group_id = openstack_networking_secgroup_v2.frontend_secgroup.id
 }
 
 resource "openstack_networking_port_v2" "frontend_ports" {
@@ -113,10 +119,10 @@ resource "openstack_lb_member_v2" "frontend_loadbalancer_members" {
 
 resource "openstack_lb_monitor_v2" "frontend_loadbalancer_healthcheck" {
   pool_id = openstack_lb_pool_v2.frontend_loadbalancer_pool.id
-  type = "HTTP"
-  delay             = 5
-  timeout           = 5
-  max_retries       = 3
+  type        = "TCP"
+  delay       = 5
+  timeout     = 5
+  max_retries = 3
 }
 
 # Neeed a router for the frontend
@@ -128,12 +134,5 @@ resource "openstack_networking_router_v2" "frontend_router" {
 resource "openstack_networking_router_interface_v2" "router_interface" {
     router_id = openstack_networking_router_v2.frontend_router.id
     subnet_id = openstack_networking_subnet_v2.frontend_subnet.id
-}
-
-# Creating floating IP for the frontend - to test. Should happen in Main before Auth0
-resource "openstack_networking_floatingip_v2" "frontend_floatingip" {
-  pool = "ext_net"
-  description = "frontend floating ip"
-  port_id = openstack_lb_loadbalancer_v2.frontend_loadbalancer.vip_port_id
 }
 # Here we could create the Auth0 service, and then create the frontend itself

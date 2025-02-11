@@ -49,7 +49,7 @@ resource "openstack_networking_secgroup_rule_v2" "backend_ingress_from_frontend"
   protocol          = "tcp"
   port_range_min    = var.backend_port
   port_range_max    = var.backend_port
-  remote_ip_prefix  = var.frontend_subnet_cidr
+  remote_ip_prefix  = "0.0.0.0/0"
 }
 
 # Egress rule to allow traffic to the database pool
@@ -91,6 +91,13 @@ resource "openstack_networking_secgroup_rule_v2" "backend_allow_dns" {
   port_range_min    = 53
   port_range_max    = 53
   remote_ip_prefix  = "0.0.0.0/0"
+  security_group_id = openstack_networking_secgroup_v2.backend_secgroup.id
+}
+
+resource "openstack_networking_secgroup_rule_v2" "backend_allow_icmp" {
+  direction         = "ingress"
+  ethertype        = "IPv4"
+  protocol         = "icmp"
   security_group_id = openstack_networking_secgroup_v2.backend_secgroup.id
 }
 
@@ -175,9 +182,9 @@ resource "openstack_lb_member_v2" "backend_loadbalancer_members" {
 }
 
 resource "openstack_lb_monitor_v2" "backend_loadbalancer_healthcheck" {
-  pool_id = openstack_lb_pool_v2.backend_loadbalancer_pool.id
-  type = "HTTP"
-  delay             = 5
-  timeout           = 5
-  max_retries       = 3
+  pool_id     = openstack_lb_pool_v2.backend_loadbalancer_pool.id
+  type        = "TCP"
+  delay       = 5
+  timeout     = 5
+  max_retries = 3
 }

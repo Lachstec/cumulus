@@ -84,3 +84,8 @@ variable "auth_client_secret" {
   description = "The Auth0 client secret"
   type        = string
 }
+
+variable "external_network_name" {
+  description = "ID of the OpenStack external network to use"
+  type = string
+}

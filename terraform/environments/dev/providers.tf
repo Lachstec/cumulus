@@ -8,6 +8,10 @@ terraform {
       source  = "terraform-provider-openstack/openstack"
       version = "~> 3.0.0"
     }
+    auth0 = {
+      source  = "auth0/auth0"
+      version = ">= 1.0.0"
+    }
   }
 }
 

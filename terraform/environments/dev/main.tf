@@ -3,6 +3,30 @@ resource "openstack_networking_router_v2" "backend_post_router" {
   external_network_id = "6f530989-999a-49e6-9197-8a33ae7bfce7"
 }
 
+module "floating_ips" {
+  source = "../../modules/floating_ips"
+
+  providers = {
+    openstack = openstack
+  }
+
+  external_network_name = var.external_network_name
+}
+
+module "auth0" {
+  source = "../../modules/auth"
+
+  providers = {
+    auth0 = auth0
+  }
+
+  frontend_url = format("http://%s", module.floating_ips.frontend_lb_floating_ip)
+  backend_url = format("http://%s", module.floating_ips.backend_lb_floating_ip)
+  auth_client_id = var.auth_client_id
+  auth_client_secret = var.auth_client_secret
+  auth_domain = var.auth_domain
+}
+
 module "database" {
   source = "../../modules/database"
 
@@ -75,6 +99,21 @@ module "backend" {
   backend_auth0_audience = "your-audience"
 }
 
+module "frontend" {
+  source = "../../modules/frontend"
+
+  providers = {
+    openstack = openstack
+  }
+
+  frontend_client_id = module.auth0.frontend_client_id
+  frontend_flavor_id = "3"
+  frontend_image_id = "d6d1835c-7180-4ca9-b4a1-470afbd8b398"
+  frontend_backend_url = format("http://%s:%d", module.floating_ips.backend_lb_floating_ip, 10000)
+  frontend_audience = format("http://%s", module.floating_ips.backend_lb_floating_ip)
+  frontend_auth_url = var.auth_domain
+}
+
 
 resource "openstack_networking_router_interface_v2" "router_interface" {
     router_id = openstack_networking_router_v2.backend_post_router.id
@@ -86,6 +125,15 @@ resource "openstack_networking_router_interface_v2" "pg_router_interface" {
     subnet_id = module.database.pg_subnet_id
 }
 
+resource "openstack_networking_floatingip_associate_v2" "backend_lb_floating_ip" {
+  floating_ip = module.floating_ips.backend_lb_floating_ip
+  port_id = module.backend.backend_loadbalancer_vip_port
+}
+
+resource "openstack_networking_floatingip_associate_v2" "frontend_lb_floating_ip" {
+  floating_ip = module.floating_ips.frontend_lb_floating_ip
+  port_id = module.frontend.frontend_loadbalancer_vip_port_id
+}
 
 # Get floating IP for the load balancers
 # Init auth 0
