@@ -27,6 +27,7 @@ docker run -d \
     -e PUBLIC_AUTH_CACHE_LOCATION="${PUBLIC_AUTH_CACHE_LOCATION}" \
     -e PUBLIC_BACKEND_URL="${PUBLIC_BACKEND_URL}" \
     -e PUBLIC_REQUESTER_NAME="${PUBLIC_REQUESTER_NAME}" \
+    -p "3000:3000" \
     ghcr.io/lachstec/frontend:dev
 
 echo "==== Successfully started frontend container ===="
