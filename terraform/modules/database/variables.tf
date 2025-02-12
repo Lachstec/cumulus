@@ -84,5 +84,5 @@ variable "pgpool_password" {
 
 variable "backend_cidr" {
   description = "CIDR for the backend subnet"
-  type = string
+  type        = string
 }

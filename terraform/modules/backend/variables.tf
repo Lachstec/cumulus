@@ -33,13 +33,13 @@ variable "backend_security_group_name" {
 }
 
 variable "backend_router_name" {
-    description = "Name of the router for the backend"
-    type = string
+  description = "Name of the router for the backend"
+  type        = string
 }
 
 variable "backend_loadbalancer_name" {
   description = "Name of the loadbalancer for the backend"
-  type = string
+  type        = string
 }
 
 variable "backend_db_host" {
@@ -65,7 +65,7 @@ variable "backend_db_password" {
 
 variable "backend_db_cidr" {
   description = "CIDR Notation of Database subnet"
-  type = string
+  type        = string
 }
 
 variable "openstack_auth_url" {
@@ -118,26 +118,26 @@ variable "backend_tracing_service_name" {
 
 variable "backend_port" {
   description = "Port under which the API listens for connections"
-  type = string
+  type        = string
 }
 
 variable "frontend_subnet_cidr" {
-    description = "The Subnet CIDR of the frontend subnet"
-    type = string
+  description = "The Subnet CIDR of the frontend subnet"
+  type        = string
 }
 
 variable "backend_auth0_url" {
   description = "URL for the Auth0 tenant"
-  type = string
+  type        = string
 }
 
 variable "backend_auth0_clientid" {
   description = "ClientID to use for Auth0"
-  type = string
-  sensitive = true
+  type        = string
+  sensitive   = true
 }
 
 variable "backend_auth0_audience" {
   description = "Audience to use for Auth0"
-  type = string
+  type        = string
 }
