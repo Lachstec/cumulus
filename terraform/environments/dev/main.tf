@@ -43,7 +43,7 @@ module "database" {
   postgres_password  = var.postgres_password
   pgpool_user        = var.pgpool_user
   pgpool_password    = var.pgpool_password
-  backend_cidr       = "10.10.10.16/28"
+  backend_cidr       = var.backend_subnet_cidr
 }
 
 module "backend" {
@@ -57,46 +57,46 @@ module "backend" {
   depends_on = [ module.database ]
 
   # Backend instance configuration
-  backend_image_id       = "d6d1835c-7180-4ca9-b4a1-470afbd8b398"
-  backend_flavor_id      = "3"
-  backend_network_name   = "backend-network"
-  backend_subnet_name    = "backend-subnet"
-  backend_subnet_cidr    = "10.10.10.16/28"
-  backend_security_group_name = "backend-sg"
-  backend_router_name    = "backend-router"
-  backend_loadbalancer_name = "backend-lb"
+  backend_image_id       = var.backend_image_id
+  backend_flavor_id      = var.backend_flavor_id
+  backend_network_name   = var.backend_network_name
+  backend_subnet_name    = var.backend_subnet_name
+  backend_subnet_cidr    = var.backend_subnet_cidr
+  backend_security_group_name = var.backend_security_group_name
+  backend_router_name    = var.backend_router_name
+  backend_loadbalancer_name = var.backend_loadbalancer_name
 
   backend_db_host        = module.database.pgpool_ip
-  backend_db_port        = "9999"
+  backend_db_port        = var.backend_db_port
   backend_db_user        = var.pgpool_user
   backend_db_password    = var.pgpool_password
   backend_db_cidr        = module.database.pg_subnet_cidr
 
   # OpenStack authentication
-  openstack_auth_url     = "https://10.32.7.184:5000/v3"
-  openstack_region       = "nova"
-  openstack_username     = "CloudServ11"
-  openstack_password     = "demo"
-  openstack_tenant       = "CloudServ11"
-  openstack_domain_name  = "Default"
+  openstack_auth_url     = var.openstack_auth_url
+  openstack_region       = var.openstack_region
+  openstack_username     = var.openstack_username
+  openstack_password     = var.openstack_password
+  openstack_tenant       = var.openstack_tenant
+  openstack_domain_name  = var.openstack_domain_name
 
   # Encryption & Security
-  backend_crypto_key     = "1YRCJE3rUygZv4zXUhBNUf1sDUIszdT2KAtczVYB85c="
+  backend_crypto_key     = var.backend_crypto_key
 
   # Logging & Monitoring
-  backend_tracing_endpoint   = "http://tracing.example.com:4317"
-  backend_tracing_service_name = "backend-service"
+  backend_tracing_endpoint   = var.backend_tracing_endpoint
+  backend_tracing_service_name = var.backend_tracing_service_name
 
   # API configuration
-  backend_port           = "10000"
+  backend_port           = var.backend_port
 
   # Frontend configuration
-  frontend_subnet_cidr   = "10.10.30.0/24"
+  frontend_subnet_cidr   = var.frontend_subnet_cidr
 
   # Auth0 configuration
-  backend_auth0_url      = "https://your-tenant.auth0.com/"
-  backend_auth0_clientid = "your-client-id"
-  backend_auth0_audience = "your-audience"
+  backend_auth0_url      = var.backend_auth0_url
+  backend_auth0_clientid = var.backend_auth0_clientid
+  backend_auth0_audience = var.backend_auth0_audience
 }
 
 module "frontend" {
@@ -107,9 +107,9 @@ module "frontend" {
   }
 
   frontend_client_id = module.auth0.frontend_client_id
-  frontend_flavor_id = "3"
-  frontend_image_id = "d6d1835c-7180-4ca9-b4a1-470afbd8b398"
-  frontend_backend_url = format("http://%s:%d", module.floating_ips.backend_lb_floating_ip, 10000)
+  frontend_flavor_id = var.frontend_flavor_id
+  frontend_image_id = var.frontend_image_id
+  frontend_backend_url = format("http://%s:%d", module.floating_ips.backend_lb_floating_ip, var.backend_port)
   frontend_audience = format("http://%s", module.floating_ips.backend_lb_floating_ip)
   frontend_auth_url = var.auth_domain
 }
