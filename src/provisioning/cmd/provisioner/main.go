@@ -12,7 +12,6 @@ import (
 	"github.com/Lachstec/mc-hosting/internal/openstack"
 	"github.com/Lachstec/mc-hosting/internal/services"
 	"github.com/Lachstec/mc-hosting/internal/types"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
@@ -68,7 +67,7 @@ func main() {
 
 	router := gin.Default()
 
-	router.Use(cors.Default())
+	router.Use(services.CORSMiddleware())
 
 	router.GET("/users", func(c *gin.Context) {
 		users, err := userService.ReadAllUsers()
