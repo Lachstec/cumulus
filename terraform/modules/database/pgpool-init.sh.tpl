@@ -22,7 +22,6 @@ id -u pgpool &>/dev/null || useradd -r -s /bin/false pgpool
 
 # Enable load balancing and master-slave mode
 sed -i "s/^#load_balance_mode = off/load_balance_mode = on/" "$PGPOOL_CONF"
-sed -i "s/^#master_slave_mode = off/master_slave_mode = on/" "$PGPOOL_CONF"
 
 # Configure PostgreSQL nodes
 IFS=',' read -r -a NODES <<< "$${PGSQL_NODES}"
@@ -75,12 +74,14 @@ chmod 600 /etc/pgpool2/pcp.conf /etc/pgpool2/pool_passwd
 chmod 750 /etc/pgpool2/failover.sh
 
 # Update pgpool.conf with failover command and health check parameters
-echo "failover_command = '/etc/pgpool2/failover.sh %d %h %P %M %H'" >> /etc/pgpool2/pgpool.conf
 echo "health_check_period = 5" >> /etc/pgpool2/pgpool.conf
 echo "health_check_timeout = 10" >> /etc/pgpool2/pgpool.conf
 echo "health_check_user = '${pgpool_user}'" >> /etc/pgpool2/pgpool.conf
 echo "health_check_password = '${pgpool_password}'" >> /etc/pgpool2/pgpool.conf
 echo "replication_mode = on" >> /etc/pgpool2/pgpool.conf
+echo "master_slave_mode = off" >> /etc/pgpool2/pgpool.conf
+echo "failover_when_quorum_exists = off" >> /etc/pgpool2/pgpool.conf
+
 
 # Restart pgpool2 to apply changes
 systemctl restart pgpool2
