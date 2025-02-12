@@ -37,10 +37,11 @@ echo "host    all             all             $${POSTGRES_SUBNET_CIDR}          
 
 # Make Pgpool listen on all interfaces (or you can set specific interfaces)
 sed -i "s/^#listen_addresses = 'localhost'/listen_addresses = '*'/g" "$PGPOOL_CONF"
+sed -i "s/backend_clustering_mode = 'streaming_replication'/backend_clustering_mode = 'native_replication'/" /etc/pgpool2/pgpool.conf
 
 # Configure pgpool user and password
 pg_md5 -m -u ${pgpool_user} ${pgpool_password} > "$PCP_CONF"
-pg_md5 -m -u ${pgpool_user} ${pgpool_password} > "$POOL_PASSWD"
+pg_md5 -m -u ${pgpool_user} ${pgpool_password} > "/etc/pgpool2/pool_passwd"
 mkdir -p /var/run/pgpool
 
 # Add failover.sh script
@@ -75,16 +76,23 @@ chmod 750 /etc/pgpool2/failover.sh
 
 # Update pgpool.conf with failover command and health check parameters
 echo "health_check_period = 5" >> /etc/pgpool2/pgpool.conf
+echo "health_check_max_retries = 3" >> /etc/pgpool2/pgpool.conf
+echo "health_check_retry_delay = 10" >> /etc/pgpool2/pgpool.conf
 echo "health_check_timeout = 10" >> /etc/pgpool2/pgpool.conf
 echo "health_check_user = '${pgpool_user}'" >> /etc/pgpool2/pgpool.conf
 echo "health_check_password = '${pgpool_password}'" >> /etc/pgpool2/pgpool.conf
 echo "replication_mode = on" >> /etc/pgpool2/pgpool.conf
 echo "master_slave_mode = off" >> /etc/pgpool2/pgpool.conf
 echo "failover_when_quorum_exists = off" >> /etc/pgpool2/pgpool.conf
+echo "log_health_check = on" >> /etc/pgpool2/pgpool.conf
 
 
 # Restart pgpool2 to apply changes
 systemctl restart pgpool2
 systemctl enable pgpool2
+
+sleep 10
+
+systemctl restart pgpool2
 
 echo "pgpool2 setup completed."
