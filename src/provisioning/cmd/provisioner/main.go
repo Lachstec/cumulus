@@ -309,5 +309,8 @@ func main() {
 	// teapot
 	router.GET("/teapot", func(c *gin.Context) { c.Status(http.StatusTeapot) })
 
+	router.GET("/healthcheck", func(ctx *gin.Context) { ctx.Status(http.StatusOK) })
+
 	_ = router.Run("0.0.0.0:10000")
+
 }
