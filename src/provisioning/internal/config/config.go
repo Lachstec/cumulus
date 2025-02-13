@@ -2,10 +2,11 @@ package config
 
 import (
 	"encoding/base64"
-	"github.com/joho/godotenv"
 	"log"
 	"net/url"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 // Config is the main configuration type for the application.
@@ -21,6 +22,8 @@ type Config struct {
 	CryptoConfig CryptoConfig
 	// TracingConfig configuration for Jaeger enabled Tracing
 	TracingConfig TracingConfig
+	// LoggingConfig configuration for Logging
+	LoggingConfig LoggingConfig
 }
 
 // LoadConfig loads the application configuration.
@@ -46,7 +49,7 @@ type Config struct {
 func LoadConfig() *Config {
 	err := godotenv.Load()
 	if err != nil {
-		log.Println("No .env file found. Using Fallback values")
+		log.Println("No .env file found. Using Environment Variables or Fallbacks")
 	}
 
 	authURL, err := url.Parse(getEnv("AUTH0_URL", "http://localhost"))
@@ -84,6 +87,9 @@ func LoadConfig() *Config {
 		TracingConfig: TracingConfig{
 			Endpoint:    getEnv("TRACE_ENDPOINT", "localhost:4317"),
 			ServiceName: getEnv("TRACE_SERVICENAME", "mc-hosting"),
+		},
+		LoggingConfig: LoggingConfig{
+			Environment: getEnv("ENVIRONMENT", "dev"),
 		},
 	}
 	return cfg
