@@ -45,8 +45,8 @@
   let selectedName = $state(data.name);
   let selectedRole = $state(data.role);
   let roles = [
-    { value: "Admin", name: "admin" },
-    { value: "User", name: "user" },
+    { value: "admin", name: "Admin" },
+    { value: "user", name: "User" },
   ];
 
   async function updateData() {
@@ -66,7 +66,7 @@
           },
           body: JSON.stringify({
             name: selectedName,
-            role: selectedRole,
+            class: selectedRole,
           }),
         },
       );
@@ -98,7 +98,7 @@
   }
 </script>
 
-<div class="p-8 mt-16 mb-6 bg-white dark:bg-gray-900 h-screen">
+<div class="p-8 bg-white dark:bg-gray-900">
   <div class="mb-6">
     <Label for="name-input" class="block mb-2">Name</Label>
     <Input id="name-input" bind:value={selectedName} />

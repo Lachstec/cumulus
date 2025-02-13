@@ -12,9 +12,10 @@
   import auth from "$lib/service/auth_service";
   import type { Auth0Client } from "@auth0/auth0-spa-js";
   import { env } from "$env/dynamic/public";
+  import type {PageData} from "../../../.svelte-kit/types/src/routes/user/[userid]/$types";
 
   let backend_url = env.PUBLIC_BACKEND_URL;
-
+  let roleHelper = { "admin":"Admin", "user":"User" };
   type UserData = {
     ID: number;
     Sub: "";
@@ -22,25 +23,8 @@
     class: string;
   };
 
-  let data: UserData[];
-  let auth0Client: Auth0Client;
-
-  async function getAllUsers() {
-    auth0Client = await auth.createClient();
-    const token = await auth0Client.getTokenSilently();
-    const res = await fetch(`${backend_url}/users`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    data = await res.json();
-  }
-
-  onMount(async () => {
-    await getAllUsers();
-  });
-
+  let {data} = $props();
+  let users = data.data as UserData[];
   let isVisible = false;
 
   function deleteUser(ID: number) {
@@ -50,7 +34,7 @@
       .then((res) => {
         if (res.status === 204) {
           isVisible = true;
-          getAllUsers();
+          //getAllUsers();
         } else {
           console.error("Failed to delete user: ", res.status);
         }
@@ -77,10 +61,10 @@
         <TableHeadCell>Options</TableHeadCell>
       </TableHead>
       <TableBody tableBodyClass="divide-y">
-        {#each data as { name, class: role, ID }}
+        {#each users as { name, class: role, ID }}
           <TableBodyRow>
             <TableBodyCell>{name}</TableBodyCell>
-            <TableBodyCell>{role}</TableBodyCell>
+            <TableBodyCell>{roleHelper[role as keyof typeof roleHelper]}</TableBodyCell>
             <TableBodyCell>
               <Button size="xs" outline color="green" href="../../user/{ID}"
                 >View</Button>
