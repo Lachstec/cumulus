@@ -12,10 +12,10 @@
   import auth from "$lib/service/auth_service";
   import type { Auth0Client } from "@auth0/auth0-spa-js";
   import { env } from "$env/dynamic/public";
-  import type {PageData} from "../../../.svelte-kit/types/src/routes/user/[userid]/$types";
+  import type { PageData } from "../../../.svelte-kit/types/src/routes/user/[userid]/$types";
 
   let backend_url = env.PUBLIC_BACKEND_URL;
-  let roleHelper = { "admin":"Admin", "user":"User" };
+  let roleHelper = { admin: "Admin", user: "User" };
   type UserData = {
     ID: number;
     Sub: "";
@@ -23,7 +23,7 @@
     class: string;
   };
 
-  let {data} = $props();
+  let { data } = $props();
   let users = data.data as UserData[];
   let isVisible = false;
 
@@ -64,7 +64,8 @@
         {#each users as { name, class: role, ID }}
           <TableBodyRow>
             <TableBodyCell>{name}</TableBodyCell>
-            <TableBodyCell>{roleHelper[role as keyof typeof roleHelper]}</TableBodyCell>
+            <TableBodyCell
+              >{roleHelper[role as keyof typeof roleHelper]}</TableBodyCell>
             <TableBodyCell>
               <Button size="xs" outline color="green" href="../../user/{ID}"
                 >View</Button>
