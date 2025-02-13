@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"net/http"
@@ -9,28 +8,29 @@ import (
 
 	"github.com/Lachstec/mc-hosting/internal/config"
 	"github.com/Lachstec/mc-hosting/internal/db"
+	"github.com/Lachstec/mc-hosting/internal/logging"
 	"github.com/Lachstec/mc-hosting/internal/openstack"
 	"github.com/Lachstec/mc-hosting/internal/services"
 	"github.com/Lachstec/mc-hosting/internal/types"
 	"github.com/gin-gonic/gin"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
+	"github.com/rs/zerolog"
 )
 
-func dbInit() *sqlx.DB {
-	cfg := config.LoadConfig()
-	s, err := sqlx.Open("pgx", cfg.Db.ConnectionURI())
+func dbInit(cfg config.DbConfig, logger zerolog.Logger) *sqlx.DB {
+	s, err := sqlx.Open("pgx", cfg.ConnectionURI())
 	if err != nil {
-		panic(err)
+		logger.Fatal().Err(err).Msg("failed to connect to backend database")
 	}
 	mig := db.NewMigrator(s)
 
 	err = mig.Migrate("./migrations")
 	if err != nil {
-		panic(err)
+		logger.Fatal().Err(err).Msg("failed to create database schema")
 	}
 
-	fmt.Println("typesbase schema has been created")
+	logger.Info().Msg("database connected and initialized")
 	return s
 }
 
@@ -47,19 +47,20 @@ func urlParamToInt64(param string) (int64, error) {
 }
 
 func main() {
-	// initialize the database
-	database := dbInit()
 	cfg := config.LoadConfig()
+	l := logging.Get(cfg.LoggingConfig)
+
+	database := dbInit(cfg.Db, l)
+
 	openstack, err := openstack.NewClient(cfg)
 	if err != nil {
-		panic(err)
+		l.Fatal().Err(err).Msg("failed to connect to openstack")
 	}
 
 	serverStore := db.NewServerStore(database)
 	userStore := db.NewUserStore(database)
 	ipStore := db.NewIPStore(database)
 
-	// initialize the services
 	serverService := services.NewServerService(serverStore)
 	userService := services.NewUserService(userStore)
 	floatingIpService := services.NewFloatingIPService(ipStore)
@@ -68,6 +69,7 @@ func main() {
 	router := gin.Default()
 
 	router.Use(services.CORSMiddleware())
+	router.Use(logging.LoggingMiddleware(cfg.LoggingConfig))
 
 	router.GET("/users", func(c *gin.Context) {
 		users, err := userService.ReadAllUsers()
