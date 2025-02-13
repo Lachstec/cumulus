@@ -32,7 +32,7 @@ func Get(cfg config.LoggingConfig) zerolog.Logger {
 		buildinfo, _ := debug.ReadBuildInfo()
 
 		if cfg.Environment == "dev" {
-			log = zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339Nano}).
+			log = zerolog.New(output).
 				Level(logLevel).
 				With().
 				Timestamp().
@@ -41,7 +41,7 @@ func Get(cfg config.LoggingConfig) zerolog.Logger {
 				Str("go_version", buildinfo.GoVersion).
 				Logger()
 		} else {
-			log = zerolog.New(output).
+			log = zerolog.New(zerolog.MultiLevelWriter(os.Stderr)).
 				Level(logLevel).
 				With().
 				Timestamp().
