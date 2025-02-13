@@ -74,6 +74,7 @@ func LoggingMiddleware(cfg config.LoggingConfig) gin.HandlerFunc {
 				Str("method", ctx.Request.Method).
 				Str("url", ctx.Request.RequestURI).
 				Str("user_agent", ctx.Request.UserAgent()).
+				Int("status_code", ctx.Writer.Status()).
 				Dur("elapsed_ms", time.Since(start)).
 				Msg("received request")
 		}()
