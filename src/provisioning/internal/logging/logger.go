@@ -29,17 +29,7 @@ func Get(cfg config.LoggingConfig) zerolog.Logger {
 			TimeFormat: time.RFC3339Nano,
 		}
 
-		var gitRevision string
-
-		buildinfo, ok := debug.ReadBuildInfo()
-		if ok {
-			for _, v := range buildinfo.Settings {
-				if v.Key == "vcs.revision" {
-					gitRevision = v.Value
-					break
-				}
-			}
-		}
+		buildinfo, _ := debug.ReadBuildInfo()
 
 		if cfg.Environment == "dev" {
 			log = zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339Nano}).
@@ -55,7 +45,6 @@ func Get(cfg config.LoggingConfig) zerolog.Logger {
 				Level(logLevel).
 				With().
 				Timestamp().
-				Str("git_revision", gitRevision).
 				Str("go_version", buildinfo.GoVersion).
 				Logger()
 		}
