@@ -11,9 +11,17 @@ export const GET: RequestHandler = async ({ url }) => {
 
   try {
     const result = await util.status(ip, 25565, options);
-    return json(result);
+    const answer = {
+      status: "success",
+      result: result,
+    }
+    return json(answer);
   } catch (error) {
-    console.error("Error fetching server status:", error);
-    return json(error);
+    //console.error("Error fetching server status:", error);
+    const answer = {
+      status: "error",
+      result: error,
+    }
+    return json(answer);
   }
 };
