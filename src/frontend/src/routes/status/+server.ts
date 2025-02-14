@@ -17,7 +17,6 @@ export const GET: RequestHandler = async ({ url }) => {
     };
     return json(answer);
   } catch (error) {
-    //console.error("Error fetching server status:", error);
     const answer = {
       status: "error",
       result: error,

@@ -15,7 +15,6 @@ export const load: PageLoad = async ({ fetch }) => {
   });
   const servers = await res.json();
   let status = 0;
-  let serverHealth = [];
   if (!servers || servers.length === 0) {
     status = -1;
     return { status, servers: [], serverHealth: [] }; // Always return serverHealth

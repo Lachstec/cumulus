@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import {
     Indicator,
     Span,
@@ -6,8 +6,19 @@
     TableBodyRow,
   } from "flowbite-svelte";
   import { goto } from "$app/navigation";
+
+  interface Status {
+    status: string;
+    result: {
+      roundTripLatency?: String;
+      players?: {
+        online?: Number;
+      };
+    };
+  }
+
   let { server } = $props();
-  let stats = $state({ status: "init" });
+  let stats = $state({ status: "init", result: {} } as Status);
   const updateInterval = 10;
 
   async function fetchHealth() {
@@ -49,7 +60,7 @@
   <TableBodyCell>{server.difficulty}</TableBodyCell>
   <TableBodyCell
     >{stats.status === "success"
-      ? stats.result.players.online
+      ? stats.result.players?.online
       : "-"}/{server.players_max}</TableBodyCell>
   <TableBodyCell>
     <svg
