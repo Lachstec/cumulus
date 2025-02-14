@@ -47,6 +47,7 @@ storage_config:
     active_index_directory: /loki/index
     cache_location: /loki/cache
     shared_store: swift
+    chunk_target_size: 1048576
   swift:
     auth_url: "${openstack_auth_url}"
     username: "${openstack_username}"
@@ -55,6 +56,7 @@ storage_config:
     domain_name: "${openstack_domain_name}"
     region_name: "${openstack_region_name}"
     container_name: "${loki_container_name}"
+    insecure_skip_verify: true  # This will skip SSL certificate verification
 
 limits_config:
   enforce_metric_name: false
