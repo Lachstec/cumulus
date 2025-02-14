@@ -3,21 +3,16 @@
   import {
     Table,
     TableBody,
-    TableBodyCell,
-    TableBodyRow,
     TableHead,
     TableHeadCell,
-    Indicator,
-    Span,
     P,
     Progressbar,
   } from "flowbite-svelte";
   import { sineInOut } from "svelte/easing";
-  import { goto } from "$app/navigation";
+  import Row from "./Row.svelte";
   let { data } = $props();
-  let indicatorColor = "black";
   const dataLength = data.servers.length
-  let latestData = $state(Array(dataLength).fill(null)); // Make a reactive copy
+  let latestData = $state(Array(dataLength).fill({status: "init"})); // Make a reactive copy
   let progress = $state(0);
   const updateInterval = 10; // interval in secondes
 
@@ -83,116 +78,9 @@
         <TableHeadCell>PVP</TableHeadCell>
       </TableHead>
       <TableBody tableBodyClass="divide-y">
-        {#each data.servers as { ID, Status, name, ip, game_version, gamemode, difficulty, players_max, pvp_enabled }, index}
-          {#if latestData[index]?.status === "error" || latestData === null}
-            <TableBodyRow on:click={() => goto(`../../server/${ID}`)}>
-              <TableBodyCell class="!p-1">
-                <Indicator color="red" />
-              </TableBodyCell>
-              <TableBodyCell>
-              <Span>
-                {name.length > 20 ? name.substring(0, 20) + "..." : name}
-              </Span>
-              </TableBodyCell>
-              <TableBodyCell>{ip}</TableBodyCell>
-              <TableBodyCell
-              >- ms</TableBodyCell>
-              <TableBodyCell>{game_version}</TableBodyCell>
-              <TableBodyCell>{gamemode}</TableBodyCell>
-              <TableBodyCell>{difficulty}</TableBodyCell>
-              <TableBodyCell
-              >-/{players_max}</TableBodyCell>
-              <TableBodyCell>
-                {#if pvp_enabled}
-                  <svg
-                          class="w-6 h-6 text-gray-800 dark:text-white"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          fill="none"
-                          viewBox="0 0 24 24">
-                    <path
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M5 11.917 9.724 16.5 19 7.5" />
-                  </svg>
-                {:else}
-                  <svg
-                          class="w-6 h-6 text-gray-800 dark:text-white"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          fill="none"
-                          viewBox="0 0 24 24">
-                    <path
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M6 18 17.94 6M18 18 6.06 6" />
-                  </svg>
-                {/if}
-              </TableBodyCell>
-            </TableBodyRow>
-          {:else}
-          <TableBodyRow on:click={() => goto(`../../server/${ID}`)}>
-            <TableBodyCell class="!p-1">
-              <Indicator color="green" />
-            </TableBodyCell>
-            <TableBodyCell>
-              <Span>
-                {name.length > 20 ? name.substring(0, 20) + "..." : name}
-              </Span>
-            </TableBodyCell>
-            <TableBodyCell>{ip}</TableBodyCell>
-            <TableBodyCell
-              >{latestData[index]?.roundTripLatency}ms</TableBodyCell>
-            <TableBodyCell>{game_version}</TableBodyCell>
-            <TableBodyCell>{gamemode}</TableBodyCell>
-            <TableBodyCell>{difficulty}</TableBodyCell>
-            <TableBodyCell
-              >{latestData[index]?.players.online}/{players_max}</TableBodyCell>
-            <TableBodyCell>
-              {#if pvp_enabled}
-                <svg
-                  class="w-6 h-6 text-gray-800 dark:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24">
-                  <path
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M5 11.917 9.724 16.5 19 7.5" />
-                </svg>
-              {:else}
-                <svg
-                  class="w-6 h-6 text-gray-800 dark:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24">
-                  <path
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M6 18 17.94 6M18 18 6.06 6" />
-                </svg>
-              {/if}
-            </TableBodyCell>
-          </TableBodyRow>
-          {/if}
+        <!--{#each data.servers as { ID, Status, name, ip, game_version, gamemode, difficulty, players_max, pvp_enabled }, index}-->
+        {#each data.servers as server, index}
+          <Row {server} health={latestData[index]}/>
         {/each}
       </TableBody>
     </Table>
