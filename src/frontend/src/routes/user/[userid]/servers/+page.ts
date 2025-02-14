@@ -14,13 +14,12 @@ export const load: PageLoad = async ({ fetch }) => {
     },
   });
   const servers = await res.json();
-
   let status = 0;
-  if (!servers) {
-    status = -1;
-    return { status };
-  }
   let serverHealth = [];
+  if (!servers || servers.length === 0) {
+    status = -1;
+    return { status, servers: [], serverHealth: [] }; // Always return serverHealth
+  }
   for (const server of servers) {
     const healthResponse = await fetch(
       `${env.PUBLIC_BACKEND_URL}/servers/${server.ID}/health`,
@@ -36,7 +35,5 @@ export const load: PageLoad = async ({ fetch }) => {
     const health = await resStatus.json();
     serverHealth.push(health);
   }
-  //console.log(servers);
-  //console.log(serverHealth);
   return { servers, serverHealth }; //Packed into an object
 };
