@@ -11,34 +11,14 @@
   import { sineInOut } from "svelte/easing";
   import Row from "./Row.svelte";
   let { data } = $props();
-  const dataLength = data.servers.length
-  let latestData = $state(Array(dataLength).fill({status: "init"})); // Make a reactive copy
   let progress = $state(0);
   const updateInterval = 10; // interval in secondes
 
-  async function fetchHealth() {
-    let serverHealth = [];
-
-    for (let i = 0; i < dataLength; i++) {
-      const server = data.servers[i];
-      const resStatus = await fetch(`/status/?ip=${server.ip}`);
-      const health = await resStatus.json();
-      serverHealth.push(health);
-    }
-    // Update each item reactively
-    latestData.forEach((_, i) => {
-      latestData[i] = serverHealth[i];
-    });
-    console.log(latestData);
-  }
-
   $effect(() => {
-    const interval = setInterval(fetchHealth, updateInterval * 1000);
     const progressInterval = setInterval(() => {
       progress = (progress + 100 / updateInterval) % 101;
     }, 1000);
     return () => {
-      clearInterval(interval);
       clearInterval(progressInterval);
     };
   });
@@ -55,6 +35,8 @@
         <div class="flex justify-between items-center w-full">
           <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
             View and setup your Servers. To edit a Server, just click on it.
+            <br>
+            This page is continuously updating the server status.
           </span>
           <Progressbar
             class="w-40"
@@ -77,9 +59,8 @@
         <TableHeadCell>PVP</TableHeadCell>
       </TableHead>
       <TableBody tableBodyClass="divide-y">
-        <!--{#each data.servers as { ID, Status, name, ip, game_version, gamemode, difficulty, players_max, pvp_enabled }, index}-->
-        {#each data.servers as server, index}
-          <Row {server} health={latestData[index]}/>
+        {#each data.servers as server}
+          <Row {server}/>
         {/each}
       </TableBody>
     </Table>

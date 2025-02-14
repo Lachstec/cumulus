@@ -1,13 +1,29 @@
 <script>
     import {Indicator, Span, TableBodyCell, TableBodyRow} from "flowbite-svelte";
     import {goto} from "$app/navigation";
-    let { server, health } = $props()
+    let { server } = $props();
+    let stats = $state({status: "init"});
+    const updateInterval = 10;
+
+    async function fetchHealth() {
+        const resStatus = await fetch(`/status/?ip=${server.ip}`);
+        stats = await resStatus.json();
+        console.log(`Stats for ${server.ip}:`);
+        console.log($state.snapshot(stats));
+    }
+
+    $effect(() => {
+        const interval = setInterval(fetchHealth, updateInterval * 1000);
+        return () => {
+            clearInterval(interval);
+        };
+    });
 </script>
 
 
 <TableBodyRow on:click={() => goto(`../../server/${server.ID}`)}>
     <TableBodyCell class="!p-1">
-        <Indicator color={health.status==="success" ? "green" : health.status==="error" ? "red" : "yellow"}/>
+        <Indicator color={stats.status==="success" ? "green" : stats.status==="error" ? "red" : "yellow"}/>
     </TableBodyCell>
     <TableBodyCell>
           <Span>
@@ -16,12 +32,12 @@
     </TableBodyCell>
     <TableBodyCell>{server.ip}</TableBodyCell>
     <TableBodyCell
-    >{health.status==="success" ? health.result.roundTripLatency : "-" } ms</TableBodyCell>
+    >{stats.status==="success" ? stats.result.roundTripLatency : "-" } ms</TableBodyCell>
     <TableBodyCell>{server.game_version}</TableBodyCell>
     <TableBodyCell>{server.gamemode}</TableBodyCell>
     <TableBodyCell>{server.difficulty}</TableBodyCell>
     <TableBodyCell
-    >{health.status==="success" ? health.result.players.online : "-" }/{server.players_max}</TableBodyCell>
+    >{stats.status==="success" ? stats.result.players.online : "-" }/{server.players_max}</TableBodyCell>
     <TableBodyCell>
         <svg
                 class="w-6 h-6 text-gray-800 dark:text-white"
