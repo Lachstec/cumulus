@@ -135,6 +135,11 @@ resource "openstack_networking_floatingip_associate_v2" "frontend_lb_floating_ip
   port_id     = module.frontend.frontend_loadbalancer_vip_port_id
 }
 
+resource "openstack_networking_floatingip_associate_v2" "grafana_floating_ip" {
+  floating_ip = module.floating_ips.grafana_floating_ip
+  port_id = module.backend.grafana_port_id
+}
+
 # Get floating IP for the load balancers
 # Init auth 0
 # Start Frontend

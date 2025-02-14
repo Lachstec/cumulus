@@ -22,3 +22,8 @@ output "backend_subnet_id" {
   description = "ID of the dedicated Backend subnet"
   value       = openstack_networking_subnet_v2.backend_subnet.id
 }
+
+output "grafana_port_id" {
+  description = "port of the grafana instance"
+  value = openstack_networking_port_v2.loki_ports[0].id 
+}
