@@ -46,7 +46,7 @@ func urlParamToInt64(param string) (int64, error) {
 
 func main() {
 	cfg := config.LoadConfig()
-	l := logging.Get(cfg.LoggingConfig)
+	l := logging.Get(*cfg)
 
 	database := dbInit(cfg.Db, l)
 
