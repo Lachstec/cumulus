@@ -14,14 +14,14 @@ export const GET: RequestHandler = async ({ url }) => {
     const answer = {
       status: "success",
       result: result,
-    }
+    };
     return json(answer);
   } catch (error) {
     //console.error("Error fetching server status:", error);
     const answer = {
       status: "error",
       result: error,
-    }
+    };
     return json(answer);
   }
 };

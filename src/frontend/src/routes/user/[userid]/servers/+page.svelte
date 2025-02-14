@@ -35,7 +35,7 @@
         <div class="flex justify-between items-center w-full">
           <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
             View and setup your Servers. To edit a Server, just click on it.
-            <br>
+            <br />
             This page is continuously updating the server status.
           </span>
           <Progressbar
@@ -60,7 +60,7 @@
       </TableHead>
       <TableBody tableBodyClass="divide-y">
         {#each data.servers as server}
-          <Row {server}/>
+          <Row {server} />
         {/each}
       </TableBody>
     </Table>
