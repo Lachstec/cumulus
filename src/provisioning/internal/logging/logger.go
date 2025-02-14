@@ -17,7 +17,7 @@ var once sync.Once
 
 var log zerolog.Logger
 
-func Get(cfg config.LoggingConfig) zerolog.Logger {
+func Get(cfg config.Config) zerolog.Logger {
 	once.Do(func() {
 		zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 		zerolog.TimeFieldFormat = time.RFC3339Nano
@@ -31,7 +31,7 @@ func Get(cfg config.LoggingConfig) zerolog.Logger {
 
 		buildinfo, _ := debug.ReadBuildInfo()
 
-		if cfg.Environment == "dev" {
+		if cfg.LoggingConfig.Environment == "dev" {
 			log = zerolog.New(output).
 				Level(logLevel).
 				With().
@@ -47,6 +47,14 @@ func Get(cfg config.LoggingConfig) zerolog.Logger {
 				Timestamp().
 				Str("go_version", buildinfo.GoVersion).
 				Logger()
+
+			lokiHook := &LokiHook{
+				Endpoint: cfg.TracingConfig.Endpoint,
+			}
+
+			log = log.Hook(lokiHook)
+
+			log = log.Hook()
 		}
 	})
 
