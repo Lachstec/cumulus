@@ -16,12 +16,12 @@
     </TableBodyCell>
     <TableBodyCell>{server.ip}</TableBodyCell>
     <TableBodyCell
-    >{health.status==="success" ? health.roundTripLatency : "-" } ms</TableBodyCell>
+    >{health.status==="success" ? health.result.roundTripLatency : "-" } ms</TableBodyCell>
     <TableBodyCell>{server.game_version}</TableBodyCell>
     <TableBodyCell>{server.gamemode}</TableBodyCell>
     <TableBodyCell>{server.difficulty}</TableBodyCell>
     <TableBodyCell
-    >{health.status==="success" ? health.players.online : "-" }/{server.players_max}</TableBodyCell>
+    >{health.status==="success" ? health.result.players.online : "-" }/{server.players_max}</TableBodyCell>
     <TableBodyCell>
         <svg
                 class="w-6 h-6 text-gray-800 dark:text-white"
