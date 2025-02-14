@@ -16,14 +16,15 @@
   import { goto } from "$app/navigation";
   let { data } = $props();
   let indicatorColor = "black";
-  let latestData = $state([...data.serverHealth]); // Make a reactive copy
+  const dataLength = data.servers.length
+  let latestData = $state(Array(dataLength).fill(null)); // Make a reactive copy
   let progress = $state(0);
   const updateInterval = 10; // interval in secondes
 
   async function fetchHealth() {
     let serverHealth = [];
 
-    for (let i = 0; i < data.servers.length; i++) {
+    for (let i = 0; i < dataLength; i++) {
       const server = data.servers[i];
       const resStatus = await fetch(`/status/?ip=${server.ip}`);
       const health = await resStatus.json();
@@ -83,7 +84,7 @@
       </TableHead>
       <TableBody tableBodyClass="divide-y">
         {#each data.servers as { ID, Status, name, ip, game_version, gamemode, difficulty, players_max, pvp_enabled }, index}
-          {#if latestData[index]?.status === "error"}
+          {#if latestData[index]?.status === "error" || latestData === null}
             <TableBodyRow on:click={() => goto(`../../server/${ID}`)}>
               <TableBodyCell class="!p-1">
                 <Indicator color="red" />
