@@ -123,6 +123,65 @@ resource "openstack_networking_port_v2" "backend_ports" {
   security_group_ids = [openstack_networking_secgroup_v2.backend_secgroup.id]
 }
 
+resource "openstack_objectstorage_container_v1" "loki_container" {
+  name = "loki-logs"
+}
+
+resource "openstack_networking_secgroup_rule_v2" "loki_ingress" {
+  security_group_id = openstack_networking_secgroup_v2.backend_secgroup.id
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  protocol          = "tcp"
+  port_range_min    = 3100
+  port_range_max    = 3100
+  remote_ip_prefix  = "0.0.0.0/0"  # You may restrict this range for added security.
+}
+
+resource "openstack_networking_port_v2" "loki_ports" {
+  count = 1
+  name = "loki-port-${count.index + 1}"
+  network_id = openstack_networking_network_v2.backend_network.id
+
+  fixed_ip {
+    subnet_id = openstack_networking_subnet_v2.backend_subnet.id
+  }
+
+  security_group_ids = [openstack_networking_secgroup_v2.backend_secgroup.id]
+}
+
+resource "openstack_compute_instance_v2" "loki_servers" {
+  count = 1
+  name = "loki-server-${count.index + 1}"
+  image_id = var.backend_image_id
+  flavor_id = var.backend_flavor_id
+  key_pair = openstack_compute_keypair_v2.keypair.name
+
+  network {
+    port = openstack_networking_port_v2.loki_ports[count.index].id
+  }
+
+  user_data = templatefile("./${path.module}/loki-init.sh.tpl", {
+    openstack_auth_url = var.openstack_auth_url
+    openstack_username = var.openstack_username
+    openstack_password = var.openstack_password
+    openstack_tenant_name = var.openstack_tenant
+    openstack_domain_name = var.openstack_domain_name
+    openstack_region_name = var.openstack_region
+    loki_container_name = openstack_objectstorage_container_v1.loki_container.name
+  })
+}
+
+resource "openstack_networking_secgroup_rule_v2" "grafana_ingress" {
+  security_group_id = openstack_networking_secgroup_v2.backend_secgroup.id
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  protocol          = "tcp"
+  port_range_min    = 3000
+  port_range_max    = 3000
+  remote_ip_prefix  = "0.0.0.0/0"  # Restrict this as needed for your security requirements.
+}
+
+
 resource "openstack_compute_instance_v2" "backend_servers" {
   count     = 2
   name      = "backend-server-${count.index + 1}"
@@ -145,7 +204,7 @@ resource "openstack_compute_instance_v2" "backend_servers" {
     OPENSTACK_DOMAIN            = var.openstack_domain_name
     OPENSTACK_TENANT_NAME       = var.openstack_tenant
     CRYPTO_KEY                  = var.backend_crypto_key
-    TRACE_ENDPOINT              = var.backend_tracing_endpoint
+    TRACE_ENDPOINT              = format("http:%s:3100/loki/api/v1/push", openstack_compute_instance_v2.loki_servers[0].access_ip_v4)
     TRACE_SERVICENAME           = var.backend_tracing_service_name
     AUTH0_URL                   = var.backend_auth0_url
     AUTH0_SECRET                = var.backend_auth0_clientid
