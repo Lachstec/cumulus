@@ -29,8 +29,7 @@
     latestData.forEach((_, i) => {
       latestData[i] = serverHealth[i];
     });
-
-    console.log("Updated health:", latestData);
+    console.log(latestData);
   }
 
   $effect(() => {
