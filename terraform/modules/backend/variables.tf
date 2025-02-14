@@ -33,7 +33,7 @@ variable "backend_security_group_name" {
 }
 
 variable "backend_router_name" {
-  description = "Name of the router for the backend"
+    description = "Name of the router for the backend"
   type        = string
 }
 
@@ -122,7 +122,7 @@ variable "backend_port" {
 }
 
 variable "frontend_subnet_cidr" {
-  description = "The Subnet CIDR of the frontend subnet"
+    description = "The Subnet CIDR of the frontend subnet"
   type        = string
 }
 

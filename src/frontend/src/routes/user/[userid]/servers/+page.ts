@@ -14,11 +14,11 @@ export const load: PageLoad = async ({ fetch }) => {
     },
   });
   const servers = await res.json();
-
   let status = 0;
-  if (!servers) {
+  let serverHealth = [];
+  if (!servers || servers.length === 0) {
     status = -1;
-    return { status };
+    return { status, servers: [], serverHealth: [] }; // Always return serverHealth
   }
   for (const server of servers) {
     const healthResponse = await fetch(

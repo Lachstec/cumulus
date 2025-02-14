@@ -36,6 +36,7 @@ docker run -d \
     -e AUTH0_URL="${AUTH0_URL}" \
     -e AUTH0_AUDIENCE="${AUTH0_AUDIENCE}" \
     -e AUTH0_SECRET="${AUTH0_SECRET}" \
+    -e ENVIRONMENT="prod" \
     -p "10000:10000" \
     --network=host \
     ghcr.io/lachstec/provisioner:dev
