@@ -3,12 +3,14 @@ package api
 import (
 	"github.com/Lachstec/mc-hosting/internal/services"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog"
 )
 
 type Handler struct {
 	UserService       services.UserService
 	ServerService     services.ServerService
 	FloatingIPService services.FloatingIPService
+	Logger            *zerolog.Logger
 }
 
 func (h *Handler) respondSuccess(c *gin.Context, code int, data interface{}) {
