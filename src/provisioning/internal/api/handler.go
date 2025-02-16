@@ -9,6 +9,7 @@ import (
 type Handler struct {
 	UserService       services.UserService
 	ServerService     services.ServerService
+	Provisioner       services.MinecraftProvisioner
 	FloatingIPService services.FloatingIPService
 	Logger            *zerolog.Logger
 }
