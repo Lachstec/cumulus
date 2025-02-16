@@ -22,7 +22,7 @@ func (h *Handler) GetServers(c *gin.Context) {
 
 func (h *Handler) CreateServer(c *gin.Context) {
 	var server *types.Server
-	err := c.BindJSON(&server)
+	err := BindJSONStrict(c, &server)
 	if err != nil {
 		h.Logger.Warn().Err(err).Msg("invalid server payload")
 		h.respondError(c, http.StatusBadRequest, "invalid server payload", err.Error())
@@ -132,7 +132,7 @@ func (h *Handler) UpdateServerById(c *gin.Context) {
 
 	server := servers[0]
 
-	err = c.BindJSON(&server)
+	err = BindJSONStrict(c, &server)
 	if err != nil {
 		h.Logger.Warn().Err(err).Msg("invalid server payload")
 		h.respondError(c, http.StatusUnprocessableEntity, "server payload not valid", err.Error())
