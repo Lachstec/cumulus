@@ -21,7 +21,7 @@ func (h *Handler) GetUsers(c *gin.Context) {
 }
 
 func (h *Handler) CreateUser(c *gin.Context) {
-	var user *types.User
+	var user types.User
 	err := BindJSONStrict(c, &user)
 	if err != nil {
 		h.Logger.Warn().Err(err).Msg("invalid payload for new user")
@@ -29,7 +29,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 		return
 	}
 
-	userid, err := h.UserService.CreateUser(user)
+	userid, err := h.UserService.CreateUser(&user)
 	if err != nil {
 		h.Logger.Warn().Err(err).Msg("invalid payload for new user")
 		h.respondError(c, http.StatusInternalServerError, "failed to create user", err.Error())
@@ -89,7 +89,7 @@ func (h *Handler) UpdateUserById(c *gin.Context) {
 
 	user := users[0]
 	user.ID = userid
-	err = BindJSONStrict(c, &user)
+	err = BindJSONStrict(c, user)
 
 	if err != nil {
 		h.Logger.Error().Err(err).Msg("user returned from database does not match expected schema")

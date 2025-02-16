@@ -21,7 +21,7 @@ func (h *Handler) GetServers(c *gin.Context) {
 }
 
 func (h *Handler) CreateServer(c *gin.Context) {
-	var server *types.Server
+	var server types.Server
 	err := BindJSONStrict(c, &server)
 	if err != nil {
 		h.Logger.Warn().Err(err).Msg("invalid server payload")
@@ -36,7 +36,7 @@ func (h *Handler) CreateServer(c *gin.Context) {
 		Class: types.Admin.Value(),
 	}
 
-	srv, err := h.Provisioner.NewGameServer(c, server, &user)
+	srv, err := h.Provisioner.NewGameServer(c, &server, &user)
 	if err != nil {
 		h.Logger.Error().Err(err).Int64("user_id", user.ID).Msg("failed to create game server")
 		h.respondError(c, http.StatusInternalServerError, "failed to create new game server", err.Error())
@@ -132,7 +132,7 @@ func (h *Handler) UpdateServerById(c *gin.Context) {
 
 	server := servers[0]
 
-	err = BindJSONStrict(c, &server)
+	err = BindJSONStrict(c, server)
 	if err != nil {
 		h.Logger.Warn().Err(err).Msg("invalid server payload")
 		h.respondError(c, http.StatusUnprocessableEntity, "server payload not valid", err.Error())

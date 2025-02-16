@@ -44,18 +44,18 @@ type Server struct {
 	ID               int64
 	UserID           int64        `db:"userid"`
 	OpenstackId      string       `db:"openstack_id"`
-	Name             string       `db:"name" json:"name"`
+	Name             string       `db:"name" json:"name" binding:"required"`
 	Address          int64        `db:"addr"`
 	Status           ServerStatus `db:"status"`
 	Port             int          `db:"port"`
 	Flavour          int64        `db:"flavour"`
-	Image            Image        `db:"image" json:"image"`
-	Game             string       `db:"game" json:"game"`
-	GameVersion      string       `db:"game_version" json:"game_version"`
-	GameMode         GameMode     `db:"game_mode" json:"gamemode"`
-	Difficulty       Difficulty   `db:"difficulty" json:"difficulty"`
-	WhitelistEnabled bool         `db:"whitelist_enabled" json:"whitelist_enabled"`
-	PvPEnabled       bool         `db:"pvp_enabled" json:"pvp_enabled"`
-	PlayersMax       int          `db:"players_max" json:"players_max"`
+	Image            Image        `db:"image" json:"image" binding:"required"`
+	Game             string       `db:"game" json:"game" binding:"required"`
+	GameVersion      string       `db:"game_version" json:"game_version" binding:"required"`
+	GameMode         GameMode     `db:"game_mode" json:"gamemode" binding:"required"`
+	Difficulty       Difficulty   `db:"difficulty" json:"difficulty" binding:"required"`
+	WhitelistEnabled bool         `db:"whitelist_enabled" json:"whitelist_enabled" binding:"required"`
+	PvPEnabled       bool         `db:"pvp_enabled" json:"pvp_enabled" binding:"required"`
+	PlayersMax       int          `db:"players_max" json:"players_max" binding:"required"`
 	SSHKey           int64        `db:"ssh_key"`
 }
