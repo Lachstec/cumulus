@@ -17,7 +17,23 @@ func RegisterRoutes(router *gin.Engine, h *Handler) {
 		userGroup.GET("/:userid/servers", h.ServersOfUser)
 	}
 
+	serverGroup := router.Group("/servers")
+	{
+		serverGroup.GET("", h.GetServers)
+		serverGroup.POST("", h.CreateServer)
+		serverGroup.GET("/:serverid", h.GetServerById)
+		serverGroup.POST("/:serverid", h.StartServerById)
+		serverGroup.PUT("/:serverid", h.Put)
+		serverGroup.PATCH("/:serverid", h.UpdateServerById)
+		serverGroup.DELETE("/:serverid", h.DeleteServerById)
+		serverGroup.GET("/:serverid/health", h.GetIpByServerId)
+	}
+
 	router.GET("/healthcheck", func(c *gin.Context) {
 		c.Status(http.StatusOK)
+	})
+
+	router.GET("/teapot", func(c *gin.Context) {
+		c.Status(http.StatusTeapot)
 	})
 }
