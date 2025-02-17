@@ -15,7 +15,6 @@ export const load: PageLoad = async ({ fetch }) => {
   });
   const servers = await res.json();
   let status = 0;
-  let serverHealth = [];
   if (!servers || servers.length === 0) {
     status = -1;
     return { status, servers: [], serverHealth: [] }; // Always return serverHealth
@@ -31,9 +30,6 @@ export const load: PageLoad = async ({ fetch }) => {
     );
     const serverip = await healthResponse.json();
     server.ip = serverip.Ip;
-    const resStatus = await fetch(`/status/?ip=${server.ip}`);
-    const health = await resStatus.json();
-    serverHealth.push(health);
   }
-  return { servers, serverHealth }; //Packed into an object
+  return { servers }; //Packed into an object
 };
