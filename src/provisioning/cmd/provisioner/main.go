@@ -62,7 +62,7 @@ func main() {
 	serverService := services.NewServerService(serverStore)
 	userService := services.NewUserService(userStore)
 	floatingIpService := services.NewFloatingIPService(ipStore)
-	minecraftProvisionerService := services.NewMinecraftProvisioner(database, openstack, cfg.CryptoConfig.EncryptionKey)
+	minecraftProvisionerService := services.NewMinecraftProvisioner(database, openstack, l, cfg.CryptoConfig.EncryptionKey)
 
 	router := gin.Default()
 
