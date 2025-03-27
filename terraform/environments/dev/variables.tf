@@ -45,32 +45,6 @@ variable "auth_client_secret" {
   type        = string
 }
 
-variable "external_network_name" {
-  description = "ID of the OpenStack external network to use"
-  type        = string
-}
-
-variable "backend_image_id" {
-  description = "The Cloud Image to use for the Backend Instance"
-  type        = string
-}
-
-variable "backend_flavor_id" {
-  description = "The Flavor ID to use for the Backend Instance"
-  type        = string
-}
-
-variable "backend_network_name" {
-  description = "Name of the network for the Backend servers"
-  type        = string
-  default     = "backend-network"
-}
-
-variable "backend_subnet_name" {
-  description = "Name of the subnet dedicated for Backend services"
-  type        = string
-  default     = "backend-subnet"
-}
 
 variable "backend_subnet_cidr" {
   description = "CIDR Notation of backend subnet address and mask"
@@ -78,41 +52,9 @@ variable "backend_subnet_cidr" {
   default     = "10.10.10.16/28"
 }
 
-variable "backend_security_group_name" {
-  description = "Name of the security group for the backend"
-  type        = string
-  default     = "backend-sg"
-}
-
-variable "backend_router_name" {
-  description = "Name of the router for the backend"
-  type        = string
-}
-
-variable "backend_loadbalancer_name" {
-  description = "Name of the loadbalancer for the backend"
-  type        = string
-}
-
-variable "backend_db_host" {
-  description = "Hostname where a PostgreSQL Database is reachable for the backend"
-  type        = string
-}
-
 variable "backend_db_port" {
   description = "Port of the PostgreSQL Database"
   type        = string
-}
-
-variable "backend_db_user" {
-  description = "Username of the Database user to use"
-  type        = string
-}
-
-variable "backend_db_password" {
-  description = "Password of the Database user to use"
-  type        = string
-  sensitive   = true
 }
 
 variable "backend_db_cidr" {

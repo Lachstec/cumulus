@@ -48,16 +48,6 @@ module "backend" {
 
   depends_on = [module.database]
 
-  # Backend instance configuration
-  backend_image_id            = var.backend_image_id
-  backend_flavor_id           = var.backend_flavor_id
-  backend_network_name        = var.backend_network_name
-  backend_subnet_name         = var.backend_subnet_name
-  backend_subnet_cidr         = var.backend_subnet_cidr
-  backend_security_group_name = var.backend_security_group_name
-  backend_router_name         = var.backend_router_name
-  backend_loadbalancer_name   = var.backend_loadbalancer_name
-
   backend_db_host     = module.database.pgpool_ip
   backend_db_port     = var.backend_db_port
   backend_db_user     = "pgpool"
