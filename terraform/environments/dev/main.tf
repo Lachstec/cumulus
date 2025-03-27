@@ -60,8 +60,8 @@ module "backend" {
 
   backend_db_host     = module.database.pgpool_ip
   backend_db_port     = var.backend_db_port
-  backend_db_user     = var.pgpool_user
-  backend_db_password = var.pgpool_password
+  backend_db_user     = "pgpool"
+  backend_db_password = module.database.postgres_password
   backend_db_cidr     = module.database.pg_subnet_cidr
 
   # OpenStack authentication

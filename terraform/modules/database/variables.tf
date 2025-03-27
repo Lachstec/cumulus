@@ -63,33 +63,6 @@ variable "pgpool_security_group_name" {
   default     = "pgpool-sg"
 }
 
-##############################
-# Database User
-##############################
-variable "postgres_user" {
-  description = "Name of the postgres user that should get created"
-  type        = string
-  default = "pguser"
-}
-
-variable "postgres_password" {
-  description = "Password of the postgres user that should get created"
-  type        = string
-  default = "pgpassword"
-}
-
-variable "pgpool_user" {
-  type        = string
-  description = "The user for Pgpool health checks"
-  default = "pgpooluser"
-}
-
-variable "pgpool_password" {
-  type        = string
-  description = "The password for Pgpool health checks"
-  default = "pgpoolpassword"
-}
-
 variable "backend_cidr" {
   description = "CIDR for the backend subnet"
   type        = string

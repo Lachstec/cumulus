@@ -22,3 +22,8 @@ output "pg_subnet_cidr" {
   description = "CIDR of the dedicated PostgreSQL subnet"
   value       = openstack_networking_subnet_v2.pg_subnet.cidr
 }
+
+output "postgres_password" {
+  description = "password for the postgres database workers"
+  value = random_password.postgres_password
+}
