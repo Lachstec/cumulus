@@ -10,7 +10,7 @@ module "floating_ips" {
     openstack = openstack
   }
 
-  external_network_name = var.external_network_name
+  external_network_name = "ext_net"
 }
 
 module "auth0" {
@@ -51,7 +51,7 @@ module "backend" {
   backend_db_host     = module.database.pgpool_ip
   backend_db_port     = var.backend_db_port
   backend_db_user     = "pgpool"
-  backend_db_password = module.database.postgres_password
+  backend_db_password = module.database.postgres_password.result
   backend_db_cidr     = module.database.pg_subnet_cidr
 
   # OpenStack authentication

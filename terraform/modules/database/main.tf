@@ -174,9 +174,9 @@ resource "openstack_compute_instance_v2" "pgsql" {
 
   user_data = templatefile("${path.module}/postgres-init.sh.tpl", {
     pg_user              = "postgres"
-    pg_password          = random_password.postgres_password
+    pg_password          = random_password.postgres_password.result
     pgpool_user          = "pgpool"
-    pgpool_password      = random_password.postgres_password
+    pgpool_password      = random_password.postgres_password.result
     postgres_subnet_cidr = var.postgres_subnet_cidr
   })
 }
@@ -207,7 +207,7 @@ resource "openstack_compute_instance_v2" "pgpool" {
 
   user_data = templatefile("${path.module}/pgpool-init.sh.tpl", {
     pgpool_user          = "pgpool"
-    pgpool_password      = random_password.postgres_password
+    pgpool_password      = random_password.postgres_password.result
     postgres_subnet_cidr = var.postgres_subnet_cidr
     pgsql_nodes          = join(",", openstack_compute_instance_v2.pgsql[*].network[0].fixed_ip_v4)
   })
