@@ -4,11 +4,13 @@
 variable "postgres_image_id" {
   description = "Image ID for postgres database nodes"
   type        = string
+  default = "d6d1835c-7180-4ca9-b4a1-470afbd8b398"
 }
 
 variable "postgres_flavor_id" {
   description = "Flavor ID for postgres database nodes"
   type        = string
+  default = "3"
 }
 
 ##############################
@@ -17,11 +19,13 @@ variable "postgres_flavor_id" {
 variable "pgpool_image_id" {
   description = "Image ID for pgpool node"
   type        = string
+  default = "d6d1835c-7180-4ca9-b4a1-470afbd8b398"
 }
 
 variable "pgpool_flavor_id" {
   description = "Flavor ID for pgpool node"
   type        = string
+  default = 3
 }
 
 ##############################
@@ -65,21 +69,25 @@ variable "pgpool_security_group_name" {
 variable "postgres_user" {
   description = "Name of the postgres user that should get created"
   type        = string
+  default = "pguser"
 }
 
 variable "postgres_password" {
   description = "Password of the postgres user that should get created"
   type        = string
+  default = "pgpassword"
 }
 
 variable "pgpool_user" {
   type        = string
   description = "The user for Pgpool health checks"
+  default = "pgpooluser"
 }
 
 variable "pgpool_password" {
   type        = string
   description = "The password for Pgpool health checks"
+  default = "pgpoolpassword"
 }
 
 variable "backend_cidr" {
