@@ -23,8 +23,7 @@ resource "tls_private_key" "generated" {
 
 resource "random_password" "postgres_password" {
   length           = 16
-  special          = true
-  override_special = "!@#"
+  special          = false
 }
 
 resource "openstack_compute_keypair_v2" "keypair" {
