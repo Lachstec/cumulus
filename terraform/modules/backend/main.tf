@@ -204,7 +204,7 @@ resource "openstack_compute_instance_v2" "backend_servers" {
     OPENSTACK_DOMAIN            = var.openstack_domain_name
     OPENSTACK_TENANT_NAME       = var.openstack_tenant
     CRYPTO_KEY                  = var.backend_crypto_key
-    TRACE_ENDPOINT              = format("%s:3100/loki/api/v1/push", openstack_compute_instance_v2.loki_servers[0].access_ip_v4)
+    TRACE_ENDPOINT              = format("http://%s:3100/otlp/v1/logs", openstack_compute_instance_v2.loki_servers[0].access_ip_v4)
     TRACE_SERVICENAME           = "provisioner_backend"
     AUTH0_URL                   = var.backend_auth0_url
     AUTH0_SECRET                = var.backend_auth0_clientid
