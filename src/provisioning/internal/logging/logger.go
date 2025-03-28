@@ -25,7 +25,7 @@ var exporter *otlploghttp.Exporter
 func Get(cfg config.Config) *logrus.Logger {
 	once.Do(func() {
 		ctx := context.Background()
-		ex, _ := otlploghttp.New(ctx, otlploghttp.WithEndpoint(cfg.TracingConfig.Endpoint), otlploghttp.WithInsecure())
+		ex, _ := otlploghttp.New(ctx, otlploghttp.WithEndpointURL(cfg.TracingConfig.Endpoint), otlploghttp.WithInsecure())
 		exporter = ex
 		processor := olog.NewSimpleProcessor(exporter)
 
