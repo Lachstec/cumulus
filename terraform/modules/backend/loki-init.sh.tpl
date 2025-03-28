@@ -69,6 +69,39 @@ docker run -d --name loki --network loki-net -p 3100:3100 grafana/loki:3.3.2 \
   -config.expand-env=true \
   -config.file=/etc/loki/local-config.yaml || true
 
+cat <<EOL > /tmp/mimir-config.yaml
+# Basic Mimir configuration example. Adjust these settings as needed.
+server:
+  http_listen_port: 9009
+
+common:
+  storage:
+    backend: swift
+    swift:
+      auth_url: "${openstack_auth_url}"
+      username: "${openstack_username}"
+      user_domain_name: "${openstack_domain_name}"
+      password: "${openstack_password}"
+      project_name: "${openstack_username}"
+      domain_name: Default
+      insecure_skip_verify: true
+
+# Example storage and runtime configuration:
+
+blocks_storage:
+  swift:
+    container_name: mimir
+
+
+# Additional Mimir specific settings can be added here.
+EOL
+
+echo "==== Starting Mimir Container ===="
+docker run -d --name mimir --network loki-net -p 9009:9009 \
+  -v /tmp/mimir-config.yaml:/etc/mimir/config.yaml \
+  grafana/mimir:latest
+
+
 echo "==== Creating Grafana datasource file ===="
 cat <<EOL > /tmp/datasource.yaml
 apiVersion: 1
