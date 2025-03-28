@@ -10,7 +10,7 @@ module "floating_ips" {
     openstack = openstack
   }
 
-  external_network_name = var.external_network_name
+  external_network_name = "ext_net"
 }
 
 module "auth0" {
@@ -35,14 +35,6 @@ module "database" {
     tls       = tls
   }
 
-  postgres_image_id  = var.postgres_image_id
-  postgres_flavor_id = var.postgres_flavor_id
-  pgpool_image_id    = var.pgpool_image_id
-  pgpool_flavor_id   = var.pgpool_flavor_id
-  postgres_user      = var.postgres_user
-  postgres_password  = var.postgres_password
-  pgpool_user        = var.pgpool_user
-  pgpool_password    = var.pgpool_password
   backend_cidr       = var.backend_subnet_cidr
 }
 
@@ -56,20 +48,10 @@ module "backend" {
 
   depends_on = [module.database]
 
-  # Backend instance configuration
-  backend_image_id            = var.backend_image_id
-  backend_flavor_id           = var.backend_flavor_id
-  backend_network_name        = var.backend_network_name
-  backend_subnet_name         = var.backend_subnet_name
-  backend_subnet_cidr         = var.backend_subnet_cidr
-  backend_security_group_name = var.backend_security_group_name
-  backend_router_name         = var.backend_router_name
-  backend_loadbalancer_name   = var.backend_loadbalancer_name
-
   backend_db_host     = module.database.pgpool_ip
   backend_db_port     = var.backend_db_port
-  backend_db_user     = var.pgpool_user
-  backend_db_password = var.pgpool_password
+  backend_db_user     = "pgpool"
+  backend_db_password = module.database.postgres_password.result
   backend_db_cidr     = module.database.pg_subnet_cidr
 
   # OpenStack authentication

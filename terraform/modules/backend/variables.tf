@@ -1,11 +1,13 @@
 variable "backend_image_id" {
   description = "The Cloud Image to use for the Backend Instance"
   type        = string
+  default = "d6d1835c-7180-4ca9-b4a1-470afbd8b398"
 }
 
 variable "backend_flavor_id" {
   description = "The Flavor ID to use for the Backend Instance"
   type        = string
+  default = "3"
 }
 
 variable "backend_network_name" {
@@ -34,12 +36,14 @@ variable "backend_security_group_name" {
 
 variable "backend_router_name" {
     description = "Name of the router for the backend"
-  type        = string
+    type        = string
+  default = "backend-router"
 }
 
 variable "backend_loadbalancer_name" {
   description = "Name of the loadbalancer for the backend"
   type        = string
+  default = "backend-loadbalancer"
 }
 
 variable "backend_db_host" {
