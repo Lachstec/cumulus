@@ -27,7 +27,7 @@ func dbInit(cfg config.DbConfig, logger *logrus.Logger) *sqlx.DB {
 		logger.WithContext(ctx).Fatal("failed to create database schema")
 	}
 
-	logger.Info("database connected and initialized")
+	logger.WithContext(ctx).Info("database connected and initialized")
 	return s
 }
 

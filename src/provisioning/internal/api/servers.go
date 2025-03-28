@@ -12,7 +12,7 @@ func (h *Handler) GetServers(c *gin.Context) {
 	servers, err := h.ServerService.ReadAllServers()
 
 	if err != nil {
-		h.Logger.Warn("failed to fetch servers from database")
+		h.Logger.WithContext(c).Warn("failed to fetch servers from database")
 		h.respondError(c, http.StatusInternalServerError, "failed to retrieve servers", err.Error())
 		return
 	}
@@ -24,7 +24,7 @@ func (h *Handler) CreateServer(c *gin.Context) {
 	var server types.Server
 	err := BindJSONStrict(c, &server)
 	if err != nil {
-		h.Logger.Warn("invalid server payload")
+		h.Logger.WithContext(c).Warn("invalid server payload")
 		h.respondError(c, http.StatusBadRequest, "invalid server payload", err.Error())
 		return
 	}
@@ -38,7 +38,7 @@ func (h *Handler) CreateServer(c *gin.Context) {
 
 	srv, err := h.Provisioner.NewGameServer(c, &server, &user)
 	if err != nil {
-		h.Logger.Error("failed to create game server")
+		h.Logger.WithContext(c).Error("failed to create game server")
 		h.respondError(c, http.StatusInternalServerError, "failed to create new game server", err.Error())
 	}
 
@@ -51,14 +51,14 @@ func (h *Handler) GetServerById(c *gin.Context) {
 
 	serverid, err := strconv.ParseInt(param, 10, 64)
 	if err != nil {
-		h.Logger.Warn("failed to extract server id from request")
+		h.Logger.WithContext(c).Warn("failed to extract server id from request")
 		h.respondError(c, http.StatusBadRequest, "expected server id in url param", err.Error())
 		return
 	}
 
 	servers, err := h.ServerService.ReadServerByServerID(serverid)
 	if err != nil {
-		h.Logger.Warn("failed to retrieve server from database")
+		h.Logger.WithContext(c).Warn("failed to retrieve server from database")
 		h.respondError(c, http.StatusInternalServerError, "failed to retrieve server", err.Error())
 		return
 	}
@@ -78,14 +78,14 @@ func (h *Handler) StartServerById(c *gin.Context) {
 
 	serverid, err := strconv.ParseInt(param, 10, 64)
 	if err != nil {
-		h.Logger.Warn("failed to extract server id from request")
+		h.Logger.WithContext(c).Warn("failed to extract server id from request")
 		h.respondError(c, http.StatusBadRequest, "expected server id in url param", err.Error())
 		return
 	}
 
 	servers, err := h.ServerService.ReadServerByServerID(serverid)
 	if err != nil {
-		h.Logger.Warn("failed to retrieve server from database")
+		h.Logger.WithContext(c).Warn("failed to retrieve server from database")
 		h.respondError(c, http.StatusInternalServerError, "failed to retrieve server", err.Error())
 		return
 	}
@@ -113,14 +113,14 @@ func (h *Handler) UpdateServerById(c *gin.Context) {
 
 	serverid, err := strconv.ParseInt(param, 10, 64)
 	if err != nil {
-		h.Logger.Warn("failed to extract server id from request")
+		h.Logger.WithContext(c).Warn("failed to extract server id from request")
 		h.respondError(c, http.StatusBadRequest, "expected server id in url param", err.Error())
 		return
 	}
 
 	servers, err := h.ServerService.ReadServerByServerID(serverid)
 	if err != nil {
-		h.Logger.Warn("failed to retrieve server from database")
+		h.Logger.WithContext(c).Warn("failed to retrieve server from database")
 		h.respondError(c, http.StatusInternalServerError, "failed to retrieve server", err.Error())
 		return
 	}
@@ -134,13 +134,13 @@ func (h *Handler) UpdateServerById(c *gin.Context) {
 
 	err = BindJSONStrict(c, server)
 	if err != nil {
-		h.Logger.Warn("invalid server payload")
+		h.Logger.WithContext(c).Warn("invalid server payload")
 		h.respondError(c, http.StatusUnprocessableEntity, "server payload not valid", err.Error())
 	}
 
 	srv, err := h.ServerService.UpdateServer(server)
 	if err != nil {
-		h.Logger.Warn("failed to update server from database")
+		h.Logger.WithContext(c).Warn("failed to update server from database")
 		h.respondError(c, http.StatusInternalServerError, "failed to update server", nil)
 		return
 	}
@@ -153,14 +153,14 @@ func (h *Handler) DeleteServerById(c *gin.Context) {
 
 	serverid, err := strconv.ParseInt(param, 10, 64)
 	if err != nil {
-		h.Logger.Warn("failed to extract server id from request")
+		h.Logger.WithContext(c).Warn("failed to extract server id from request")
 		h.respondError(c, http.StatusBadRequest, "expected server id in url param", err.Error())
 		return
 	}
 
 	servers, err := h.ServerService.ReadServerByServerID(serverid)
 	if err != nil {
-		h.Logger.Warn("failed to retrieve server from database")
+		h.Logger.WithContext(c).Warn("failed to retrieve server from database")
 		h.respondError(c, http.StatusInternalServerError, "failed to retrieve server", err.Error())
 		return
 	}
@@ -174,7 +174,7 @@ func (h *Handler) DeleteServerById(c *gin.Context) {
 	err = h.ServerService.DeleteServer(server)
 
 	if err != nil {
-		h.Logger.Warn("failed to delete server from database")
+		h.Logger.WithContext(c).Warn("failed to delete server from database")
 		h.respondError(c, http.StatusInternalServerError, "failed to delete server", err.Error())
 		return
 	}
@@ -187,7 +187,7 @@ func (h *Handler) GetIpByServerId(c *gin.Context) {
 
 	serverid, err := strconv.ParseInt(param, 10, 64)
 	if err != nil {
-		h.Logger.Warn("failed to extract server id from request")
+		h.Logger.WithContext(c).Warn("failed to extract server id from request")
 		h.respondError(c, http.StatusBadRequest, "expected server id in url param", err.Error())
 		return
 	}
@@ -195,7 +195,7 @@ func (h *Handler) GetIpByServerId(c *gin.Context) {
 	ip, err := h.FloatingIPService.ReadIpByServerID(serverid)
 
 	if err != nil {
-		h.Logger.Warn("failed to retrieve floating ip for server from database")
+		h.Logger.WithContext(c).Warn("failed to retrieve floating ip for server from database")
 		h.respondError(c, http.StatusInternalServerError, "failed to retrieve server ip address", err.Error())
 		return
 	}
