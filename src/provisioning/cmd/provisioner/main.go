@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"github.com/Lachstec/mc-hosting/internal/api"
 	"github.com/Lachstec/mc-hosting/internal/config"
 	"github.com/Lachstec/mc-hosting/internal/db"
@@ -15,14 +16,15 @@ import (
 
 func dbInit(cfg config.DbConfig, logger *logrus.Logger) *sqlx.DB {
 	s, err := sqlx.Open("pgx", cfg.ConnectionURI())
+	ctx := context.Background()
 	if err != nil {
-		logger.Fatal("failed to connect to backend database")
+		logger.WithContext(ctx).Fatal("failed to connect to backend database")
 	}
 	mig := db.NewMigrator(s)
 
 	err = mig.Migrate("./migrations")
 	if err != nil {
-		logger.Fatal("failed to create database schema")
+		logger.WithContext(ctx).Fatal("failed to create database schema")
 	}
 
 	logger.Info("database connected and initialized")

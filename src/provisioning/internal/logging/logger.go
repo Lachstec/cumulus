@@ -75,7 +75,7 @@ func LoggingMiddleware(cfg config.LoggingConfig) gin.HandlerFunc {
 		ctx.Next()
 
 		// Log the request details.
-		Get(config.Config{LoggingConfig: cfg}).WithFields(logrus.Fields{
+		Get(config.Config{LoggingConfig: cfg}).WithContext(ctx).WithFields(logrus.Fields{
 			"method":      ctx.Request.Method,
 			"url":         ctx.Request.RequestURI,
 			"user_agent":  ctx.Request.UserAgent(),
