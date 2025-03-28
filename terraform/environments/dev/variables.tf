@@ -68,16 +68,6 @@ variable "backend_crypto_key" {
   sensitive   = true
 }
 
-variable "backend_tracing_endpoint" {
-  description = "Endpoint where Logs can be sent to"
-  type        = string
-}
-
-variable "backend_tracing_service_name" {
-  description = "The service name to use when sending logs"
-  type        = string
-}
-
 variable "backend_port" {
   description = "Port under which the API listens for connections"
   type        = string
