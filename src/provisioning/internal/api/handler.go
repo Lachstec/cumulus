@@ -3,7 +3,7 @@ package api
 import (
 	"github.com/Lachstec/mc-hosting/internal/services"
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog"
+	"github.com/sirupsen/logrus"
 )
 
 type Handler struct {
@@ -11,7 +11,7 @@ type Handler struct {
 	ServerService     services.ServerService
 	Provisioner       services.MinecraftProvisioner
 	FloatingIPService services.FloatingIPService
-	Logger            *zerolog.Logger
+	Logger            *logrus.Logger
 }
 
 func (h *Handler) respondSuccess(c *gin.Context, code int, data interface{}) {
