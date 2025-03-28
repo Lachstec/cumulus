@@ -65,10 +65,6 @@ module "backend" {
   # Encryption & Security
   backend_crypto_key = var.backend_crypto_key
 
-  # Logging & Monitoring
-  backend_tracing_endpoint     = var.backend_tracing_endpoint
-  backend_tracing_service_name = var.backend_tracing_service_name
-
   # API configuration
   backend_port = var.backend_port
 

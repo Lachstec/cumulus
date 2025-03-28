@@ -10,22 +10,22 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
-	"github.com/rs/zerolog"
+	"github.com/sirupsen/logrus"
 )
 
-func dbInit(cfg config.DbConfig, logger zerolog.Logger) *sqlx.DB {
+func dbInit(cfg config.DbConfig, logger *logrus.Logger) *sqlx.DB {
 	s, err := sqlx.Open("pgx", cfg.ConnectionURI())
 	if err != nil {
-		logger.Fatal().Err(err).Msg("failed to connect to backend database")
+		logger.Fatal("failed to connect to backend database")
 	}
 	mig := db.NewMigrator(s)
 
 	err = mig.Migrate("./migrations")
 	if err != nil {
-		logger.Fatal().Err(err).Msg("failed to create database schema")
+		logger.Fatal("failed to create database schema")
 	}
 
-	logger.Info().Msg("database connected and initialized")
+	logger.Info("database connected and initialized")
 	return s
 }
 
@@ -37,7 +37,7 @@ func main() {
 
 	openstack, err := openstack.NewClient(cfg)
 	if err != nil {
-		l.Fatal().Err(err).Msg("failed to connect to openstack")
+		l.Fatal("failed to connect to openstack")
 	}
 
 	serverStore := db.NewServerStore(database)
@@ -57,7 +57,7 @@ func main() {
 	handler := &api.Handler{
 		UserService:       *userService,
 		ServerService:     *serverService,
-		Logger:            &l,
+		Logger:            l,
 		FloatingIPService: *floatingIpService,
 		Provisioner:       *minecraftProvisionerService,
 	}

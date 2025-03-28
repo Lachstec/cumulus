@@ -12,7 +12,7 @@ func (h *Handler) GetUsers(c *gin.Context) {
 	users, err := h.UserService.ReadAllUsers()
 
 	if err != nil {
-		h.Logger.Error().Err(err).Msg("failed to fetch users from database")
+		h.Logger.Error("failed to fetch users from database")
 		h.respondError(c, http.StatusInternalServerError, "failed to retrieve users from database", err.Error())
 		return
 	}
@@ -24,14 +24,14 @@ func (h *Handler) CreateUser(c *gin.Context) {
 	var user types.User
 	err := BindJSONStrict(c, &user)
 	if err != nil {
-		h.Logger.Warn().Err(err).Msg("invalid payload for new user")
+		h.Logger.Warn("invalid payload for new user")
 		h.respondError(c, http.StatusUnprocessableEntity, "user cannot be created from request", err.Error())
 		return
 	}
 
 	userid, err := h.UserService.CreateUser(&user)
 	if err != nil {
-		h.Logger.Warn().Err(err).Msg("invalid payload for new user")
+		h.Logger.Warn("invalid payload for new user")
 		h.respondError(c, http.StatusInternalServerError, "failed to create user", err.Error())
 		return
 	}
@@ -45,14 +45,14 @@ func (h *Handler) GetUserById(c *gin.Context) {
 
 	userid, err := strconv.ParseInt(param, 10, 64)
 	if err != nil {
-		h.Logger.Warn().Err(err).Msg("failed to extract user id from request")
+		h.Logger.Warn("failed to extract user id from request")
 		h.respondError(c, http.StatusBadRequest, "expected user id in url param", err.Error())
 		return
 	}
 
 	users, err := h.UserService.ReadUserByUserID(userid)
 	if err != nil {
-		h.Logger.Warn().Err(err).Msg("failed to retrieve user from database")
+		h.Logger.Warn("failed to retrieve user from database")
 		h.respondError(c, http.StatusInternalServerError, "failed to retrieve user from database", err.Error())
 		return
 	}
@@ -70,14 +70,14 @@ func (h *Handler) UpdateUserById(c *gin.Context) {
 
 	userid, err := strconv.ParseInt(param, 10, 64)
 	if err != nil {
-		h.Logger.Warn().Err(err).Msg("failed to extract user id from request")
+		h.Logger.Warn("failed to extract user id from request")
 		h.respondError(c, http.StatusBadRequest, "expected user id in url param", err.Error())
 		return
 	}
 
 	users, err := h.UserService.ReadUserByUserID(userid)
 	if err != nil {
-		h.Logger.Warn().Err(err).Msg("failed to retrieve user from database")
+		h.Logger.Warn("failed to retrieve user from database")
 		h.respondError(c, http.StatusInternalServerError, "failed to retrieve user", err.Error())
 		return
 	}
@@ -92,14 +92,14 @@ func (h *Handler) UpdateUserById(c *gin.Context) {
 	err = BindJSONStrict(c, user)
 
 	if err != nil {
-		h.Logger.Error().Err(err).Msg("user returned from database does not match expected schema")
+		h.Logger.Error("user returned from database does not match expected schema")
 		h.respondError(c, http.StatusInternalServerError, "failed to retrieve user", err.Error())
 		return
 	}
 
 	updated, err := h.UserService.UpdateUser(user)
 	if err != nil {
-		h.Logger.Warn().Err(err).Int64("userid", user.ID).Msg("failed to update user in database")
+		h.Logger.Warn("failed to update user in database")
 		h.respondError(c, http.StatusInternalServerError, "failed to update user", err.Error())
 		return
 	}
@@ -113,14 +113,14 @@ func (h *Handler) DeleteUserById(c *gin.Context) {
 
 	userid, err := strconv.ParseInt(param, 10, 64)
 	if err != nil {
-		h.Logger.Warn().Err(err).Msg("failed to extract user id from request")
+		h.Logger.Warn("failed to extract user id from request")
 		h.respondError(c, http.StatusBadRequest, "expected user id in url param", err.Error())
 		return
 	}
 
 	users, err := h.UserService.ReadUserByUserID(userid)
 	if err != nil {
-		h.Logger.Warn().Err(err).Msg("failed to retrieve user from database")
+		h.Logger.Warn("failed to retrieve user from database")
 		h.respondError(c, http.StatusInternalServerError, "failed to retrieve user", err.Error())
 		return
 	}
@@ -133,7 +133,7 @@ func (h *Handler) DeleteUserById(c *gin.Context) {
 	user := users[0]
 	err = h.UserService.DeleteUser(user)
 	if err != nil {
-		h.Logger.Warn().Err(err).Msg("failed to delete user from database")
+		h.Logger.Warn("failed to delete user from database")
 		h.respondError(c, http.StatusInternalServerError, "failed to delete user", err.Error())
 		return
 	}
@@ -147,14 +147,14 @@ func (h *Handler) ServersOfUser(c *gin.Context) {
 
 	userid, err := strconv.ParseInt(param, 10, 64)
 	if err != nil {
-		h.Logger.Warn().Err(err).Msg("failed to extract user id from request")
+		h.Logger.Warn("failed to extract user id from request")
 		h.respondError(c, http.StatusBadRequest, "expected user id in url param", err.Error())
 		return
 	}
 
 	servers, err := h.ServerService.ReadServerByUserID(userid)
 	if err != nil {
-		h.Logger.Warn().Err(err).Msg("failed to fetch servers for given user")
+		h.Logger.Warn("failed to fetch servers for given user")
 		h.respondError(c, http.StatusInternalServerError, "failed to retrieve servers", err.Error())
 		return
 	}
