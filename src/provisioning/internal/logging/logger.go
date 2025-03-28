@@ -19,13 +19,14 @@ import (
 var once sync.Once
 var logger *logrus.Logger
 var provider log.LoggerProvider
-var exporter otlploghttp.Exporter
+var exporter *otlploghttp.Exporter
 
 // Get initializes and returns a logrus.Logger instance based on the provided config.
 func Get(cfg config.Config) *logrus.Logger {
 	once.Do(func() {
 		ctx := context.Background()
-		exporter, _ := otlploghttp.New(ctx, otlploghttp.WithEndpoint(cfg.TracingConfig.Endpoint), otlploghttp.WithInsecure())
+		ex, _ := otlploghttp.New(ctx, otlploghttp.WithEndpoint(cfg.TracingConfig.Endpoint), otlploghttp.WithInsecure())
+		exporter = ex
 		processor := olog.NewSimpleProcessor(exporter)
 
 		logger = logrus.New()
