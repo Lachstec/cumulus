@@ -1,0 +1,12 @@
+services:
+    frontend:
+    container_name: frontend
+    depends_on:
+      - backend
+    image: ghcr.io/drop-table-team/frontend:latest
+    env_file:
+      - .env
+    networks:
+      - net
+    ports:
+      - "http://localhost:3000"
